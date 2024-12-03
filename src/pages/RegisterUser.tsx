@@ -15,8 +15,12 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import { GoogleIcon, FacebookIcon } from "../assets/icons/CustomIcons";
 import { registrationSchema } from "../validation/schema";
-import axios from "axios";
+import axios from "../utils/axiosConfig";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { useNavigate } from "react-router-dom";
+import { Alert, IconButton, Snackbar } from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { AxiosError, AxiosResponse } from "axios";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -79,6 +83,12 @@ interface FormData {
   };
 }
 
+interface SnackbarState {
+  error: boolean;
+  message: string;
+  isOpen: boolean;
+}
+
 const RegisterUser = () => {
   const [formData, setFormData] = useState<FormData>({
     name: {
@@ -98,8 +108,15 @@ const RegisterUser = () => {
       errorMsg: "",
     },
   });
+  const snackbarState = {
+    error: false,
+    message: "",
+    isOpen: false,
+  };
   const [allowMarketing, setMarketing] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState<SnackbarState>(snackbarState);
+  const navigate = useNavigate();
 
   const validateInputs = (type?: FormInput): boolean => {
     const validationData = {
@@ -108,6 +125,8 @@ const RegisterUser = () => {
       password: formData.password.value,
       confirm: formData.confirm.value,
     };
+
+    setSnackbar(snackbarState);
 
     // get validation errors from joi validation library
     const { error } = registrationSchema.validate(validationData, {
@@ -172,17 +191,28 @@ const RegisterUser = () => {
     if (!isValid) return;
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_API}/api/user/register`,
-        {
-          name: formData.name.value,
-          email: formData.email.value,
-          password: formData.password.value,
-        }
-      );
+      const res = await axios.post(`/api/user/register`, {
+        name: formData.name.value,
+        email: formData.email.value,
+        password: formData.password.value,
+      });
+      setSnackbar({
+        error: false,
+        message: "User successfully registered",
+        isOpen: true,
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
       console.log(res);
     } catch (err) {
-      console.error(err);
+      const message = (err as any).response.data.message;
+      console.log(err);
+      setSnackbar({
+        error: true,
+        message: message || "Unable to complete registration",
+        isOpen: true,
+      });
     }
     setLoading(false);
   };
@@ -245,8 +275,8 @@ const RegisterUser = () => {
                 })
               }
               onBlur={() => validateInputs("email")}
-              error={!!formData.email.errorMsg}
-              helperText={formData.email.errorMsg}
+              error={!!formData.email.errorMsg || snackbar.error}
+              helperText={formData.email.errorMsg || snackbar.message}
               color={!!formData.email.errorMsg ? "error" : "primary"}
             />
             <TextField
@@ -311,10 +341,11 @@ const RegisterUser = () => {
               type="submit"
               fullWidth
               variant="contained"
+              color={snackbar.error ? "error" : "primary"}
               onClick={handleSubmit}
               loading={isLoading}
             >
-              Sign up
+              {snackbar.error ? snackbar.message : "Sign up"}
             </LoadingButton>
             <Typography sx={{ textAlign: "center" }}>
               Already have an account?{" "}
@@ -352,6 +383,17 @@ const RegisterUser = () => {
           </Box>
         </Card>
       </SignUpContainer>
+      <Snackbar
+        open={snackbar.isOpen}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        autoHideDuration={2500}
+        onClose={() => setSnackbar({ ...snackbar, isOpen: false })}
+        message={snackbar.message}
+      >
+        <Alert severity={snackbar.error ? "error" : "success"}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

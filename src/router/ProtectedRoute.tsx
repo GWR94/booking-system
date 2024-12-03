@@ -1,16 +1,20 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+// PrivateRoute.tsx
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-interface ProtectedRouteProps {
-  isAuthenticated: boolean;
-  children: React.ReactNode;
-}
+const PrivateRoute: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  isAuthenticated,
-  children,
-}) => {
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default PrivateRoute;

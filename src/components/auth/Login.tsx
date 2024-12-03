@@ -1,10 +1,11 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
-import { GoogleIcon, FacebookIcon } from "../assets/icons/CustomIcons";
-import { loginSchema } from "../validation/schema";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { GoogleIcon, FacebookIcon } from "../../assets/icons/CustomIcons";
+import { loginSchema } from "../../validation/schema";
+import axios from "../../utils/axiosConfig";
+import { isAxiosError } from "axios";
+import { useNavigate } from "react-router-dom";
 import { Alert, LoadingButton } from "@mui/lab";
 import {
   Stack,
@@ -12,6 +13,7 @@ import {
   CssBaseline,
   Typography,
   Box,
+  Link,
   TextField,
   FormControlLabel,
   Checkbox,
@@ -19,6 +21,7 @@ import {
   Button,
   Card as MuiCard,
 } from "@mui/material";
+import { useAuth } from "../../context/AuthContext";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -77,6 +80,7 @@ interface FormData {
 }
 
 const Login = () => {
+  const { user, login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -105,27 +109,19 @@ const Login = () => {
 
   const handleLegacySignin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     const isValid = validateInputs();
     if (!isValid) return;
     const { email, password } = formData;
-    setLoading(true);
     try {
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BACKEND_API}/api/user/login`,
-        {
-          email: email.value,
-          password: password.value,
-        }
-      );
-      localStorage.setItem("jwtToken", data.token);
-      setAlertOpen(true);
-      navigate("/book");
-    } catch (err) {
-      setAlertError(true);
-      setAlertOpen(true);
+      await login({
+        email: email.value,
+        password: password.value,
+      });
       setTimeout(() => {
-        setAlertError(false);
-      }, 2000);
+        navigate("/book");
+      }, 1500);
+    } catch (err) {
       console.error(err);
     }
     setLoading(false);
@@ -146,8 +142,6 @@ const Login = () => {
     const { error } = loginSchema.validate(validationData, {
       abortEarly: false,
     });
-
-    console.log(error);
 
     if (error) {
       const updatedFormData: FormData = { ...formData };
@@ -199,24 +193,16 @@ const Login = () => {
     }
   };
 
+  const { email, password } = formData;
+
+  const shouldDisable =
+    !email.value.length ||
+    !password.value.length ||
+    email.errorMsg.length > 0 ||
+    password.errorMsg.length > 0;
+
   return (
     <>
-      <Snackbar
-        open={alertOpen}
-        autoHideDuration={2000}
-        onClose={() => setAlertOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity={alertError ? "error" : "success"}
-          variant="outlined"
-          sx={{ width: "100%" }}
-        >
-          {alertError
-            ? "Unable to login. Please check email and password."
-            : "Logged in successfully"}
-        </Alert>
-      </Snackbar>
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
@@ -238,13 +224,13 @@ const Login = () => {
             }}
           >
             <TextField
-              error={!!formData.email.errorMsg}
-              helperText={formData.email.errorMsg}
+              error={!!email.errorMsg}
+              helperText={email.errorMsg}
               id="email"
               type="email"
               name="email"
               label="Email Address"
-              value={formData.email.value}
+              value={email.value}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -261,18 +247,18 @@ const Login = () => {
               required
               fullWidth
               variant="outlined"
-              color={!!formData.email.errorMsg ? "error" : "primary"}
+              color={!!email.errorMsg ? "error" : "primary"}
               sx={{ ariaLabel: "email" }}
             />
             <TextField
-              error={!!formData.password.errorMsg}
-              helperText={formData.password.errorMsg}
+              error={!!password.errorMsg}
+              helperText={password.errorMsg}
               name="password"
               placeholder="••••••"
               type="password"
               id="password"
               label="Password"
-              value={formData.password.value}
+              value={password.value}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -287,7 +273,7 @@ const Login = () => {
               required
               fullWidth
               variant="outlined"
-              color={!!formData.password.errorMsg ? "error" : "primary"}
+              color={!!password.errorMsg ? "error" : "primary"}
             />
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <Link
@@ -310,6 +296,7 @@ const Login = () => {
               fullWidth
               loading={isLoading}
               variant="contained"
+              disabled={shouldDisable}
               color={alertError ? "error" : "primary"}
               onClick={(e) => handleLegacySignin(e)}
             >

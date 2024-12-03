@@ -1,35 +1,27 @@
 // src/App.tsx
-import React, { useEffect, useState } from "react";
+import { FC } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "../components/Login";
+import Login from "../components/auth/Login";
 import Booking from "../pages/Booking";
 import RegisterUser from "../pages/RegisterUser";
-import Dashboard from "../pages/Dashboard";
-import NavBar from "../components/NavBar";
+import ProtectedRoute from "./ProtectedRoute";
+import NotFound from "../pages/NotFound";
+import Landing from "../pages/Landing";
+import NavBar from "../components/common/NavBar";
 
-const App: React.FC = () => {
-  useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    console.log(token);
-    setAuth(token);
-    return () => {
-      setAuth(null);
-    };
-  }, []);
-  const [auth, setAuth] = useState<string | null>(null);
+const App: FC = () => {
   return (
     <Router>
-      <NavBar
-        handleSignOut={() => {
-          setAuth(null);
-          localStorage.removeItem("jwtToken");
-        }}
-      />
+      <NavBar />
       <Routes>
-        <Route path="/" element={auth ? <Dashboard /> : <Login />} />
-        <Route path="/book" element={<Booking token={auth} />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+          {/* <Route path="/profile" element={<Dashboard />} /> */}
+        </Route>
+        <Route path="/book" element={<Booking />} />
         <Route path="/register" element={<RegisterUser />} />
-        {/*    <Route path="*" element={<NotFound />} /> Fallback route for 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

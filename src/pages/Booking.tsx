@@ -1,98 +1,67 @@
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import dayjs, { Dayjs } from "dayjs";
-import Slot, { iSlot } from "../components/Slot";
-import {
-  Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  Grid2 as Grid,
-} from "@mui/material";
-import GenerateSlots from "../components/GenerateSlots";
+import { useEffect, useState } from "react";
+import axios from "../utils/axiosConfig";
+import dayjs from "dayjs";
+import { Container, Typography } from "@mui/material";
+import GenerateSlots from "../components/booking/GenerateSlots";
+import { useAuth } from "../context/AuthContext";
+import NavBar from "../components/common/NavBar";
+import SessionPicker from "../components/booking/SessionPicker";
+import ManageBookings from "../components/booking/ManageBookings";
 
-interface BookingProps {
-  token: string | null;
-}
-
-type SessionTimes = 1 | 2 | 3 | 4;
-const Booking = ({ token }: BookingProps) => {
+export type SessionTimes = 1 | 2 | 3 | 4;
+const Booking = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs(new Date()));
-  const [slots, setSlots] = useState<iSlot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState(null);
   const [sessionTime, setSessionTime] = useState<SessionTimes>(1);
+  const [slots, setSlots] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  const handleSessionChange = () => {};
-
-  // Function to check availability for the chosen duration
-  const checkAvailability = (startIndex, duration) => {
-    // Ensure there are enough subsequent slots for the selected duration
-    for (let i = 0; i < duration; i++) {
-      const slot = slots[startIndex + i];
-      if (!slot || slot.status === "booked") return false;
-    }
-    return true;
-  };
-
-  const handleBooking = async (slotId: number) => {
-    const { data } = await axios.post(
-      "/api/booking",
-      { slotId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json", // Set the content type if necessary
+  useEffect(() => {
+    // Fetch available slots for the selected date (current date as default)
+    const getAvailableSlots = async (from?: Date) => {
+      // console.log(selectedDate);
+      const { data } = await axios.get(`/api/slots`, {
+        params: {
+          from: dayjs(selectedDate).startOf("day").toDate(),
+          to: dayjs(selectedDate).endOf("day").toDate(),
         },
-      }
-    );
-    fetch(`/api/bookings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slotId }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        alert("Booking confirmed!");
-        setSlots((prevSlots: iSlot[]) =>
-          prevSlots.map((slot: iSlot) =>
-            slot.id === slotId ? { ...slot, status: "booked" } : slot
-          )
-        );
-      })
-      .catch((error) => console.error("Error making booking:", error));
+      });
+      setSlots(data);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    };
+    getAvailableSlots();
+  }, [selectedDate]);
+
+  const handleBooking = async (slots: number[]): Promise<boolean> => {
+    try {
+      const slotId = slots[0];
+      console.log(user);
+      // slots.forEach(async (slotId) => {
+      const { data } = await axios.post(`/api/bookings`, {
+        userId: user?.id,
+        slotId,
+      });
+      console.log(data, user?.id, slotId);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   };
 
   return (
-    <Container>
-      <DatePicker
-        label="Booking Date"
-        value={selectedDate}
-        onChange={(date) => setSelectedDate(date as Dayjs)}
-      />
-      <FormControl>
-        <InputLabel id="session-label">Session Length</InputLabel>
-        <Select
-          labelId="session-label"
-          id="session"
-          value={sessionTime}
-          label="Session Length"
-          onChange={(e) => {
-            setSessionTime(e.target.value as SessionTimes);
-            handleSessionChange();
-          }}
-        >
-          <MenuItem value={1}>1 Hour</MenuItem>
-          <MenuItem value={2}>2 Hours</MenuItem>
-          <MenuItem value={3}>3 Hours</MenuItem>
-          <MenuItem value={4}>All Slots</MenuItem>
-        </Select>
-      </FormControl>
-      <Typography variant="h4">Available Slots</Typography>
-      <GenerateSlots selectedDate={selectedDate} session={sessionTime} />
-    </Container>
+    <>
+      <Container maxWidth="md" sx={{ mt: 5 }}>
+        <SessionPicker />
+        <Typography variant="h4">Available Slots</Typography>
+        <GenerateSlots
+          handleBooking={(slots: number[]) => handleBooking(slots)}
+        />
+        <ManageBookings />
+      </Container>
+    </>
   );
 };
 

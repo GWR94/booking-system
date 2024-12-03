@@ -1,23 +1,24 @@
-import { Button } from "@mui/material";
+import { Button, Container } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import React from "react";
 
 type SlotProps = {
   slot: iSlot;
-  handleBooking: (id: number) => void;
+  handleBooking: (slots: number[]) => void;
 };
 
 // TODO
 // [ ] set unavailable if time already gone
 
-type Status = "available" | "booked" | "unavailable";
+export type StatusType = "available" | "booked" | "unavailable";
 export interface iSlot {
   id: number;
   startTime: Dayjs;
   endTime: Dayjs;
-  status: Status;
+  status: StatusType;
   bookings: Booking[];
   slots: number[];
+  bayId: number;
 }
 
 interface Booking {
@@ -25,12 +26,12 @@ interface Booking {
   userId: number;
   slotId: number;
   bookingTime: Dayjs;
-  status: Status;
+  status: StatusType;
   user: User;
   slot: iSlot;
 }
 
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string;
@@ -40,18 +41,19 @@ interface User {
 }
 
 const Slot = ({ slot, handleBooking }: SlotProps) => {
-  // console.log(JSON.stringify(slot));
   return (
-    <Button
-      onClick={() => handleBooking(slot.id)}
-      disabled={slot.status !== "available"}
-      key={slot.id}
-      variant="contained"
-      sx={{ mb: 2 }}
-    >
-      {dayjs(slot.startTime).format("HH:mm")} -{" "}
-      {dayjs(slot.endTime).format("HH:mm")} ({slot.status})
-    </Button>
+    <Container sx={{ my: 1 }}>
+      <Button
+        onClick={() => handleBooking(slot.slots)}
+        disabled={slot.status !== "available"}
+        key={slot.id}
+        variant="contained"
+        fullWidth
+      >
+        {dayjs(slot.startTime).format("HH:mm")} -{" "}
+        {dayjs(slot.endTime).format("HH:mm")} ({slot.status})
+      </Button>
+    </Container>
   );
 };
 
