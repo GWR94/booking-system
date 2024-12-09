@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         credentials
       );
 
-      if (!response) return false;
+      if (response.status !== 200) return false;
       setAlert({
         message: "Successfully signed in",
         error: false,
@@ -80,6 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }, 1500);
       return true;
     } catch (error) {
+      console.error("error", error);
       setAlert({
         error: true,
         message: (error as any).response.data.message,

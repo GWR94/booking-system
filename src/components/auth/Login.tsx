@@ -2,14 +2,10 @@ import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import ForgotPassword from "./ForgotPassword";
 import { GoogleIcon, FacebookIcon } from "../../assets/icons/CustomIcons";
-import { loginSchema } from "../../validation/schema";
-import axios from "../../utils/axiosConfig";
-import { isAxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
-import { Alert, LoadingButton } from "@mui/lab";
+import { LoadingButton } from "@mui/lab";
 import {
   Stack,
-  Snackbar,
   CssBaseline,
   Typography,
   Box,
@@ -22,6 +18,7 @@ import {
   Card as MuiCard,
 } from "@mui/material";
 import { useAuth } from "../../context/AuthContext";
+import validateInputs from "../../utils/validateInput";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -41,8 +38,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
       "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
   }),
 }));
-
-type ValidationType = "password" | "email" | "confirmPassword";
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
   height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
@@ -67,8 +62,7 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-type FormInput = "email" | "password";
-interface FormData {
+export interface FormData {
   email: {
     value: string;
     errorMsg: string;
@@ -80,7 +74,7 @@ interface FormData {
 }
 
 const Login = () => {
-  const { user, login } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -105,92 +99,26 @@ const Login = () => {
     setOpen(false);
   };
 
-  const handleOAuthSignin = () => {};
-
   const handleLegacySignin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const isValid = validateInputs();
+    const isValid = validateInputs(formData, setFormData);
     if (!isValid) return;
     const { email, password } = formData;
     try {
-      await login({
+      const success = await login({
         email: email.value,
         password: password.value,
       });
-      setTimeout(() => {
-        navigate("/book");
-      }, 1500);
+      if (success) {
+        setTimeout(() => {
+          navigate("/book");
+        }, 1500);
+      }
     } catch (err) {
       console.error(err);
     }
     setLoading(false);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // validateInputs();
-  };
-
-  const validateInputs = (type?: FormInput): boolean => {
-    const validationData = {
-      email: formData.email.value,
-      password: formData.password.value,
-    };
-
-    // get validation errors from joi validation library
-    const { error } = loginSchema.validate(validationData, {
-      abortEarly: false,
-    });
-
-    if (error) {
-      const updatedFormData: FormData = { ...formData };
-      if (type) {
-        // filter out others to return error which matches the input type
-        const err = error.details?.filter(
-          (detail) => detail.path[0] === type
-        )[0];
-        if (err) {
-          setFormData({
-            ...formData,
-            [type]: {
-              ...formData[type],
-              errorMsg: err.message,
-            },
-          });
-          return false;
-        } else {
-          setFormData({
-            ...formData,
-            [type]: {
-              ...formData[type],
-              errorMsg: "",
-            },
-          });
-          return true;
-        }
-      }
-      error.details.forEach((detail) => {
-        // get key for incorrectly validated
-        const key = detail.path[0] as keyof typeof formData;
-        if (key in updatedFormData) {
-          updatedFormData[key] = {
-            ...updatedFormData[key],
-            errorMsg: detail.message,
-          };
-        }
-        setFormData(updatedFormData);
-      });
-      return false;
-    } else {
-      // clear all error messages if there are no validation errors.
-      setFormData((prevData) => ({
-        ...prevData,
-        email: { ...prevData.email, errorMsg: "" },
-        password: { ...prevData.password, errorMsg: "" },
-      }));
-      return true;
-    }
   };
 
   const { email, password } = formData;
@@ -240,10 +168,9 @@ const Login = () => {
                   },
                 })
               }
-              onBlur={() => validateInputs("email")}
+              onBlur={() => validateInputs(formData, setFormData, "email")}
               placeholder="your@email.com"
               autoComplete="email"
-              autoFocus
               required
               fullWidth
               variant="outlined"
@@ -268,7 +195,7 @@ const Login = () => {
                   },
                 })
               }
-              onBlur={() => validateInputs("password")}
+              onBlur={() => validateInputs(formData, setFormData, "password")}
               autoComplete="current-password"
               required
               fullWidth
@@ -320,7 +247,8 @@ const Login = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert("Sign in with Google")}
+              href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/google`}
+              // onClick={() => handleOAuthSignin("google")}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
@@ -328,7 +256,7 @@ const Login = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert("Sign in with Facebook")}
+              href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/facebook}`}
               startIcon={<FacebookIcon />}
             >
               Sign in with Facebook
@@ -341,3 +269,4 @@ const Login = () => {
 };
 
 export default Login;
+

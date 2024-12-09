@@ -51,12 +51,12 @@ export const loginSchema = Joi.object<LoginForm>({
     }),
   password: Joi.string()
     .min(8)
-    .pattern(new RegExp("(?=.*[A-Z])(?=.*[!@#$&*])"))
+    // .pattern(new RegExp("(?=.*[A-Z])(?=.*[!@#$&*])"))
     .required()
     .messages({
-      "string.min": "Password must be at least 8 characters long",
-      "string.pattern.base":
-        "Password must contain an uppercase letter and a special character",
+      // "string.min": "Password must be at least 8 characters long",
+      // "string.pattern.base":
+      //   "Password must contain an uppercase letter and a special character",
       "string.empty": "Password is required",
     }),
 });

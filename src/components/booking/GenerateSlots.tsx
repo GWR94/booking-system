@@ -10,6 +10,7 @@ import {
   MenuItem,
   Paper,
   TextField,
+  Card,
 } from "@mui/material";
 import { Dayjs } from "dayjs";
 import { SessionTimes } from "../../pages/Booking";
@@ -39,7 +40,8 @@ interface TimeSlotBookingProps {
 }
 
 const TimeSlotBooking: React.FC<TimeSlotBookingProps> = () => {
-  const { availableTimeSlots, selectedSession, selectedDate } = useSlots();
+  const { availableTimeSlots, selectedSession, selectedDate, allSlotsForDay } =
+    useSlots();
   const [selectedBay, setSelectedBay] = useState<number | null>(null);
   const [selectedTimeSlot, setSelectedTimeSlot] =
     useState<AvailableTimeSlot | null>(null);
@@ -53,19 +55,20 @@ const TimeSlotBooking: React.FC<TimeSlotBookingProps> = () => {
   };
 
   const renderAvailableBays = () => {
-    console.log(availableTimeSlots);
-    return Object.keys(availableTimeSlots).map((bayId) => (
-      <Grid size={{ xs: 6, md: 3 }} key={bayId}>
-        <Button
-          variant={selectedBay === parseInt(bayId) ? "contained" : "outlined"}
-          color="primary"
-          fullWidth
-          onClick={() => handleBaySelection(parseInt(bayId))}
-        >
-          Bay {bayId}
-        </Button>
-      </Grid>
-    ));
+    return Object.keys(availableTimeSlots).map((bayId) => {
+      return (
+        <Grid size={{ xs: 6, md: 3 }} key={bayId}>
+          <Button
+            variant={selectedBay === parseInt(bayId) ? "contained" : "outlined"}
+            color="primary"
+            fullWidth
+            onClick={() => handleBaySelection(parseInt(bayId))}
+          >
+            Bay {bayId}
+          </Button>
+        </Grid>
+      );
+    });
   };
 
   const renderAvailableTimeSlots = () => {
@@ -77,20 +80,25 @@ const TimeSlotBooking: React.FC<TimeSlotBookingProps> = () => {
         ? Object.values(availableTimeSlots).flat()
         : availableTimeSlots[selectedBay] || [];
 
-    return bayTimeSlots.map((timeSlot, index) => (
-      <Grid size={{ xs: 12, md: 6 }} key={index}>
-        <Button
-          variant={selectedTimeSlot === timeSlot ? "contained" : "outlined"}
-          color="secondary"
-          fullWidth
-          onClick={() => handleTimeSlotSelection(timeSlot)}
-        >
-          {dayjs(timeSlot.startTime).format("hh:mm a") +
-            " - " +
-            dayjs(timeSlot.endTime).format("hh:mm a")}
-        </Button>
-      </Grid>
-    ));
+    return bayTimeSlots.map((timeSlot, index) => {
+      console.log(timeSlot);
+      return (
+        <Grid size={{ xs: 12, md: 6 }} key={index}>
+          <Card>
+            <Button
+              variant={selectedTimeSlot === timeSlot ? "contained" : "outlined"}
+              color="secondary"
+              fullWidth
+              onClick={() => handleTimeSlotSelection(timeSlot)}
+            >
+              {dayjs(timeSlot.startTime).format("hh:mm a") +
+                " - " +
+                dayjs(timeSlot.endTime).format("hh:mm a")}
+            </Button>
+          </Card>
+        </Grid>
+      );
+    });
   };
 
   return (

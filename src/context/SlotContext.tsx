@@ -18,6 +18,8 @@ export interface SlotsContextType {
   selectedDate: Dayjs;
   selectedSession: SessionTimes;
   selectedBay: Bays | null;
+  searchedSlot: TimeSlot | null;
+  getUniqueSlot: (slotId: number) => void;
   setSelectedBay: (bay: Bays) => void;
   setSelectedDate: (date: Dayjs) => void;
   setSelectedSession: (session: SessionTimes) => void;
@@ -44,6 +46,7 @@ interface AvailableTimeSlot {
   bayId: number;
   startTime: string;
   endTime: string;
+  slot: TimeSlot;
 }
 
 interface TimeSlotBookingProps {
@@ -60,6 +63,7 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
   const [selectedSession, setSelectedSession] = useState<SessionTimes>(1);
   const [selectedBay, setSelectedBay] = useState<Bays | null>(null);
   const [allSlots, setAllSlots] = useState<TimeSlot[]>([]);
+  const [searchedSlot, setSearchedSlot] = useState<TimeSlot | null>(null);
 
   const getAvailableTimeSlots = (
     timeSlots: TimeSlot[],
@@ -122,6 +126,7 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
           bayId: startSlot.bayId,
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
+          slot: startSlot,
         });
       }
     }
@@ -155,15 +160,30 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
     getAvailableSlots();
   }, [selectedDate]);
 
+  const getUniqueSlot = async (slotId: number) => {
+    const slot = allSlots.filter((slot) => slot.id === slotId)[0];
+    if (slot) setSearchedSlot(slot);
+
+    const { data } = await axios.get("/api/slots", {
+      params: {
+        id: slotId
+      }
+    });
+    setSearchedSlot(data.slot)
+
+  }
+
   const value: SlotsContextType = {
     allSlotsForDay: allSlots,
     availableTimeSlots,
     selectedDate,
     selectedSession,
     selectedBay,
+    searchedSlot,
     setSelectedDate: (date: Dayjs) => setSelectedDate(date),
     setSelectedSession: (session: SessionTimes) => setSelectedSession(session),
     setSelectedBay: (bay: Bays) => setSelectedBay(bay),
+    getUniqueSlot: (slotId: number) => getUniqueSlot(slotId),
     isLoading,
   };
   return (
