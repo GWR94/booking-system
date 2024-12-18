@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../../context/AuthContext";
 import validateInputs from "../../utils/validateInput";
+import axiosInstance from "../../utils/axiosConfig";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -248,7 +249,6 @@ const Login = () => {
               fullWidth
               variant="outlined"
               href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/google`}
-              // onClick={() => handleOAuthSignin("google")}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
@@ -256,7 +256,7 @@ const Login = () => {
             <Button
               fullWidth
               variant="outlined"
-              href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/facebook}`}
+              href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/facebook`}
               startIcon={<FacebookIcon />}
             >
               Sign in with Facebook

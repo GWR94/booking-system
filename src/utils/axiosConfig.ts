@@ -13,34 +13,31 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 // Axios Interceptor for automatic token refresh
-// axiosInstance.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest: CustomAxiosRequestConfig = error.config;
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest: CustomAxiosRequestConfig = error.config;
 
-//     // If the error status is 401 and there is no originalRequest._retry flag
-//     if (error?.response?.status === 401 && !originalRequest?._retry) {
-//       originalRequest._retry = true;
+    // If the error status is 401 and there is no originalRequest._retry flag
+    if (error?.response?.status === 401 && !originalRequest?._retry) {
+      originalRequest._retry = true;
 
-//       try {
-//         // Try to refresh the token
-//         await axios.post(
-//           `${process.env.REACT_APP_BACKEND_API}/api/user/refresh`,
-//           { withCredentials: true }
-//         );
+      try {
+        // Try to refresh the token
+        await axiosInstance.post("/api/user/refresh");
 
-//         // Retry the original request
-//         return axiosInstance(originalRequest);
-//       } catch (refreshError) {
-//         // Refresh failed, redirect to login
-//         // FIXME
-//         // window.location.href = "/login";
-//         return Promise.reject(refreshError);
-//       }
-//     }
+        // Retry the original request
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        // Refresh failed, redirect to login
+        // FIXME
+        // window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
 
-//     return Promise.reject(error);
-//   }
-// );
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

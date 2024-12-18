@@ -9,9 +9,8 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
-import React from "react";
 import { SessionTimes } from "../../pages/Booking";
-import { useSlots } from "../../context/SlotContext";
+import { Bays, useSlots } from "../../context/SlotContext";
 
 const SessionPicker = () => {
   const {
@@ -26,34 +25,34 @@ const SessionPicker = () => {
     <Box
       maxWidth="sm"
       sx={{
-        background: "#eaecff",
-        p: 5,
         m: "0 auto",
-        borderRadius: "25px",
-        mb: 4,
+        p: 3,
+        borderTop: "1px solid #1976d2",
+        borderBottom: "1px solid #1976d2",
       }}
     >
-      <Typography variant="h5" align="center" gutterBottom>
-        Pick a session
+      <Typography variant="h5" gutterBottom sx={{ fontWeight: "bold" }}>
+        Find Session
       </Typography>
-      <Typography variant="body1" align="center" sx={{ mb: 2 }}>
-        Pick a date and then select how long you wish to be on the simulator for
+      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+        Select your preferred date and specify the desired duration of your simulator session. <br />
+        Picking a specific bay is entirely optional.
       </Typography>
       <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 5 }}>
+        <Grid size={{ xs: 12, md: 6, sm: 12 }} >
           <Box
             sx={{ display: "flex", width: "100%", justifyContent: "flex-end" }}
           >
             <DatePicker
               label="Booking Date"
               value={selectedDate}
-              format="dddd Do MMM YYYY"
+              format="dddd Do MMM 'YY"
               onChange={(date) => setSelectedDate(date as Dayjs)}
               sx={{ width: "100%" }}
             />
           </Box>
         </Grid>
-        <Grid size={{ xs: 12, md: 5 }}>
+        <Grid size={{ xs: 12, md: 3, sm: 6 }}>
           <FormControl sx={{ width: "100%" }}>
             <InputLabel id="session-label">Session Length</InputLabel>
             <Select
@@ -68,11 +67,29 @@ const SessionPicker = () => {
               <MenuItem value={1}>1 Hour</MenuItem>
               <MenuItem value={2}>2 Hours</MenuItem>
               <MenuItem value={3}>3 Hours</MenuItem>
-              <MenuItem value={4}>All Slots</MenuItem>
+            </Select>
+          </FormControl>
+
+        </Grid>
+        <Grid size={{ xs: 12, md: 3, sm: 6 }}>
+          <FormControl sx={{ width: "100%" }}>
+            <InputLabel id="session-label">Bay</InputLabel>
+            <Select
+              labelId="session-label"
+              id="session"
+              value={selectedBay}
+              label="Bay"
+              onChange={(e) => setSelectedBay(e.target.value as Bays)}
+            >
+              <MenuItem value={5}>Any</MenuItem>
+              <MenuItem value={1}>Bay 1</MenuItem>
+              <MenuItem value={2}>Bay 2</MenuItem>
+              <MenuItem value={3}>Bay 3</MenuItem>
+              <MenuItem value={4}>Bay 4</MenuItem>
+
             </Select>
           </FormControl>
         </Grid>
-        <Grid size={{ xs: 12, md: 5 }}></Grid>
       </Grid>
     </Box>
   );

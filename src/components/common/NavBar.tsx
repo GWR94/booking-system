@@ -231,16 +231,16 @@ const NavBar = ({ threshold = 150 }) => {
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
                 >
-                  <MenuItem key="Account" onClick={() => navigate(`/account`)}>
+                  <MenuItem key="profile" onClick={() => navigate(`/profile`)}>
                     <Typography sx={{ textAlign: "center" }}>
-                      Account
+                      Profile
                     </Typography>
                   </MenuItem>
                   <MenuItem
                     key="Bookings"
                     onClick={() => {
                       handleCloseUserMenu();
-                      navigate(`/account/bookings`);
+                      navigate(`/profile/bookings`);
                     }}
                   >
                     <Typography sx={{ textAlign: "center" }}>

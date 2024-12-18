@@ -9,7 +9,7 @@ import axios from "../utils/axiosConfig";
 import dayjs, { Dayjs } from "dayjs";
 import { SessionTimes } from "../pages/Booking";
 
-type Bays = "1" | "2" | "3" | "4";
+export type Bays = 1 | 2 | 3 | 4 | 5;
 
 export interface SlotsContextType {
   availableTimeSlots: {
@@ -17,7 +17,7 @@ export interface SlotsContextType {
   };
   selectedDate: Dayjs;
   selectedSession: SessionTimes;
-  selectedBay: Bays | null;
+  selectedBay: Bays;
   searchedSlot: TimeSlot | null;
   getUniqueSlot: (slotId: number) => void;
   setSelectedBay: (bay: Bays) => void;
@@ -25,6 +25,8 @@ export interface SlotsContextType {
   setSelectedSession: (session: SessionTimes) => void;
   isLoading: boolean;
   allSlotsForDay: TimeSlot[];
+  basket: TimeSlot[];
+  groupedTimeSlots: GroupedTimeSlots
 }
 
 export interface SlotsProviderProps {
@@ -42,6 +44,13 @@ interface TimeSlot {
   bayId: number;
 }
 
+export interface GroupedSlot {
+  startTime: Dayjs;
+  endTime: Dayjs;
+  bayId: number;
+  slotIds: number[];
+}
+
 interface AvailableTimeSlot {
   bayId: number;
   startTime: string;
@@ -56,14 +65,20 @@ interface TimeSlotBookingProps {
   handleBooking: (slots: number[]) => Promise<boolean>;
 }
 
+interface GroupedTimeSlots {
+  [key: string]: GroupedSlot[]
+}
+
+
 export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [isLoading, setLoading] = useState(true);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [selectedSession, setSelectedSession] = useState<SessionTimes>(1);
-  const [selectedBay, setSelectedBay] = useState<Bays | null>(null);
+  const [selectedBay, setSelectedBay] = useState<Bays>(5);
   const [allSlots, setAllSlots] = useState<TimeSlot[]>([]);
   const [searchedSlot, setSearchedSlot] = useState<TimeSlot | null>(null);
+  const [basket, setBasket] = useState<TimeSlot[]>([]);
 
   const getAvailableTimeSlots = (
     timeSlots: TimeSlot[],
@@ -99,6 +114,69 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
     });
 
     return availableTimeslots;
+  };
+
+
+  const getGroupedTimeSlots = (
+    slots: TimeSlot[],
+    sessionDuration = 1,
+    selectedBay = 5, // all bays
+  ): GroupedTimeSlots => {
+    // Sort slots by start time
+    const sortedSlots = slots
+      .filter((slot) => selectedBay !== 5 ? slot.bayId === selectedBay : true)
+      .sort(
+        (a, b) =>
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      );
+
+    const groupedSlots: GroupedTimeSlots = {};
+
+    // Group slots by bay
+    const slotsByBay: { [bayId: number]: TimeSlot[] } = {};
+    sortedSlots.forEach((slot) => {
+      if (!slotsByBay[slot.bayId]) {
+        slotsByBay[slot.bayId] = [];
+      }
+      slotsByBay[slot.bayId].push(slot);
+    });
+
+    // Process each bay's slots
+    Object.entries(slotsByBay).forEach(([bayId, baySlots]) => {
+      for (let i = 0; i <= baySlots.length - sessionDuration; i++) {
+        // Check if consecutive slots can form the desired session duration
+        const consecutiveSlots = baySlots.slice(i, i + sessionDuration);
+
+        // Validate that slots are consecutive
+        const isConsecutive = consecutiveSlots.every(
+          (slot, index) =>
+            index === 0 ||
+            dayjs(slot.startTime).isSame(
+              dayjs(consecutiveSlots[index - 1].endTime)
+            )
+        );
+
+        const startTime = dayjs(consecutiveSlots[0].startTime);
+        const endTime = dayjs(consecutiveSlots[sessionDuration - 1].endTime);
+
+        if (isConsecutive) {
+          const key = `${startTime.format("HH:mm")}-${endTime.format("HH:mm")}`;
+
+          if (!groupedSlots[key]) {
+            groupedSlots[key] = [];
+          }
+
+          const slotIds = consecutiveSlots.map((slot) => slot.id);
+          groupedSlots[key].push({
+            startTime,
+            endTime,
+            bayId: parseInt(bayId),
+            slotIds,
+          });
+        }
+      }
+    });
+    return groupedSlots;
   };
 
   const findContinuousSlots = (
@@ -138,11 +216,15 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
     [timeSlots, selectedDate, selectedSession]
   );
 
+  const groupedTimeSlots = useMemo(
+    () => getGroupedTimeSlots(timeSlots, selectedSession, selectedBay),
+    [timeSlots, selectedSession, selectedBay]
+  )
+
   useEffect(() => {
     // Fetch available slots for the selected date (current date as default)
     const getAvailableSlots = async () => {
       try {
-        // console.log(selectedDate);
         const { data } = await axios.get(`/api/slots`, {
           params: {
             from: dayjs(selectedDate).startOf("day").toDate(),
@@ -150,6 +232,7 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
           },
         });
         setTimeSlots(data);
+        // getGroupedTimeSlots(data, selectedSession);
         setTimeout(() => {
           setLoading(false);
         }, 1000);
@@ -170,7 +253,6 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
       }
     });
     setSearchedSlot(data.slot)
-
   }
 
   const value: SlotsContextType = {
@@ -185,6 +267,8 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
     setSelectedBay: (bay: Bays) => setSelectedBay(bay),
     getUniqueSlot: (slotId: number) => getUniqueSlot(slotId),
     isLoading,
+    basket,
+    groupedTimeSlots
   };
   return (
     <SlotsContext.Provider value={value}>{children}</SlotsContext.Provider>

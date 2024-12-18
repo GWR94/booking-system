@@ -34,10 +34,13 @@ interface Booking {
 export interface User {
   id: number;
   name: string;
-  email: string;
-  passwordHash: string;
+  email: string | null;
+  passwordHash: string | null;
   role: "user" | "admin";
   bookings: Booking[];
+  googleId: string | null;
+  facebookId: string | null;
+  appleId: string | null;
 }
 
 const Slot = ({ slot, handleBooking }: SlotProps) => {
