@@ -1,46 +1,89 @@
-# Getting Started with Create React App
+# Golf Simulator Website Frontend (WIP)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive website for a golf simulator business built with React and Material-UI. The UI / general layout and content is currently a work in progress as the main focus has been on creating the backend, which can be access [here](http://www.github.com/GWR94/booking-system-backend).
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+This frontend application provides an interactive and engaging user experience for golf enthusiasts looking to book simulator sessions, view facility information, and manage their bookings. The website features real-time availability, detailed simulator specifications, and an intuitive booking system.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Interactive booking system with payment and soon to be refunds (Stripe is currently in test-mode for development)
+- User account management and booking history
+- Responsive design for all device sizes
+- Integration with popular golf analysis software
+- Event booking for corporate events and parties
+- Animated UI components with Framer Motion
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **React 18**: Frontend framework
+- **TypeScript**: Type safety and better developer experience
+- **Material-UI (MUI) v6**: Component library and styling system
+- **Stripe**: Payment processing integration
+- **React Router v6**: Client-side routing
+- **Axios**: HTTP client for API requests
+- **Day.js**: Modern date utility library
+- **Framer Motion**: Animation library
+- **Joi**: Schema validation
+- **Jest & React Testing Library**: Testing framework
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+### Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js (v16 or higher)
+- npm or yarn
+- Git
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Installation
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/booking-system.git
+cd booking-system
+```
 
-### `npm run eject`
+Install dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+npm install
+# or
+yarn install
+```
+Create a `.env` file in the root directory:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+REACT_APP_BACKEND_URL=your_api_url
+REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_key
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Start the development server:
+```bash
+npm start
+# or
+yarn start
+```
+The application will be available at `http://localhost:3000`
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Available Scripts
 
-## Learn More
+`npm start`: Start development server
+`npm run build`: Build production bundle
+`npm test`: Run Jest tests
+`npm run eject`: Eject from Create React App
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Environment Variables
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Required environment variables:
+
+```
+REACT_APP_API_URL: Backend API URL
+REACT_APP_STRIPE_PUBLIC_KEY: Stripe public key
+```
+
+### Future Plans
+
+- UI and general content overhaul
+- Create all missing webpages and remove dead links etc
+

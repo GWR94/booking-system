@@ -17,7 +17,6 @@ const stripe = loadStripe(
 );
 const Checkout = () => {
 	const { basket } = useSlots();
-	const { user } = useAuth();
 	const [paymentRequested, setPaymentRequested] = useState(false);
 	const [clientSecret, setClientSecret] = useState('');
 

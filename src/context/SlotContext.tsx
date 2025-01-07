@@ -17,6 +17,11 @@ import {
 	GroupedSlot,
 } from '../components/interfaces/SlotContext.i';
 
+/**
+ * TODO
+ * [ ] Refactor getGroupedTimeSlots function to be more legible
+ */
+
 const SlotsContext = createContext<SlotsContextType | null>(null);
 
 export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
@@ -34,6 +39,7 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
 	): GroupedTimeSlots => {
 		// Filter and sort slots
 		const sortedSlots = slots
+			// if selectedBay is 5 then it will show all bays, so no need to filter
 			.filter((slot) => (selectedBay !== 5 ? slot.bayId === selectedBay : true))
 			.sort(
 				(a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf(),
