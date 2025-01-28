@@ -13,10 +13,12 @@ import {
 	Button,
 	Tooltip,
 	Avatar,
+	Badge,
 } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
 import { useMotionValueEvent, useScroll, motion } from 'framer-motion';
+import { useBasket } from '../../context/BasketContext';
 
 interface NavBarProps {
 	threshold?: number;
@@ -31,10 +33,10 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
 		null,
 	);
-
 	const { scrollY } = useScroll();
 	const [hidden, setHidden] = useState<boolean>(false);
 	const [lastScrollY, setLastScrollY] = useState<number>(0);
+	const { basket } = useBasket();
 
 	useMotionValueEvent(scrollY, 'change', (latest: number) => {
 		// Determine scroll direction
@@ -45,7 +47,6 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 			// Scrolling up
 			setHidden(false);
 		}
-
 		// Update last scroll position
 		setLastScrollY(latest);
 	});
@@ -213,10 +214,9 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 							<Box sx={{ flexGrow: 0 }}>
 								<Tooltip title="Open settings">
 									<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-										<Avatar
-											alt="Remy Sharp"
-											src="/static/images/avatar/2.jpg"
-										/>
+										<Badge badgeContent={basket.length} color="error">
+											<Avatar alt="User Profile" />
+										</Badge>
 									</IconButton>
 								</Tooltip>
 								<Menu

@@ -4,13 +4,15 @@ import { Paper, Typography, Button } from '@mui/material';
 import dayjs from 'dayjs';
 import { GroupedSlot } from '../interfaces/SlotContext.i';
 import { useNavigate } from 'react-router-dom';
+import { useBasket } from '../../context/BasketContext';
 
 interface SelectedSlotProps {
 	selectedSlot: GroupedSlot;
 }
 
 const SelectedSlot: React.FC<SelectedSlotProps> = ({ selectedSlot }) => {
-	const { selectedDate, selectedBay, addToBasket } = useSlots();
+	const { selectedDate, selectedBay } = useSlots();
+	const { addToBasket } = useBasket();
 	const navigate = useNavigate();
 
 	const handleAddToBasket = () => {
@@ -23,7 +25,7 @@ const SelectedSlot: React.FC<SelectedSlotProps> = ({ selectedSlot }) => {
 			<Paper elevation={3} sx={{ p: 2, mt: 3 }}>
 				<Typography variant="h6">Booking Summary</Typography>
 				<Typography>
-					Bay: <em>{selectedBay}</em>
+					Bay: <em>{selectedSlot.bayId}</em>
 				</Typography>
 				<Typography>
 					Date: <em>{selectedDate.format('dddd Do MMM YYYY')}</em>

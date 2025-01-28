@@ -10,7 +10,7 @@ const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => (
 		<Button
 			fullWidth
 			variant="outlined"
-			href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/google`}
+			href="/api/user/login/google"
 			startIcon={<GoogleIcon />}
 		>
 			Sign {isLogin ? 'in ' : 'up '} with Google
@@ -18,7 +18,7 @@ const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => (
 		<Button
 			fullWidth
 			variant="outlined"
-			href={`${process.env.REACT_APP_BACKEND_API}/api/user/login/facebook`}
+			href="/api/user/login/facebook"
 			startIcon={<FacebookIcon />}
 		>
 			Sign {isLogin ? 'in ' : 'up '} with Facebook

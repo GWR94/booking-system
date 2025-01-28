@@ -1,79 +1,80 @@
-import { useSlots } from '../../context/SlotContext';
-import { Paper, Typography, Button, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import CheckoutItem from './CheckoutItem';
+import { Typography, Button, Box } from '@mui/material';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import CheckoutForm from './CheckoutForm';
-import { CheckoutProvider, useCheckout } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import axios from '../../utils/axiosConfig';
-import { loadStripe } from '@stripe/stripe-js';
-import { useAuth } from '../../context/AuthContext';
+import { Appearance, loadStripe } from '@stripe/stripe-js';
+import CompleteBooking from './CompleteBooking';
+import { ShoppingBasketOutlined } from '@mui/icons-material';
+import { useBasket } from '../../context/BasketContext';
 
 const stripe = loadStripe(
-	process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY as string,
-	{
-		betas: ['custom_checkout_beta_5'],
-	},
+	import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string,
 );
 const Checkout = () => {
-	const { basket } = useSlots();
-	const [paymentRequested, setPaymentRequested] = useState(false);
+	const { basket } = useBasket();
 	const [clientSecret, setClientSecret] = useState('');
 
 	useEffect(() => {
 		const getClientSecret = async () => {
-			const response = await axios.post(
-				'/api/booking/create-checkout-session',
-				{
-					basket,
-				},
-			);
+			if (basket.length === 0) return;
+			const response = await axios.post('/api/bookings/create-payment-intent', {
+				items: basket,
+			});
 			const { clientSecret }: { clientSecret: string } = response.data;
 			setClientSecret(clientSecret);
 		};
 		getClientSecret();
-		// FIXME - get user email if one doesn't exist
-	}, []);
+	}, [basket]);
 
-	const navigate = useNavigate();
+	const appearance: Appearance = {
+		theme: 'stripe',
+	};
+	// Enable the skeleton loader UI for optimal loading.
+	const loader = 'auto';
+
+	console.log(clientSecret);
 
 	return (
-		<CheckoutProvider stripe={stripe} options={{ clientSecret }}>
-			<Paper elevation={3} sx={{ p: 3, my: 3, maxWidth: 400, mx: 'auto' }}>
-				{paymentRequested ? (
-					<CheckoutForm />
-				) : (
-					<>
-						<Typography variant="h6" gutterBottom>
-							Checkout Summary
-						</Typography>
-						{basket.length > 0 ? (
-							basket.map((slot, i) => (
-								<CheckoutItem
-									key={i}
-									slot={slot}
-									proceedToPayment={() => setPaymentRequested(true)}
-								/>
-							))
-						) : (
-							<Box>
-								<Typography variant="body1" gutterBottom>
-									Nothing here!
-								</Typography>
-								<Button
-									variant="contained"
-									color="primary"
-									fullWidth
-									onClick={() => navigate('/book')}
-								>
-									Find a Slot
-								</Button>
-							</Box>
-						)}
-					</>
-				)}
-			</Paper>
-		</CheckoutProvider>
+		<Box maxWidth="md" sx={{ p: 3, my: 3, mx: 'auto' }}>
+			{clientSecret && (
+				<Elements
+					options={{ clientSecret, appearance, loader }}
+					stripe={stripe}
+				>
+					<Routes>
+						<Route path="/" element={<CheckoutForm />} />
+						<Route path="/complete" element={<CompleteBooking />} />
+					</Routes>
+				</Elements>
+			)}
+		</Box>
+	);
+};
+
+const EmptyBasket = () => {
+	const navigate = useNavigate();
+	return (
+		<Box
+			sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+		>
+			<Typography variant="h6" align="center" gutterBottom>
+				Your basket is empty.
+			</Typography>
+			<Typography variant="h6" align="center" gutterBottom>
+				Please add items to proceed.
+			</Typography>
+
+			<ShoppingBasketOutlined sx={{ mb: 2 }} />
+			<Button
+				variant="contained"
+				color="primary"
+				onClick={() => navigate('/book')}
+			>
+				Go to Booking
+			</Button>
+		</Box>
 	);
 };
 

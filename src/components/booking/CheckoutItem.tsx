@@ -1,54 +1,117 @@
-import { Box, Typography, Button } from '@mui/material';
+import {
+	Box,
+	Typography,
+	Button,
+	Card,
+	CardContent,
+	Grid2 as Grid,
+	IconButton,
+	Divider,
+} from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useSlots } from '../../context/SlotContext';
 import { GroupedSlot } from '../interfaces/SlotContext.i';
+import { useBasket } from '../../context/BasketContext';
 
 type CheckoutItemProps = {
 	slot: GroupedSlot;
-	proceedToPayment: () => void;
+	isCompleted?: boolean;
 };
 
-const HOURLY_RATE = 4500;
+export const HOURLY_RATE = 4500;
 
-const CheckoutItem: React.FC<CheckoutItemProps> = ({
-	slot,
-	proceedToPayment,
-}) => {
-	const { removeFromBasket, selectedDate } = useSlots();
+const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
+	const { selectedDate } = useSlots();
+	const { removeFromBasket } = useBasket();
+	const SESSION_LENGTH = slot.slotIds.length;
+	const totalPrice = ((HOURLY_RATE / 100) * SESSION_LENGTH).toFixed(2);
+
 	return (
-		<Box sx={{ mb: 3 }}>
-			<Typography variant="body1" gutterBottom>
-				Date: <strong>{selectedDate.format('dddd Do MMM YYYY')}</strong>
-			</Typography>
-			<Typography variant="body1" gutterBottom>
-				Time:{' '}
-				<strong>
-					{dayjs(slot.startTime).format('h:mma')} -{' '}
-					{dayjs(slot.endTime).format('h:mma')}
-				</strong>
-			</Typography>
-			<Typography variant="body1" gutterBottom>
-				Bay: <strong>{slot.bayId}</strong>
-			</Typography>
-			<Typography variant="body1" gutterBottom>
-				Price:{' '}
-				<strong>
-					£{((HOURLY_RATE / 100) * slot.slotIds.length).toFixed(2)}
-				</strong>
-			</Typography>
-			<Button variant="text" onClick={() => removeFromBasket(slot)}>
-				Remove
-			</Button>
-			<Button
-				variant="contained"
-				color="primary"
-				fullWidth
-				onClick={proceedToPayment}
-			>
-				Proceed to Payment
-			</Button>
-		</Box>
+		<Card
+			sx={{
+				mb: 2,
+				'&:hover': {
+					boxShadow: 3,
+					transition: '0.3s',
+				},
+			}}
+		>
+			<CardContent>
+				<Grid container spacing={2} alignItems="center">
+					<Grid size={{ xs: 12, sm: 10 }}>
+						<Box>
+							<Grid container spacing={2}>
+								<Grid size={{ xs: 6 }}>
+									<Typography variant="body2" color="text.secondary">
+										Date
+									</Typography>
+									<Typography variant="body1" fontWeight="medium">
+										{selectedDate.format('dddd Do MMM YYYY')}
+									</Typography>
+								</Grid>
+								<Grid size={{ xs: 6 }}>
+									<Typography variant="body2" color="text.secondary">
+										Time
+									</Typography>
+									<Typography variant="body1" fontWeight="medium">
+										{dayjs(slot.startTime).format('h:mma')} -{' '}
+										{dayjs(slot.endTime).format('h:mma')}
+									</Typography>
+								</Grid>
+								<Grid size={{ xs: 6 }}>
+									<Typography variant="body2" color="text.secondary">
+										Bay Number
+									</Typography>
+									<Typography variant="body1" fontWeight="medium">
+										Bay {slot.bayId}
+									</Typography>
+								</Grid>
+								<Grid size={{ xs: 6 }}>
+									<Typography variant="body2" color="text.secondary">
+										Duration
+									</Typography>
+									<Typography variant="body1" fontWeight="medium">
+										{dayjs(slot.endTime).diff(dayjs(slot.startTime), 'minute')}{' '}
+										minutes
+									</Typography>
+								</Grid>
+							</Grid>
+						</Box>
+					</Grid>
+					<Grid size={{ xs: 12, sm: 2 }}>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: { xs: 'flex-start', sm: 'flex-end' },
+								height: '100%',
+								justifyContent: 'space-between',
+							}}
+						>
+							<Typography
+								variant="h6"
+								color="primary"
+								sx={{ fontWeight: 'bold' }}
+							>
+								£{totalPrice}
+							</Typography>
+							{!isCompleted && (
+								<IconButton
+									onClick={() => removeFromBasket(slot)}
+									color="error"
+									sx={{ mt: 1 }}
+									aria-label="remove item"
+								>
+									<DeleteOutlineIcon />
+								</IconButton>
+							)}
+						</Box>
+					</Grid>
+				</Grid>
+			</CardContent>
+		</Card>
 	);
 };
 

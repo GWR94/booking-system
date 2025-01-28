@@ -14,7 +14,6 @@ import {
 	TimeSlot,
 	Bays,
 	GroupedTimeSlots,
-	GroupedSlot,
 } from '../components/interfaces/SlotContext.i';
 
 /**
@@ -30,7 +29,6 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
 	const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
 	const [selectedSession, setSelectedSession] = useState<SessionTimes>(1);
 	const [selectedBay, setSelectedBay] = useState<Bays>(5);
-	const [basket, setBasket] = useState<GroupedSlot[]>([]);
 
 	const getGroupedTimeSlots = (
 		slots: TimeSlot[],
@@ -128,10 +126,6 @@ export const SlotsProvider: React.FC<SlotsProviderProps> = ({ children }) => {
 		setSelectedSession: (session: SessionTimes) => setSelectedSession(session),
 		setSelectedBay: (bay: Bays) => setSelectedBay(bay),
 		isLoading,
-		basket,
-		addToBasket: (slot: GroupedSlot) => setBasket([...basket, slot]),
-		removeFromBasket: (slot: GroupedSlot) =>
-			setBasket(basket.filter((s) => s.id !== slot.id)),
 		groupedTimeSlots,
 	};
 	return (

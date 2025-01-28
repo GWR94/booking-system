@@ -40,13 +40,27 @@ const Testimonials = () => {
 					What Our Golfers Say
 				</Typography>
 				<Grid container spacing={4} sx={{ mt: 4 }}>
-					{testimonials.map((testimonial, index) => (
-						<Grid size={{ xs: 12, md: 4 }} key={index}>
-							<Card>
-								<CardContent>
+					{testimonials.map((testimonial, i) => (
+						<Grid size={{ xs: 12, md: 4 }} key={i}>
+							<Card
+								sx={{
+									height: '100%',
+									display: 'flex',
+									flexDirection: 'column',
+								}}
+							>
+								<CardContent
+									sx={{
+										flex: 1,
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'space-between',
+									}}
+								>
 									<Avatar
 										src={testimonial.avatar}
-										sx={{ width: 80, height: 80, margin: 'auto', mb: 2 }}
+										sx={{ width: 80, height: 80, mb: 2 }}
 									/>
 									<Typography
 										variant="body1"
@@ -56,14 +70,16 @@ const Testimonials = () => {
 									>
 										&ldquo;{testimonial.quote}&ldquo;
 									</Typography>
-									<Typography variant="subtitle1" align="center">
-										{testimonial.name}
-									</Typography>
-									<Rating
-										value={testimonial.stars}
-										readOnly
-										sx={{ justifyContent: 'center', width: '100%' }}
-									/>
+									<Box>
+										<Typography variant="subtitle1" align="center">
+											{testimonial.name}
+										</Typography>
+										<Rating
+											value={testimonial.stars}
+											readOnly
+											sx={{ justifyContent: 'center', width: '100%' }}
+										/>
+									</Box>
 								</CardContent>
 							</Card>
 						</Grid>

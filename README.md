@@ -54,8 +54,8 @@ yarn install
 Create a `.env` file in the root directory:
 
 ```
-REACT_APP_BACKEND_URL=your_api_url
-REACT_APP_STRIPE_PUBLIC_KEY=your_stripe_key
+VITE_BACKEND_URL=your_api_url
+VITE_STRIPE_PUBLIC_KEY=your_stripe_key
 ```
 
 Start the development server:
@@ -78,8 +78,8 @@ The application will be available at `http://localhost:3000`
 #### Required environment variables:
 
 ```
-REACT_APP_API_URL: Backend API URL
-REACT_APP_STRIPE_PUBLIC_KEY: Stripe public key
+VITE_API_URL: Backend API URL
+VITE_STRIPE_PUBLIC_KEY: Stripe public key
 ```
 
 ### Future Plans

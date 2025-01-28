@@ -11,9 +11,6 @@ export interface SlotsContextType {
 	setSelectedDate: (date: Dayjs) => void;
 	setSelectedSession: (session: SessionTimes) => void;
 	isLoading: boolean;
-	basket: GroupedSlot[];
-	addToBasket: (slot: GroupedSlot) => void;
-	removeFromBasket: (slot: GroupedSlot) => void;
 	groupedTimeSlots: GroupedTimeSlots;
 }
 

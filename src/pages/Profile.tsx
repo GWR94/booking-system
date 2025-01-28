@@ -15,11 +15,13 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { FacebookIcon, GoogleIcon } from '../assets/icons/CustomIcons';
 import FloatingButton from '../components/common/FloatingButton';
+import UserBookings from '../components/auth/UserBookings';
 
 const ProfilePage = () => {
 	const theme = useTheme();
 	const fullscreen = useMediaQuery(theme.breakpoints.down('sm'));
 	const { user } = useAuth();
+	if (!user) return;
 	const [isEditing, setIsEditing] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [userState, setUserState] = useState({
@@ -313,6 +315,7 @@ const ProfilePage = () => {
 						</Box>
 					</Box>
 				)}
+				{user.bookings && <UserBookings bookings={user.bookings} />}
 				<Dialog
 					open={dialogOpen}
 					fullScreen={fullscreen}

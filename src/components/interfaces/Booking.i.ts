@@ -6,10 +6,17 @@ export interface Booking {
 	slotId: number;
 	bookingTime: Dayjs;
 	status: StatusType;
-	slot: iSlot;
+	slots: iSlot[];
+	paymentId: string;
+	paymentStatus: string;
 }
 
-export type StatusType = 'available' | 'booked' | 'unavailable';
+export type StatusType =
+	| 'available'
+	| 'booked'
+	| 'unavailable'
+	| 'pending'
+	| 'cancelled';
 
 export interface iSlot {
 	id: number;

@@ -18,12 +18,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [isLoading, setLoading] = useState<boolean>(true);
 	const [user, setUser] = useState<User | null>(null);
 	const { showSnackbar, hideSnackbar } = useSnackbar();
+	let authChecked = false;
 
 	useEffect(() => {
 		checkAuth();
 	}, []);
 
 	const checkAuth = async (): Promise<void> => {
+		if (authChecked) return;
+		authChecked = true;
 		try {
 			const response = await axios.get<{ user: User }>('/api/user/verify');
 			setUser(response.data.user);

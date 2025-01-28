@@ -20,8 +20,8 @@ const App: FC = () => {
 				<Route path="/login" element={<Login />} />
 				<Route element={<ProtectedRoute />}>
 					<Route path="/profile" element={<Profile />} />
-					<Route path="/checkout" element={<Checkout />} />
 				</Route>
+				<Route path="/checkout/*" element={<Checkout />} />
 				<Route path="/book" element={<Booking />} />
 				<Route path="/register" element={<RegisterUser />} />
 				<Route path="*" element={<NotFound />} />

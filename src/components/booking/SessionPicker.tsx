@@ -35,10 +35,9 @@ const SessionPicker = () => {
 			<Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
 				Find Session
 			</Typography>
-			<Typography variant="subtitle2" sx={{ mb: 2 }}>
+			<Typography sx={{ mb: 3 }}>
 				Select your preferred date and specify the desired duration of your
-				simulator session. <br />
-				Picking a specific bay is entirely optional.
+				simulator session.
 			</Typography>
 			<Grid container spacing={2}>
 				<Grid size={{ xs: 12, md: 6, sm: 12 }}>
