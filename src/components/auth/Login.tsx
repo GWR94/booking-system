@@ -13,11 +13,11 @@ import {
 	Checkbox,
 	Divider,
 } from '@mui/material';
-import { useAuth } from '../../context/AuthContext';
 import validateInputs from '../../utils/validateInput';
 import OAuthButtons from './OAuthButtons';
 import { Card, SignInContainer } from '../../styles/themes';
 import { FormInput } from '../interfaces/auth.i';
+import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
 	const { login } = useAuth();
@@ -35,6 +35,7 @@ const Login = () => {
 			},
 		},
 	);
+	const [rememberMe, setRememberMe] = useState(false);
 
 	const [open, setOpen] = useState(false);
 	const handleClickOpen = () => {
@@ -52,15 +53,13 @@ const Login = () => {
 		if (!isValid) return;
 		const { email, password } = formData;
 		try {
-			const success = await login({
+			await login({
 				email: email.value,
 				password: password.value,
 			});
-			if (success) {
-				setTimeout(() => {
-					navigate('/book');
-				}, 1500);
-			}
+			setTimeout(() => {
+				navigate('/book');
+			}, 1500);
 		} catch (err) {
 			console.error(err);
 		}
@@ -152,7 +151,12 @@ const Login = () => {
 							<Grid size={{ xs: 12, sm: 6 }}>
 								<FormControlLabel
 									control={
-										<Checkbox value="remember" color="primary" size="small" />
+										<Checkbox
+											color="primary"
+											size="small"
+											value={rememberMe}
+											onChange={(e) => setRememberMe(e.currentTarget.checked)}
+										/>
 									}
 									label="Remember me"
 								/>

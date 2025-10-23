@@ -1,14 +1,25 @@
-import { Box, Typography, Grid2 as Grid } from '@mui/material';
-import { useSlots } from '../../context/SlotContext';
+import {
+	Box,
+	Typography,
+	Grid2 as Grid,
+	CircularProgress,
+	Container,
+} from '@mui/material';
 import Slot from './Slot';
+import dayjs from 'dayjs';
+import { useSlots } from '../../hooks/useSlots';
 
 const TimeSlotBooking = () => {
-	const { groupedTimeSlots } = useSlots();
+	const { groupedTimeSlots, isLoading } = useSlots();
 
 	return (
-		<Box sx={{ flexGrow: 1, p: 3 }}>
+		<Container maxWidth="xl" sx={{ flexGrow: 1, p: 3 }}>
 			<Grid container spacing={2}>
-				{Object.keys(groupedTimeSlots).length === 0 ? (
+				{isLoading ? (
+					<Box sx={{ display: 'flex', justifyContent: 'center' }}>
+						<CircularProgress />
+					</Box>
+				) : Object.keys(groupedTimeSlots).length === 0 ? (
 					<Box
 						sx={{
 							m: '10px auto',
@@ -22,12 +33,18 @@ const TimeSlotBooking = () => {
 						</Typography>
 					</Box>
 				) : (
-					Object.keys(groupedTimeSlots).map((key: string, i) => (
-						<Slot key={i} slotKey={key} timeSlots={groupedTimeSlots} />
-					))
+					Object.keys(groupedTimeSlots)
+						.sort((a, b) => {
+							const aTime = dayjs(groupedTimeSlots[a][0].startTime).valueOf();
+							const bTime = dayjs(groupedTimeSlots[b][0].startTime).valueOf();
+							return aTime - bTime;
+						})
+						.map((key: string, i) => (
+							<Slot key={i} slotKey={key} timeSlots={groupedTimeSlots} />
+						))
 				)}
 			</Grid>
-		</Box>
+		</Container>
 	);
 };
 

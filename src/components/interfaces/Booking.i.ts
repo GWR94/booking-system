@@ -15,6 +15,7 @@ export type StatusType =
 	| 'available'
 	| 'booked'
 	| 'unavailable'
+	| 'confirmed'
 	| 'pending'
 	| 'cancelled';
 

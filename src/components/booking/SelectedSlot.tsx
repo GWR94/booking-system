@@ -1,18 +1,18 @@
 import React from 'react';
-import { useSlots } from '../../context/SlotContext';
 import { Paper, Typography, Button } from '@mui/material';
 import dayjs from 'dayjs';
 import { GroupedSlot } from '../interfaces/SlotContext.i';
 import { useNavigate } from 'react-router-dom';
-import { useBasket } from '../../context/BasketContext';
+import { useSession } from '../../hooks/useSession';
+import { useBasket } from '../../hooks/useBasket';
 
 interface SelectedSlotProps {
 	selectedSlot: GroupedSlot;
 }
 
 const SelectedSlot: React.FC<SelectedSlotProps> = ({ selectedSlot }) => {
-	const { selectedDate, selectedBay } = useSlots();
 	const { addToBasket } = useBasket();
+	const { selectedDate } = useSession();
 	const navigate = useNavigate();
 
 	const handleAddToBasket = () => {

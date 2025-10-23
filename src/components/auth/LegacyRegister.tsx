@@ -7,14 +7,11 @@ import {
 	Typography,
 	Link,
 } from '@mui/material';
-import { AxiosError } from 'axios';
 import React, { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { registrationSchema } from '../../validation/schema';
-import { useSnackbar } from '../../context/SnackbarContext';
 import { FormInput, FormInputType } from '../interfaces/auth.i';
-import axios from '../../utils/axiosConfig';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 const LegacyRegister = () => {
 	const { register, isLoading } = useAuth();
@@ -47,8 +44,6 @@ const LegacyRegister = () => {
 			password: formInput.password.value,
 			confirm: formInput.confirm.value,
 		};
-
-		// setSnackbar(snackbarState);
 
 		// get validation errors from joi validation library
 		const { error } = registrationSchema.validate(validationData, {

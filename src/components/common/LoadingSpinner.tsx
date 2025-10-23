@@ -15,13 +15,13 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 	return (
 		<Box
 			sx={{
-				...sx,
 				width: '100%',
 				height: '100%',
 				minHeight: '80px',
 				display: 'flex',
 				justifyContent: 'center',
 				alignItems: 'center',
+				...sx,
 			}}
 		>
 			<CircularProgress color={color} size={size} />

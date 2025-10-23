@@ -1,10 +1,12 @@
 // PrivateRoute.tsx
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { Box, CircularProgress } from '@mui/material';
+import { useSnackbar } from '../context/SnackbarContext';
+import { useAuth } from '../hooks/useAuth';
 
 const PrivateRoute: React.FC = () => {
 	const { isAuthenticated, isLoading } = useAuth();
+	const { showSnackbar } = useSnackbar();
 
 	if (isLoading) {
 		return (
@@ -23,6 +25,7 @@ const PrivateRoute: React.FC = () => {
 	}
 
 	if (!isAuthenticated) {
+		showSnackbar('You must be logged in to view this page', 'error');
 		return <Navigate to="/login" replace />;
 	}
 

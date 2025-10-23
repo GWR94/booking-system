@@ -19,11 +19,10 @@ import {
 	Warning,
 	Done,
 } from '@mui/icons-material';
-import { useBasket } from '../../context/BasketContext';
 import CheckoutItem from './CheckoutItem';
-import axios from '../../utils/axiosConfig';
-import { Booking } from '../interfaces/Booking.i';
 import { GroupedSlot } from '../interfaces/SlotContext.i';
+import { useBasket } from '../../hooks/useBasket';
+import { useBookingManager } from '../../hooks/useBookingManager';
 
 interface StatusContent {
 	text: string;
@@ -71,7 +70,8 @@ const STATUS_CONTENT_MAP: Record<PaymentIntent.Status, StatusContent> = {
 
 export default function CompletePage() {
 	const stripe = useStripe();
-	const { basket, basketPrice, booking, setBooking, clearBasket } = useBasket();
+	const { basket, basketPrice, clearBasket } = useBasket();
+	const { booking } = useBookingManager();
 
 	const [status, setStatus] = useState<PaymentIntent.Status>('processing');
 	const [intentId, setIntentId] = useState('');
@@ -87,50 +87,25 @@ export default function CompletePage() {
 				'payment_intent_client_secret',
 			);
 
+			console.log(clientSecret);
+
 			if (!clientSecret) return;
 
 			const { paymentIntent } = await stripe.retrievePaymentIntent(
 				clientSecret,
 			);
-			if (!paymentIntent) {
-				return;
-			}
+
+			if (!paymentIntent) return;
 
 			setItems(basket);
 			setStatus(paymentIntent.status);
 			setIntentId(paymentIntent.id);
 			setItemsCost(basketPrice);
-
-			if (paymentIntent.status === 'succeeded') {
-				await confirmBooking();
-			}
-
+			clearBasket();
 			setLoading(false);
 		};
 		fetchPaymentIntent();
 	}, [stripe]);
-
-	const confirmBooking = async (): Promise<boolean> => {
-		if (!booking) {
-			console.error('No booking found');
-			return false;
-		}
-		try {
-			const response = await axios.put('/api/bookings', {
-				bookingId: booking.id,
-				paymentStatus: status,
-				paymentId: intentId,
-			});
-			const updatedBooking: Booking = response.data.booking;
-			console.log(updatedBooking);
-			setBooking(updatedBooking);
-			clearBasket();
-			return true;
-		} catch (err) {
-			console.error(err);
-			return false;
-		}
-	};
 
 	return isLoading ? (
 		<Box display="flex" justifyContent="center" p={4}>

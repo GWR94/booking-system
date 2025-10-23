@@ -67,7 +67,6 @@ axiosInstance.interceptors.response.use(
 			} catch (refreshError) {
 				processQueue(refreshError);
 				isRefreshing = false;
-				// window.location.href = '/login';
 				return Promise.reject(refreshError);
 			}
 		}

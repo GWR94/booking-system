@@ -1,25 +1,36 @@
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AppRouter from './router/AppRouter';
-import { AuthProvider } from './context/AuthContext';
-import { SlotsProvider } from './context/SlotContext';
 import { SnackbarProvider } from './context/SnackbarContext';
-import { BasketProvider } from './context/BasketContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { AnimationProvider } from './context/AnimationContext';
+import { ThemeProvider } from './context/ThemeContext';
+import { CssBaseline } from '@mui/material';
 
-const App = () => {
-	return (
-		<LocalizationProvider dateAdapter={AdapterDayjs}>
-			<SnackbarProvider>
-				<BasketProvider>
-					<AuthProvider>
-						<SlotsProvider>
-							<AppRouter />
-						</SlotsProvider>
-					</AuthProvider>
-				</BasketProvider>
-			</SnackbarProvider>
-		</LocalizationProvider>
-	);
-};
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 1000 * 60 * 5, // 5 minutes
+			refetchOnWindowFocus: false,
+		},
+	},
+});
+
+const App = () => (
+	<ThemeProvider>
+		<CssBaseline />
+		<AnimationProvider>
+			<QueryClientProvider client={queryClient}>
+				<LocalizationProvider dateAdapter={AdapterDayjs}>
+					<SnackbarProvider>
+						<AppRouter />
+						<ReactQueryDevtools initialIsOpen={false} />
+					</SnackbarProvider>
+				</LocalizationProvider>
+			</QueryClientProvider>
+		</AnimationProvider>
+	</ThemeProvider>
+);
 
 export default App;

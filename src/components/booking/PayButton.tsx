@@ -1,11 +1,11 @@
-import React from 'react';
+import { useState } from 'react';
 import { useCheckout } from '@stripe/react-stripe-js';
 import { Button } from '@mui/material';
 
 const PayButton = () => {
 	const { confirm } = useCheckout();
-	const [loading, setLoading] = React.useState(false);
-	const [error, setError] = React.useState<{ message: string } | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<{ message: string } | null>(null);
 
 	const handleClick = () => {
 		setLoading(true);

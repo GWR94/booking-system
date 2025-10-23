@@ -2,14 +2,14 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { AuthProvider } from '../context/AuthContext';
 import { SnackbarProvider } from '../context/SnackbarContext';
-import { SlotsProvider } from '../context/SlotContext';
+import { BookingProvider } from '../context/BookingContext';
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<SnackbarProvider>
-			<SlotsProvider>
+			<BookingProvider>
 				<AuthProvider>{children}</AuthProvider>
-			</SlotsProvider>
+			</BookingProvider>
 		</SnackbarProvider>
 	);
 };

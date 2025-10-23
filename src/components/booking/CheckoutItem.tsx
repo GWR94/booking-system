@@ -1,19 +1,17 @@
 import {
 	Box,
 	Typography,
-	Button,
 	Card,
 	CardContent,
 	Grid2 as Grid,
 	IconButton,
-	Divider,
 } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from 'dayjs';
 import React from 'react';
-import { useSlots } from '../../context/SlotContext';
 import { GroupedSlot } from '../interfaces/SlotContext.i';
-import { useBasket } from '../../context/BasketContext';
+import { useSession } from '../../hooks/useSession';
+import { useBasket } from '../../hooks/useBasket';
 
 type CheckoutItemProps = {
 	slot: GroupedSlot;
@@ -23,7 +21,7 @@ type CheckoutItemProps = {
 export const HOURLY_RATE = 4500;
 
 const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
-	const { selectedDate } = useSlots();
+	const { selectedDate } = useSession();
 	const { removeFromBasket } = useBasket();
 	const SESSION_LENGTH = slot.slotIds.length;
 	const totalPrice = ((HOURLY_RATE / 100) * SESSION_LENGTH).toFixed(2);

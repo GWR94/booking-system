@@ -8,6 +8,7 @@ export interface AuthContextType {
 	login: (credentials: LoginCredentials) => Promise<boolean>;
 	logout: () => Promise<void>;
 	checkAuth: () => Promise<void>;
+	isAdmin: boolean;
 }
 
 export interface LoginCredentials {

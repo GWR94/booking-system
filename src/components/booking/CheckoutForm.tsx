@@ -15,22 +15,24 @@ import {
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
 import { useSnackbar } from '../../context/SnackbarContext';
 import CheckoutItem from './CheckoutItem';
-import { useBasket } from '../../context/BasketContext';
 import axios from '../../utils/axiosConfig';
-import { useAuth } from '../../context/AuthContext';
 import { AxiosError } from 'axios';
+import { useBasket } from '../../hooks/useBasket';
+import { useAuth } from '../../hooks/useAuth';
+import { useBookingManager } from '../../hooks/useBookingManager';
 
 const CheckoutForm: React.FC = () => {
 	const stripe = useStripe();
 	const elements = useElements();
 	const { user } = useAuth();
 	const { showSnackbar } = useSnackbar();
+	const { basket, basketPrice } = useBasket();
+	const { setBooking } = useBookingManager();
 
 	const [message, setMessage] = useState('');
 	const [isLoading, setLoading] = useState(false);
 	const [discount, setDiscount] = useState(0);
 	const [promoCode, setPromoCode] = useState('');
-	const { basket, basketPrice, setBooking } = useBasket();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -65,14 +67,13 @@ const CheckoutForm: React.FC = () => {
 		}
 		try {
 			let slotIds = basket.map((slot) => slot.slotIds).flat();
-			console.log(user.id);
-			const response = await axios.post('/api/bookings', {
+			const {
+				data: { booking },
+			} = await axios.post('/api/bookings', {
 				userId: user.id,
 				slotIds,
 			});
 
-			console.log(response.data);
-			const { booking } = response.data;
 			setBooking(booking);
 			return true;
 		} catch (err) {
@@ -86,6 +87,12 @@ const CheckoutForm: React.FC = () => {
 			return false;
 		}
 	};
+
+	/**
+	 * TODO
+	 * [ ] Add check for un
+	 *
+	 * */
 
 	const handlePromoCheck = () => {
 		if (!promoCode) return;
@@ -101,7 +108,15 @@ const CheckoutForm: React.FC = () => {
 
 	const paymentElementOptions: StripePaymentElementOptions = {
 		layout: 'accordion',
+		defaultValues: {
+			billingDetails: {
+				name: user?.name as string,
+				email: user?.email as string,
+			},
+		},
 	};
+
+	const VAT = ((parseInt(basketPrice) - discount) * 0.2).toFixed(2);
 
 	return (
 		<Box>
@@ -119,8 +134,7 @@ const CheckoutForm: React.FC = () => {
 				gutterBottom
 			>
 				Please check that all of the below details are correct, and continue
-				with payment. Payment is taken via Stripe, and no payment details are
-				seen or stored on our servers.
+				with payment.
 			</Typography>
 			{basket.map((slot) => (
 				<CheckoutItem slot={slot} key={slot.id} />
@@ -160,20 +174,61 @@ const CheckoutForm: React.FC = () => {
 					</Grid>
 				</Grid>
 				<Grid size={{ xs: 12, sm: 6 }}>
-					<Typography gutterBottom textAlign="right">
-						<strong>Subtotal: </strong> £{basketPrice}
-					</Typography>
-					<Typography
-						gutterBottom
-						textAlign="right"
-						sx={{ color: discount > 0 ? 'red' : 'black' }}
-					>
-						<strong>Discount: </strong> -£{discount.toFixed(2)}
-					</Typography>
-					<Typography gutterBottom textAlign="right">
-						<strong>Total: </strong> £
-						{(parseInt(basketPrice) - discount).toFixed(2)}
-					</Typography>
+					<Grid container spacing={1} alignItems="center">
+						<Grid size={{ xs: 6 }}>
+							<Typography variant="body1" fontWeight="bold" textAlign="right">
+								Subtotal:
+							</Typography>
+						</Grid>
+						<Grid size={{ xs: 6 }}>
+							<Typography variant="body1" textAlign="right">
+								£{(parseInt(basketPrice) - parseInt(VAT)).toFixed(2)}
+							</Typography>
+						</Grid>
+						{discount > 0 && (
+							<>
+								<Grid size={{ xs: 6 }}>
+									<Typography
+										variant="body1"
+										fontWeight="bold"
+										textAlign="right"
+										sx={{ color: 'red' }}
+									>
+										Discount:
+									</Typography>
+								</Grid>
+								<Grid size={{ xs: 6 }}>
+									<Typography
+										variant="body1"
+										textAlign="right"
+										sx={{ color: 'red' }}
+									>
+										-£{discount.toFixed(2)}
+									</Typography>
+								</Grid>
+							</>
+						)}
+						<Grid size={{ xs: 6 }}>
+							<Typography variant="body1" fontWeight="bold" textAlign="right">
+								VAT:
+							</Typography>
+						</Grid>
+						<Grid size={{ xs: 6 }}>
+							<Typography variant="body1" textAlign="right">
+								£{VAT}
+							</Typography>
+						</Grid>
+						<Grid size={{ xs: 6 }}>
+							<Typography variant="h6" fontWeight="bold" textAlign="right">
+								Total:
+							</Typography>
+						</Grid>
+						<Grid size={{ xs: 6 }}>
+							<Typography variant="h6" textAlign="right">
+								£{(parseInt(basketPrice) - discount).toFixed(2)}
+							</Typography>
+						</Grid>
+					</Grid>
 				</Grid>
 			</Grid>
 			<form id="payment-form" onSubmit={handleSubmit}>

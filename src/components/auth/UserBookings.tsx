@@ -20,14 +20,13 @@ import {
 	OpenInNew,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
-import { Booking, StatusType } from '../interfaces/Booking.i';
+import { StatusType } from '../interfaces/Booking.i';
 import dayjs from 'dayjs';
+import axios from '../../utils/axiosConfig';
+import { useAuth } from '../../hooks/useAuth';
 
-type UserBookingsProps = {
-	bookings: Booking[];
-};
-
-const UserBookings = ({ bookings }: UserBookingsProps) => {
+const UserBookings = () => {
+	const { user } = useAuth();
 	const [expandedRow, setExpandedRow] = useState<string | null>(null);
 	const renderBookingStatus = (status: StatusType) => {
 		const statusColors: Partial<
@@ -42,6 +41,12 @@ const UserBookings = ({ bookings }: UserBookingsProps) => {
 		return <Chip label={status} color={statusColors[status]} size="small" />;
 	};
 
+	const handleDeleteBooking = async (bookingId: number) => {
+		const { data } = await axios.delete(`/api/booking/${bookingId}`);
+	};
+
+	if (!user || user.bookings.length === 0) return;
+
 	return (
 		<Box sx={{ mt: 4 }}>
 			<Typography variant="h6" sx={{ mb: 2 }}>
@@ -52,15 +57,17 @@ const UserBookings = ({ bookings }: UserBookingsProps) => {
 					<TableHead>
 						<TableRow>
 							<TableCell width="50px" />
-							<TableCell>Booking Date</TableCell>
-							<TableCell>Slots</TableCell>
-							<TableCell>Status</TableCell>
-							<TableCell>Actions</TableCell>
+							<TableCell align="center">Booking Date</TableCell>
+							<TableCell align="center">Slots</TableCell>
+							<TableCell align="center">Status</TableCell>
+							<TableCell align="center">Actions</TableCell>
+							<TableCell align="center" width="80px">
+								Delete
+							</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{bookings.map((booking) => {
-							console.log(booking);
+						{user.bookings.map((booking) => {
 							const isExpanded = expandedRow === booking.id.toString();
 							return (
 								<React.Fragment key={booking.id}>
@@ -81,12 +88,14 @@ const UserBookings = ({ bookings }: UserBookingsProps) => {
 												)}
 											</IconButton>
 										</TableCell>
-										<TableCell>
+										<TableCell align="center">
 											{dayjs(booking.bookingTime).format('DD/MM/YYYY')}
 										</TableCell>
-										<TableCell>{booking.slots.length}</TableCell>
-										<TableCell>{renderBookingStatus(booking.status)}</TableCell>
-										<TableCell>
+										<TableCell align="center">{booking.slots.length}</TableCell>
+										<TableCell align="center">
+											{renderBookingStatus(booking.status)}
+										</TableCell>
+										<TableCell align="center">
 											{booking.paymentId && (
 												<Button
 													variant="outlined"
@@ -97,11 +106,20 @@ const UserBookings = ({ bookings }: UserBookingsProps) => {
 													href={`https://dashboard.stripe.com/payments/${booking.paymentId}`}
 													target="_blank"
 													rel="noopener noreferrer"
-													sx={{ m: '0 auto' }}
 												>
 													Payment Details
 												</Button>
 											)}
+										</TableCell>
+										<TableCell>
+											<Button
+												variant="outlined"
+												size="small"
+												color="primary"
+												onClick={() => handleDeleteBooking(booking.id)}
+											>
+												Delete
+											</Button>
 										</TableCell>
 									</TableRow>
 									<TableRow>

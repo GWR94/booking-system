@@ -19,6 +19,13 @@ export default defineConfig({
 		cors: true,
 		// https: true, // Enable if needed
 	},
+	resolve: {
+		alias: {
+			'@common': '/src/components/common',
+			'@components': '/src/components',
+			'@hooks': '/src/hooks',
+		},
+	},
 	test: {
 		globals: true,
 		environment: 'jsdom',

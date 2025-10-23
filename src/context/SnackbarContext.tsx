@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { Snackbar, Alert, AlertProps } from '@mui/material';
 
 interface SnackbarContextType {
 	showSnackbar: (message: string, severity?: AlertProps['severity']) => void;
@@ -48,13 +47,14 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
 				onClose={hideSnackbar}
 				anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
 			>
-				<MuiAlert
+				<Alert
 					onClose={hideSnackbar}
 					severity={snackbar.severity}
 					sx={{ width: '100%' }}
+					variant="filled"
 				>
 					{snackbar.message}
-				</MuiAlert>
+				</Alert>
 			</Snackbar>
 		</SnackbarContext.Provider>
 	);
