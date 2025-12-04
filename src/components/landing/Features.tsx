@@ -13,7 +13,7 @@ import {
 	EventAvailable as EventAvailableIcon,
 	LocationOn as LocationOnIcon,
 } from '@mui/icons-material';
-import { motion, Variants } from 'motion/react';
+import { AnimateIn } from '@common';
 
 const simulatorFeatures = [
 	{
@@ -42,28 +42,12 @@ const simulatorFeatures = [
 
 const Features = () => {
 	const theme = useTheme();
-	const MotionBox = motion.create(Box);
-
-	const variant: Variants = {
-		hidden: { opacity: 0, y: 40 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: { duration: 0.6, ease: 'easeOut' },
-		},
-	};
-
-	console.log(theme.palette.divider);
 
 	return (
-		<MotionBox
-			initial="hidden"
-			whileInView="visible"
-			viewport={{ once: true, amount: 0.2 }}
-			variants={variant}
+		<Box
 			sx={{
 				py: 10,
-				backgroundColor: alpha(theme.palette.accent.light, 0.3),
+				backgroundColor: alpha(theme.palette.primary.light, 0.3),
 			}}
 		>
 			<Container maxWidth="lg" sx={{ mb: 4 }}>
@@ -95,52 +79,54 @@ const Features = () => {
 				<Grid container spacing={4} sx={{ mt: 4 }}>
 					{simulatorFeatures.map((feature, index) => (
 						<Grid size={{ xs: 12, md: 3 }} key={index}>
-							<Box
-								textAlign="center"
-								sx={{
-									display: 'flex',
-									flexDirection: 'column',
-									justifyContent: 'space-around',
-									height: '100%',
-								}}
-							>
-								<Avatar
-									sx={{
-										width: 80,
-										height: 80,
-										margin: 'auto',
-										bgcolor: 'primary.dark',
-										color: 'secondary.light',
-									}}
-								>
-									{feature.icon}
-								</Avatar>
+							<AnimateIn delay={index * 0.1}>
 								<Box
+									textAlign="center"
 									sx={{
-										height: '100%',
 										display: 'flex',
 										flexDirection: 'column',
-										justifyContent: 'center',
+										justifyContent: 'space-around',
+										height: '100%',
 									}}
 								>
-									<Typography
-										variant="h6"
+									<Avatar
 										sx={{
-											mb: 1,
+											width: 80,
+											height: 80,
+											margin: 'auto',
+											bgcolor: 'primary.dark',
+											color: 'secondary.light',
 										}}
 									>
-										{feature.title}
-									</Typography>
-									<Typography variant="body2" color="text.secondary">
-										{feature.description}
-									</Typography>
+										{feature.icon}
+									</Avatar>
+									<Box
+										sx={{
+											height: '100%',
+											display: 'flex',
+											flexDirection: 'column',
+											justifyContent: 'center',
+										}}
+									>
+										<Typography
+											variant="h6"
+											sx={{
+												mb: 1,
+											}}
+										>
+											{feature.title}
+										</Typography>
+										<Typography variant="body2" color="text.secondary">
+											{feature.description}
+										</Typography>
+									</Box>
 								</Box>
-							</Box>
+							</AnimateIn>
 						</Grid>
 					))}
 				</Grid>
 			</Container>
-		</MotionBox>
+		</Box>
 	);
 };
 

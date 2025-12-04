@@ -49,51 +49,60 @@ export const Card = styled(MuiCard)(({ theme }) => ({
 declare module '@mui/material/styles' {
 	interface Palette {
 		accent: Palette['primary'];
+		link: Palette['primary'];
 	}
 	interface PaletteOptions {
 		accent?: PaletteColorOptions;
+		link?: PaletteColorOptions;
 	}
 }
 
 declare module '@mui/material/Button' {
 	interface ButtonPropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
 declare module '@mui/material/Badge' {
 	interface BadgePropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
 declare module '@mui/material/IconButton' {
 	interface IconButtonPropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
 declare module '@mui/material/SvgIcon' {
 	interface SvgIconPropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
 declare module '@mui/material/Avatar' {
 	interface AvatarPropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
 declare module '@mui/material/Chip' {
 	interface ChipPropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
 declare module '@mui/material/Fab' {
 	interface FabPropsColorOverrides {
 		accent: true;
+		link: true;
 	}
 }
 
@@ -143,43 +152,11 @@ const blueTealYellowTheme: ThemePalette = {
 			dark: '#087f23', // Darker shade
 			contrastText: '#ffffff',
 		},
-	},
-};
-
-const blueYellowTheme: ThemePalette = {
-	id: 'blue-yellow',
-	name: 'Blue Yellow',
-	palette: {
-		mode: 'dark',
-		primary: {
-			main: '#8ecae6', // Light blue
-			light: '#b3e4f3', // Lighter blue
-			dark: '#5b9db3', // Darker blue
-			contrastText: '#000',
-		},
-		secondary: {
-			main: '#219ebc', // Medium blue
-			light: '#5ab8d1', // Lighter medium blue
-			dark: '#176e83', // Darker medium blue
-			contrastText: '#000',
-		},
-		accent: {
-			main: '#023047', // Dark blue
-			light: '#355a6b', // Lighter dark blue
-			dark: '#011d2e', // Darker dark blue
-			contrastText: '#000',
-		},
-		warning: {
-			main: '#ffb703', // Yellow
-			light: '#ffcb4d', // Lighter yellow
-			dark: '#c68400', // Darker yellow
+		link: {
+			main: '#54cebf', // Bright cyan for good contrast on dark primary background
+			light: '#7fddd0', // Lighter cyan
+			dark: '#2a9d8f', // Darker cyan
 			contrastText: '#000000',
-		},
-		error: {
-			main: '#fb8500', // Orange
-			light: '#ff9e4d', // Lighter orange
-			dark: '#c45c00', // Darker orange
-			contrastText: '#ffffff',
 		},
 	},
 };
@@ -204,7 +181,7 @@ const modernCalmTheme: ThemePalette = {
 			main: '#f4a261', // Soft Orange
 			light: '#f7c08a', // Lighter Orange
 			dark: '#c17a3e', // Darker Orange
-			contrastText: '#ffffff', // White text
+			contrastText: '#000000', // Black text
 		},
 		warning: {
 			main: '#e9c46a', // Warm Yellow
@@ -224,20 +201,13 @@ const modernCalmTheme: ThemePalette = {
 			dark: '#1b6d63', // Darker Teal Green
 			contrastText: '#ffffff', // White text
 		},
-		background: {
-			default: '#f4f4f9', // Soft Neutral Background
-			paper: '#ffffff', // White Paper Background
-		},
-		text: {
-			primary: '#2d3748', // Dark Gray Text
-			secondary: '#718096', // Medium Gray Text
-			disabled: '#a0aec0', // Light Gray Text
+		link: {
+			main: '#64d8ff', // Bright sky blue for good contrast on medium-dark primary background
+			light: '#8ee4ff', // Lighter sky blue
+			dark: '#3db8e6', // Darker sky blue
+			contrastText: '#000000',
 		},
 	},
 };
 
-export const themes: ThemePalette[] = [
-	blueTealYellowTheme,
-	blueYellowTheme,
-	modernCalmTheme,
-];
+export const themes: ThemePalette[] = [blueTealYellowTheme, modernCalmTheme];

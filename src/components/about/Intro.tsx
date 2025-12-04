@@ -9,31 +9,15 @@ import {
 	Container,
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import { motion, Variants } from 'motion/react';
 
 const Intro = () => {
 	const theme = useTheme();
-	const MotionBox = motion.create(Box);
-
-	const variant: Variants = {
-		hidden: { opacity: 0, y: 40 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: { duration: 0.6, ease: 'easeOut' },
-		},
-	};
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 6 }}>
 			<Grid container spacing={4} alignItems="center">
 				<Grid size={{ xs: 12, md: 8 }}>
-					<MotionBox
-						initial="hidden"
-						whileInView="visible"
-						viewport={{ once: true, amount: 0.3 }}
-						variants={variant}
-					>
+					<Box>
 						<Typography
 							variant="h3"
 							component="h2"
@@ -112,17 +96,7 @@ const Intro = () => {
 									},
 								].map((item, index) => (
 									<Grid size={{ xs: 12, sm: 6 }} key={index}>
-										<MotionBox
-											initial={{ opacity: 0, x: -20 }}
-											whileInView={{
-												opacity: 1,
-												x: 0,
-												transition: {
-													delay: item.delay,
-													duration: 0.5,
-												},
-											}}
-											viewport={{ once: true }}
+										<Box
 											sx={{
 												display: 'flex',
 												alignItems: 'center',
@@ -149,24 +123,16 @@ const Intro = () => {
 												/>
 											</Box>
 											<Typography variant="body1">{item.text}</Typography>
-										</MotionBox>
+										</Box>
 									</Grid>
 								))}
 							</Grid>
 						</Box>
-					</MotionBox>
+					</Box>
 				</Grid>
 
 				<Grid container size={{ xs: 12, md: 4 }} spacing={2}>
-					<MotionBox
-						initial={{ opacity: 0, scale: 0.9 }}
-						whileInView={{
-							opacity: 1,
-							scale: 1,
-							transition: { duration: 0.7, ease: 'easeOut' },
-						}}
-						viewport={{ once: true, amount: 0.3 }}
-					>
+					<Box>
 						<Paper
 							elevation={6}
 							sx={{
@@ -187,7 +153,7 @@ const Intro = () => {
 								}}
 							/>
 						</Paper>
-					</MotionBox>
+					</Box>
 				</Grid>
 			</Grid>
 		</Container>

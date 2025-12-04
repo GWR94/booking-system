@@ -9,6 +9,11 @@ export interface Booking {
 	slots: iSlot[];
 	paymentId: string;
 	paymentStatus: string;
+	user?: {
+		name: string;
+		email: string;
+		phone?: string;
+	};
 }
 
 export type StatusType =

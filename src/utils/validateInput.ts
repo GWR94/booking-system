@@ -12,7 +12,6 @@ const validateInputs = (
 		password: formData.password.value,
 	};
 
-	// get validation errors from joi validation library
 	const { error } = loginSchema.validate(validationData, {
 		abortEarly: false,
 	});

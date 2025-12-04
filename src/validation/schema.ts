@@ -60,3 +60,25 @@ export const loginSchema = Joi.object<LoginForm>({
 			'string.empty': 'Password is required',
 		}),
 });
+
+export const guestSchema = Joi.object({
+	name: Joi.string().required().messages({
+		'string.empty': 'Name is required',
+	}),
+	email: Joi.string()
+		.email({
+			tlds: { allow: false },
+		})
+		.required()
+		.messages({
+			'string.email': 'Please enter a valid email address',
+			'string.empty': 'Email is required',
+		}),
+	phone: Joi.string()
+		.pattern(/^[0-9]{10,15}$/) // Basic phone number regex (adjust as needed)
+		.allow('') // Allow empty string for optional
+		.messages({
+			'string.pattern.base': 'Phone number is not valid',
+		})
+		.optional(), // Mark as optional
+});

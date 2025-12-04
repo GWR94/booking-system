@@ -1,11 +1,11 @@
 import { Box, Button } from '@mui/material';
 import dayjs from 'dayjs';
-import { useSession } from '../../hooks/useSession';
+import { useSession } from '@hooks';
 
 const NextPreviousButtons = () => {
 	const { setSelectedDate, selectedDate } = useSession();
 	return (
-		<Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+		<Box sx={{ display: 'flex', justifyContent: 'center', pb: 2 }}>
 			<Button
 				variant="outlined"
 				color="primary"

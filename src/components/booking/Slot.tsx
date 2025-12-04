@@ -4,21 +4,16 @@ import {
 	CardActions,
 	CardContent,
 	Chip,
-	Dialog,
-	DialogContent,
-	DialogContentText,
-	DialogTitle,
 	Grid2 as Grid,
 	Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { GroupedSlot, GroupedTimeSlots } from '../interfaces/SlotContext.i';
+import { GroupedTimeSlots } from '../interfaces/SlotContext.i';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from '../../utils/axiosConfig';
-import { Booking } from '../interfaces/Booking.i';
 import { useBasket } from '../../hooks/useBasket';
 import { useAuth } from '../../hooks/useAuth';
+import AdminBookingDialog from './AdminBookingDialog';
 
 type SlotProps = {
 	slotKey: string;
@@ -45,12 +40,10 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 	const slot = hourlySlots[0];
 	const startTime = dayjs(slot.startTime).format('h:mma');
 	const endTime = dayjs(slot.endTime).format('h:mma');
-	const slotPassed = slot.startTime.isBefore(dayjs());
+	const slotPassed = slot.endTime.isBefore(dayjs());
 
-	// Dialog states
-	const [pickDialogOpen, setPickDialogOpen] = useState(false);
-	const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-	const [booking, setBooking] = useState<Booking | null>(null);
+	// Dialog state
+	const [adminDialogOpen, setAdminDialogOpen] = useState(false);
 
 	// Set availability text and color
 	let availabilityText = '';
@@ -70,31 +63,10 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 		availabilityColor = 'error';
 	}
 
-	const handleAdminBookSlot = async (slot: GroupedSlot) => {
-		const {
-			data: { booking },
-		} = await axios.post(`/api/booking`, {
-			slotIds: slot.slotIds,
-		});
-		setBooking(booking);
-		setConfirmDialogOpen(true);
-	};
-
-	// Handler for adding to basket
 	const handleAddToBasket = () => {
-		// If there are available slots, add the first one
 		if (availableSlots.length > 0) {
 			addToBasket(availableSlots[0]);
 		}
-	};
-
-	// Handler for checkout now
-	const handleCheckoutNow = () => {
-		// If there are available slots, add the first one
-		if (availableSlots.length > 0) {
-			addToBasket(availableSlots[0]);
-		}
-		navigate('/checkout');
 	};
 
 	return (
@@ -117,7 +89,7 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 						>
 							{dayjs(slot.startTime).format('dddd Do MMMM')}
 						</Typography>
-						<Typography
+						{/* <Typography
 							variant="body2"
 							color="text.secondary"
 							sx={{ mt: 1, mb: 2 }}
@@ -125,27 +97,17 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 							{slotPassed
 								? 'This slot has passed.'
 								: `Availability: ${availableSlots.length}/${hourlySlots.length}`}
-						</Typography>
+						</Typography> */}
 						<Chip
 							label={slotPassed ? 'Unavailable' : availabilityText}
 							color={slotPassed ? 'error' : availabilityColor}
 							size="small"
+							sx={{ mt: 1 }}
 						/>
 					</CardContent>
 					<CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 						{isAdmin ? (
 							<>
-								{hourlySlots.length > 1 && (
-									<Button
-										variant="outlined"
-										color="primary"
-										size="small"
-										sx={{ textTransform: 'none' }}
-										onClick={() => setPickDialogOpen(true)}
-									>
-										Pick a Bay
-									</Button>
-								)}
 								<Button
 									variant="contained"
 									color="primary"
@@ -153,7 +115,7 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 									sx={{
 										textTransform: 'none',
 									}}
-									onClick={() => handleAdminBookSlot(availableSlots[0] || slot)}
+									onClick={() => setAdminDialogOpen(true)}
 								>
 									Book Slot
 								</Button>
@@ -180,9 +142,12 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 									sx={{
 										textTransform: 'none',
 									}}
-									onClick={handleCheckoutNow}
+									onClick={() => {
+										handleAddToBasket();
+										navigate('/checkout');
+									}}
 								>
-									Checkout Now
+									Checkout
 								</Button>
 							</>
 						)}
@@ -190,49 +155,14 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 				</Card>
 			</Grid>
 
-			{/* Pick dialog for admin */}
-			<Dialog open={pickDialogOpen} onClose={() => setPickDialogOpen(false)}>
-				<DialogTitle>Select a Bay</DialogTitle>
-				<DialogContent>
-					<DialogContentText>Pick a bay to book.</DialogContentText>
-					<Grid container spacing={2}>
-						{hourlySlots.map((slot) => (
-							<Grid key={slot.id}>
-								<Button
-									variant="outlined"
-									color="primary"
-									onClick={() => handleAdminBookSlot(slot)}
-								>
-									Bay {slot.bayId}
-								</Button>
-							</Grid>
-						))}
-					</Grid>
-				</DialogContent>
-			</Dialog>
-
-			{/* Confirmation dialog */}
-			{booking && (
-				<Dialog
-					open={confirmDialogOpen}
-					onClose={() => setConfirmDialogOpen(false)}
-				>
-					<DialogTitle>Booking Confirmed</DialogTitle>
-					<DialogContent>
-						<DialogContentText>
-							<Typography>Your booking has been confirmed.</Typography>
-							<Typography>Booking ID: {booking.id}</Typography>
-							<Typography>
-								Time:{' '}
-								{`${dayjs(startTime).format('dddd Do MMMM HH:mma')} - ${dayjs(
-									endTime,
-								).format('HH:mma')}`}
-							</Typography>
-							<Typography>Bay: {booking.slots[0].bayId}</Typography>
-						</DialogContentText>
-					</DialogContent>
-				</Dialog>
-			)}
+			{/* Admin booking dialog */}
+			<AdminBookingDialog
+				open={adminDialogOpen}
+				onClose={() => setAdminDialogOpen(false)}
+				slots={hourlySlots}
+				startTime={slot.startTime.format()}
+				endTime={slot.endTime.format()}
+			/>
 		</>
 	);
 };

@@ -5,13 +5,14 @@
 /.pnp
 .pnp.js
 
-/ .github
+/.github
 
 # testing
 /coverage
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store

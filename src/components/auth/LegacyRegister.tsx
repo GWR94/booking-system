@@ -50,8 +50,6 @@ const LegacyRegister = () => {
 			abortEarly: false,
 		});
 
-		console.log(error);
-
 		if (error) {
 			const updatedFormInput: FormInput = { ...formInput };
 			if (type) {

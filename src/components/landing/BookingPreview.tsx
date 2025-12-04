@@ -21,55 +21,10 @@ import {
 	GolfCourse,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { motion, useAnimation } from 'motion/react';
-import { useEffect, useRef } from 'react';
-import { useAnimationContext } from '../../context/AnimationContext';
 
 const BookingPreview = () => {
 	const theme = useTheme();
 	const navigate = useNavigate();
-	const MotionBox = motion.create(Box);
-	const MotionPaper = motion.create(Paper);
-	const MotionTypography = motion.create(Typography);
-	const MotionButton = motion.create(Button);
-
-	// Animation controls
-	const controls = useAnimation();
-
-	// Define staggered animation variants
-	const containerVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: {
-				staggerChildren: 0.1,
-				delayChildren: 0.2,
-			},
-		},
-	};
-
-	const cardVariants = {
-		hidden: { opacity: 0, y: 30 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: {
-				duration: 0.7,
-				ease: [0.22, 1, 0.36, 1],
-			},
-		},
-	};
-
-	const fadeInVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: {
-				duration: 0.6,
-				delay: 0.3,
-			},
-		},
-	};
 
 	// Step data with enhanced descriptions
 	const bookingSteps = [
@@ -116,16 +71,12 @@ const BookingPreview = () => {
 	];
 
 	return (
-		<MotionBox
+		<Box
 			id="booking-preview-section"
-			animate={controls}
-			variants={containerVariants}
 			sx={{
 				py: { xs: 8, md: 12 },
 				position: 'relative',
-				background: `linear-gradient(to bottom, ${
-					theme.palette.grey[50]
-				} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+				background: `linear-gradient(to bottom, ${theme.palette.primary.light} 0%,${theme.palette.primary.main} 100%)`,
 				overflow: 'hidden',
 				'&::after': {
 					content: '""',
@@ -135,8 +86,8 @@ const BookingPreview = () => {
 					width: '100%',
 					height: '40%',
 					background: `radial-gradient(ellipse at 50% 100%, ${alpha(
-						theme.palette.primary.main,
-						0.05,
+						theme.palette.accent.light,
+						0.15,
 					)} 0%, transparent 70%)`,
 					zIndex: 1,
 					pointerEvents: 'none',
@@ -145,10 +96,9 @@ const BookingPreview = () => {
 		>
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
 				<Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
-					<MotionTypography
+					<Typography
 						variant="h3"
 						gutterBottom
-						variants={fadeInVariants}
 						sx={{
 							fontWeight: 700,
 							color: theme.palette.primary.main,
@@ -156,12 +106,11 @@ const BookingPreview = () => {
 						}}
 					>
 						Easy Online Booking
-					</MotionTypography>
+					</Typography>
 
-					<MotionTypography
+					<Typography
 						variant="h6"
 						color="text.secondary"
-						variants={fadeInVariants}
 						sx={{
 							maxWidth: 700,
 							mx: 'auto',
@@ -171,10 +120,9 @@ const BookingPreview = () => {
 					>
 						Book your simulator session in seconds with our intuitive online
 						reservation system
-					</MotionTypography>
+					</Typography>
 
-					<MotionBox
-						variants={fadeInVariants}
+					<Box
 						sx={{
 							display: 'flex',
 							justifyContent: 'center',
@@ -186,40 +134,40 @@ const BookingPreview = () => {
 						<Chip
 							icon={<Check fontSize="small" />}
 							label="Real-time Availability"
-							color="secondary"
+							color="accent"
 							variant="outlined"
 							sx={{ fontWeight: 500 }}
 						/>
 						<Chip
 							icon={<DevicesOutlined fontSize="small" />}
 							label="Mobile Friendly"
-							color="secondary"
+							color="accent"
 							variant="outlined"
 							sx={{ fontWeight: 500 }}
 						/>
 						<Chip
 							icon={<Check fontSize="small" />}
 							label="Instant Confirmation"
-							color="secondary"
+							color="accent"
 							variant="outlined"
 							sx={{ fontWeight: 500 }}
 						/>
-					</MotionBox>
+					</Box>
 				</Box>
 
 				<Grid container spacing={4} justifyContent="center">
 					{bookingSteps.map((step, index) => (
 						<Grid size={{ xs: 12, md: 4 }} key={index}>
-							<MotionPaper
+							<Paper
 								elevation={4}
-								variants={cardVariants}
 								sx={{
 									p: 4,
+									borderRadius: '0 0 3px 3px',
 									height: '100%',
 									display: 'flex',
 									flexDirection: 'column',
 									alignItems: 'center',
-									borderRadius: 3,
+									mb: 8,
 									transition: 'all 0.3s ease',
 									position: 'relative',
 									'&:hover': {
@@ -239,7 +187,6 @@ const BookingPreview = () => {
 										right: 0,
 										height: '4px',
 										backgroundColor: step.color,
-										borderRadius: '3px 3px 0 0',
 									},
 								}}
 							>
@@ -252,7 +199,7 @@ const BookingPreview = () => {
 										width: 30,
 										height: 30,
 										borderRadius: '50%',
-										backgroundColor: '#fff',
+										backgroundColor: theme.palette.background.paper,
 										color: step.color,
 										display: 'flex',
 										alignItems: 'center',
@@ -264,9 +211,7 @@ const BookingPreview = () => {
 								>
 									{index + 1}
 								</Box>
-
 								{step.icon}
-
 								<Typography
 									variant="h5"
 									component="h3"
@@ -317,7 +262,7 @@ const BookingPreview = () => {
 										</Box>
 									))}
 								</Stack>
-							</MotionPaper>
+							</Paper>
 						</Grid>
 					))}
 				</Grid>
@@ -329,8 +274,6 @@ const BookingPreview = () => {
 						position: 'relative',
 						zIndex: 3,
 					}}
-					component={motion.div}
-					variants={fadeInVariants}
 				>
 					<Card
 						elevation={4}
@@ -338,9 +281,10 @@ const BookingPreview = () => {
 							maxWidth: 600,
 							mx: 'auto',
 							p: 2,
-							mt: { xs: 2, md: -7 },
-							borderRadius: 3,
-							background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+							borderTop: `4px solid ${theme.palette.primary.light}`,
+							borderBottom: `4px solid ${theme.palette.primary.light}`,
+							mt: { xs: 4, md: -9 },
+							borderRadius: 0,
 							boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
 						}}
 					>
@@ -351,7 +295,6 @@ const BookingPreview = () => {
 								gutterBottom
 								sx={{
 									fontWeight: 600,
-									color: 'white',
 									textAlign: 'center',
 								}}
 							>
@@ -362,7 +305,6 @@ const BookingPreview = () => {
 								variant="body1"
 								sx={{
 									mb: 3,
-									color: alpha('#fff', 0.85),
 									textAlign: 'center',
 								}}
 							>
@@ -370,7 +312,7 @@ const BookingPreview = () => {
 								golf game
 							</Typography>
 
-							<MotionButton
+							<Button
 								variant="contained"
 								color="secondary"
 								endIcon={<ArrowForward />}
@@ -385,20 +327,13 @@ const BookingPreview = () => {
 									mx: 'auto',
 									mb: 1,
 								}}
-								whileHover={{
-									scale: 1.02,
-									boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-									transition: { duration: 0.2 },
-								}}
-								whileTap={{ scale: 0.98 }}
 							>
 								Book a Session Now
-							</MotionButton>
+							</Button>
 
 							<Typography
 								variant="body2"
 								sx={{
-									color: alpha('#fff', 0.7),
 									textAlign: 'center',
 									mt: 1,
 								}}
@@ -409,7 +344,7 @@ const BookingPreview = () => {
 					</Card>
 				</Box>
 			</Container>
-		</MotionBox>
+		</Box>
 	);
 };
 

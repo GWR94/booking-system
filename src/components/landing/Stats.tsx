@@ -11,8 +11,9 @@ import {
 	Groups,
 	EmojiEvents,
 } from '@mui/icons-material';
-import { motion, Variants } from 'motion/react';
+import React from 'react';
 import AbstractBackground from '../../assets/svg/AbstractBackground';
+import AnimateIn from '../common/AnimateIn';
 
 const statsData = [
 	{
@@ -39,26 +40,6 @@ const statsData = [
 
 const Stats = () => {
 	const theme = useTheme();
-	const MotionBox = motion.create(Box);
-
-	const itemVariants: Variants = {
-		hidden: { opacity: 0, y: 40 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: { duration: 0.6, ease: 'easeOut' },
-		},
-	};
-
-	const staggerVariants: Variants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: {
-				staggerChildren: 0.2,
-			},
-		},
-	};
 
 	return (
 		<Box
@@ -67,55 +48,53 @@ const Stats = () => {
 				position: 'relative',
 				backgroundColor: theme.palette.primary.main,
 				overflow: 'hidden',
+				borderTop: `2px solid ${theme.palette.accent.main}`,
+				borderBottom: `2px solid ${theme.palette.accent.main}`,
 			}}
 		>
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-				<MotionBox
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, amount: 0.2 }}
-					variants={staggerVariants}
-				>
+				<Box>
 					<AbstractBackground opacity={0.07} />
 					<Grid container spacing={4} justifyContent="center">
 						{statsData.map((stat, index) => (
 							<Grid size={{ xs: 12, md: 3 }} key={index}>
-								<MotionBox
-									variants={itemVariants}
-									sx={{
-										textAlign: 'center',
-										py: 2,
-										color: theme.palette.primary.contrastText,
-									}}
-								>
-									<Box sx={{ mb: 2 }}>{stat.icon}</Box>
-									<Typography
-										variant="h3"
-										component="p"
+								<AnimateIn delay={index * 0.1}>
+									<Box
 										sx={{
-											fontWeight: 700,
-											mb: 1,
+											textAlign: 'center',
+											py: 2,
+											color: theme.palette.primary.contrastText,
 										}}
 									>
-										{stat.number}
-									</Typography>
-									<Typography
-										variant="h6"
-										sx={{
-											fontWeight: 500,
-											opacity: 0.9,
-										}}
-									>
-										{stat.label}
-									</Typography>
-								</MotionBox>
+										<Box sx={{ mb: 2 }}>{stat.icon}</Box>
+										<Typography
+											variant="h3"
+											component="p"
+											sx={{
+												fontWeight: 700,
+												mb: 1,
+											}}
+										>
+											{stat.number}
+										</Typography>
+										<Typography
+											variant="h6"
+											sx={{
+												fontWeight: 500,
+												opacity: 0.9,
+											}}
+										>
+											{stat.label}
+										</Typography>
+									</Box>
+								</AnimateIn>
 							</Grid>
 						))}
 					</Grid>
-				</MotionBox>
+				</Box>
 			</Container>
 		</Box>
 	);
 };
 
-export default Stats;
+export default React.memo(Stats);

@@ -1,0 +1,15 @@
+export { default as Contact } from './Contact';
+export { default as About } from './About';
+export { default as Terms } from './Terms';
+export { default as PrivacyPolicy } from './PrivacyPolicy';
+export { default as HelpCenter } from './HelpCenter';
+export { default as CookiesPolicy } from './CookiesPolicy';
+export { default as Membership } from './Membership';
+export { default as Checkout } from './Checkout';
+export { default as Login } from './Login';
+export { default as NotFound } from './NotFound';
+export { default as RegisterUser } from './RegisterUser';
+export { default as Landing } from './Landing';
+export { default as Booking } from './Booking';
+export { default as Home } from './Home';
+export { default as Profile } from './Profile';

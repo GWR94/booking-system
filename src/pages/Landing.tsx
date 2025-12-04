@@ -14,8 +14,8 @@ const Landing = () => {
 			<Features />
 			<FeaturedCourses />
 			<Stats />
-			<BookingPreview />
 			<Testimonials />
+			<BookingPreview />
 			<CallToAction />
 		</Box>
 	);

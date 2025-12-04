@@ -13,10 +13,8 @@ import {
 	Chip,
 	Divider,
 } from '@mui/material';
-import { motion, Variants, useAnimation } from 'motion/react';
 import { FormatQuote, Verified } from '@mui/icons-material';
-import { useEffect, useRef } from 'react';
-import { useAnimationContext } from '../../context/AnimationContext';
+import AnimateIn from '../common/AnimateIn';
 
 // Enhanced testimonial data with additional details
 const testimonials = [
@@ -54,41 +52,13 @@ const testimonials = [
 
 const Testimonials = () => {
 	const theme = useTheme();
-	const MotionBox = motion.create(Box);
-	const MotionCard = motion.create(Card);
-	const MotionTypography = motion.create(Typography);
-
-	// Create staggered variants for testimonial cards
-	const containerVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: {
-				staggerChildren: 0.2,
-				delayChildren: 0.2,
-			},
-		},
-	};
-
-	const itemVariants = {
-		hidden: { opacity: 0, y: 30 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: {
-				duration: 0.6,
-				ease: [0.22, 1, 0.36, 1],
-			},
-		},
-	};
 
 	return (
-		<MotionBox
+		<Box
 			id="testimonials-section"
-			variants={containerVariants}
 			sx={{
 				py: { xs: 8, md: 12 },
-				background: `linear-gradient(to bottom, ${theme.palette.grey[100]} 0%, ${theme.palette.background.default} 100%)`,
+				background: `linear-gradient(to bottom, ${theme.palette.background.paper} 0%, ${theme.palette.background.default} 100%)`,
 				position: 'relative',
 				overflow: 'hidden',
 				'&::before': {
@@ -97,10 +67,10 @@ const Testimonials = () => {
 					top: 0,
 					left: 0,
 					right: 0,
-					height: '400px',
+					height: '100%',
 					background: `radial-gradient(circle at 50% 50%, ${alpha(
-						theme.palette.primary.light,
-						0.08,
+						theme.palette.primary.main,
+						0.2,
 					)} 0%, transparent 70%)`,
 					zIndex: 1,
 				},
@@ -108,10 +78,9 @@ const Testimonials = () => {
 		>
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
 				<Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
-					<MotionTypography
+					<Typography
 						variant="h3"
 						gutterBottom
-						variants={itemVariants}
 						sx={{
 							fontWeight: 700,
 							color: theme.palette.primary.main,
@@ -119,12 +88,11 @@ const Testimonials = () => {
 						}}
 					>
 						What Our Customers Say
-					</MotionTypography>
+					</Typography>
 
-					<MotionTypography
+					<Typography
 						variant="h6"
 						color="text.secondary"
-						variants={itemVariants}
 						sx={{
 							maxWidth: 700,
 							mx: 'auto',
@@ -134,11 +102,10 @@ const Testimonials = () => {
 					>
 						Join hundreds of satisfied golfers who've improved their game with
 						our premium simulators
-					</MotionTypography>
+					</Typography>
 
-					<MotionBox
+					<Box
 						sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}
-						variants={itemVariants}
 					>
 						<Rating
 							value={4.9}
@@ -149,126 +116,129 @@ const Testimonials = () => {
 						<Typography variant="body2" fontWeight={500} color="text.secondary">
 							4.9/5 from over 200 reviews
 						</Typography>
-					</MotionBox>
+					</Box>
 				</Box>
 
 				<Grid container spacing={4} sx={{ mt: 4 }}>
 					{testimonials.map((testimonial, i) => (
 						<Grid size={{ xs: 12, md: 4 }} key={i}>
-							<MotionCard
-								variants={itemVariants}
-								sx={{
-									height: '100%',
-									display: 'flex',
-									flexDirection: 'column',
-									borderRadius: 3,
-									boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-									transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-									'&:hover': {
-										transform: 'translateY(-8px)',
-										boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
-									},
-									overflow: 'visible',
-									position: 'relative',
-								}}
-							>
-								<FormatQuote
+							<AnimateIn delay={i * 0.1}>
+								<Card
 									sx={{
-										position: 'absolute',
-										color: alpha(theme.palette.primary.main, 0.1),
-										fontSize: '6rem',
-										top: -15,
-										left: -10,
-										transform: 'rotate(5deg)',
-									}}
-								/>
-
-								<CardContent
-									sx={{
-										flex: 1,
+										height: '100%',
 										display: 'flex',
 										flexDirection: 'column',
-										p: 3,
-										zIndex: 2,
+										borderRadius: 3,
+										boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+										transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+										'&:hover': {
+											transform: 'translateY(-8px)',
+											boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
+										},
+										overflow: 'visible',
+										position: 'relative',
 									}}
 								>
-									<Box sx={{ mb: 3 }}>
-										<Rating
-											value={testimonial.stars}
-											readOnly
-											size="small"
-											sx={{ color: theme.palette.secondary.main }}
-										/>
-									</Box>
-
-									<Typography
-										variant="body1"
-										color="text.primary"
+									<FormatQuote
 										sx={{
-											fontStyle: 'italic',
-											mb: 3,
-											fontWeight: 400,
-											lineHeight: 1.6,
-											minHeight: 120,
-											position: 'relative',
-											zIndex: 5,
+											position: 'absolute',
+											color: alpha(theme.palette.primary.main, 0.1),
+											fontSize: '6rem',
+											top: -15,
+											left: -10,
+											transform: 'rotate(5deg)',
+										}}
+									/>
+
+									<CardContent
+										sx={{
+											flex: 1,
+											display: 'flex',
+											flexDirection: 'column',
+											p: 3,
+											zIndex: 2,
 										}}
 									>
-										"{testimonial.quote}"
-									</Typography>
-
-									<Divider sx={{ mb: 3 }} />
-
-									<Stack direction="row" spacing={2} alignItems="center">
-										<Avatar
-											src={testimonial.avatar}
-											sx={{
-												width: 56,
-												height: 56,
-												border: `2px solid ${alpha(
-													theme.palette.primary.main,
-													0.2,
-												)}`,
-											}}
-										/>
-
-										<Box sx={{ flex: 1 }}>
-											<Box
-												sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}
-											>
-												<Typography variant="subtitle1" fontWeight={600}>
-													{testimonial.name}
-												</Typography>
-												{testimonial.verified && (
-													<Verified
-														sx={{
-															ml: 1,
-															fontSize: '1rem',
-															color: theme.palette.secondary.main,
-														}}
-													/>
-												)}
-											</Box>
-
-											<Typography
-												variant="caption"
-												color="text.secondary"
-												sx={{ display: 'block' }}
-											>
-												{testimonial.position} • Handicap:{' '}
-												{testimonial.handicap}
-											</Typography>
+										<Box sx={{ mb: 3 }}>
+											<Rating
+												value={testimonial.stars}
+												readOnly
+												size="small"
+												sx={{ color: theme.palette.secondary.main }}
+											/>
 										</Box>
-									</Stack>
-								</CardContent>
-							</MotionCard>
+
+										<Typography
+											variant="body1"
+											color="text.primary"
+											sx={{
+												fontStyle: 'italic',
+												mb: 3,
+												fontWeight: 400,
+												lineHeight: 1.6,
+												minHeight: 120,
+												position: 'relative',
+												zIndex: 5,
+											}}
+										>
+											"{testimonial.quote}"
+										</Typography>
+
+										<Divider sx={{ mb: 3 }} />
+
+										<Stack direction="row" spacing={2} alignItems="center">
+											<Avatar
+												src={testimonial.avatar}
+												sx={{
+													width: 56,
+													height: 56,
+													border: `2px solid ${alpha(
+														theme.palette.primary.main,
+														0.2,
+													)}`,
+												}}
+											/>
+
+											<Box sx={{ flex: 1 }}>
+												<Box
+													sx={{
+														display: 'flex',
+														alignItems: 'center',
+														mb: 0.5,
+													}}
+												>
+													<Typography variant="subtitle1" fontWeight={600}>
+														{testimonial.name}
+													</Typography>
+													{testimonial.verified && (
+														<Verified
+															sx={{
+																ml: 1,
+																fontSize: '1rem',
+																color: theme.palette.secondary.main,
+															}}
+														/>
+													)}
+												</Box>
+
+												<Typography
+													variant="caption"
+													color="text.secondary"
+													sx={{ display: 'block' }}
+												>
+													{testimonial.position} • Handicap:{' '}
+													{testimonial.handicap}
+												</Typography>
+											</Box>
+										</Stack>
+									</CardContent>
+								</Card>
+							</AnimateIn>
 						</Grid>
 					))}
 				</Grid>
 
 				<Box
-					component={motion.div}
-					variants={itemVariants}
 					sx={{
 						mt: 6,
 						textAlign: 'center',
@@ -309,7 +279,7 @@ const Testimonials = () => {
 					/>
 				</Box>
 			</Container>
-		</MotionBox>
+		</Box>
 	);
 };
 

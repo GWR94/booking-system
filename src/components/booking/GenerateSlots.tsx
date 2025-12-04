@@ -9,7 +9,7 @@ import Slot from './Slot';
 import dayjs from 'dayjs';
 import { useSlots } from '../../hooks/useSlots';
 
-const TimeSlotBooking = () => {
+const GenerateSlots = () => {
 	const { groupedTimeSlots, isLoading } = useSlots();
 
 	return (
@@ -34,12 +34,18 @@ const TimeSlotBooking = () => {
 					</Box>
 				) : (
 					Object.keys(groupedTimeSlots)
+						.filter((key: string) => {
+							const firstSlot = groupedTimeSlots[key][0];
+							return dayjs(firstSlot.startTime).isAfter(
+								dayjs().subtract(30, 'minutes'),
+							);
+						})
 						.sort((a, b) => {
 							const aTime = dayjs(groupedTimeSlots[a][0].startTime).valueOf();
 							const bTime = dayjs(groupedTimeSlots[b][0].startTime).valueOf();
 							return aTime - bTime;
 						})
-						.map((key: string, i) => (
+						.map((key: string, i: number) => (
 							<Slot key={i} slotKey={key} timeSlots={groupedTimeSlots} />
 						))
 				)}
@@ -48,4 +54,4 @@ const TimeSlotBooking = () => {
 	);
 };
 
-export default TimeSlotBooking;
+export default GenerateSlots;

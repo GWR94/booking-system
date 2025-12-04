@@ -14,6 +14,7 @@ import {
 	Twitter,
 	Instagram,
 	YouTube,
+	X,
 	GolfCourse,
 	Email,
 	Phone,
@@ -23,7 +24,6 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
-	const currentYear = new Date().getFullYear();
 
 	return (
 		<Box
@@ -32,11 +32,11 @@ const Footer: React.FC = () => {
 				backgroundColor: theme.palette.primary.main,
 				color: theme.palette.primary.contrastText,
 				py: 6,
-				mt: 'auto', // This pushes the footer to the bottom if the page content is short
+				mt: 'auto',
 			}}
 		>
-			<Container maxWidth="xl">
-				<Grid container spacing={4}>
+			<Container>
+				<Grid container spacing={2}>
 					{/* Logo and Description */}
 					<Grid size={{ xs: 12, md: 4 }}>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -76,7 +76,7 @@ const Footer: React.FC = () => {
 							</IconButton>
 							<IconButton
 								color="inherit"
-								aria-label="Twitter"
+								aria-label="X | Twitter"
 								sx={{
 									color: theme.palette.accent.main,
 
@@ -108,7 +108,7 @@ const Footer: React.FC = () => {
 									},
 								}}
 							>
-								<YouTube />
+								<X />
 							</IconButton>
 						</Box>
 					</Grid>
@@ -203,7 +203,7 @@ const Footer: React.FC = () => {
 					</Grid>
 
 					{/* Contact */}
-					<Grid size={{ xs: 12, md: 2 }}>
+					<Grid size={{ xs: 12, md: 3 }}>
 						<Typography
 							variant="h6"
 							gutterBottom
@@ -219,11 +219,25 @@ const Footer: React.FC = () => {
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
 							<Phone sx={{ mr: 1, color: theme.palette.error.main }} />
-							<Typography variant="body2">+44 79874 45123</Typography>
+							<Typography variant="body2">+44 79864 45123</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<Email sx={{ mr: 1, color: theme.palette.error.dark }} />
-							<Typography variant="body2">info@gwrgolf.com</Typography>
+							<Typography variant="body2">
+								<Box
+									component="a"
+									href="mailto:info@gwrgolf.com"
+									sx={{
+										color: '#fff',
+										textDecoration: 'none',
+										'&:hover': {
+											textDecoration: 'underline',
+										},
+									}}
+								>
+									info@gwrgolf.com
+								</Box>
+							</Typography>
 						</Box>
 					</Grid>
 				</Grid>
@@ -241,7 +255,8 @@ const Footer: React.FC = () => {
 						variant="body2"
 						sx={{ color: theme.palette.grey[500], mb: { xs: 2, sm: 0 } }}
 					>
-						© {currentYear} GWR Golf Simulators. All rights reserved.
+						© {new Date().getFullYear()} GWR Golf Simulators. All rights
+						reserved.
 					</Typography>
 					<Box sx={{ display: 'flex', gap: 2 }}>
 						<Link

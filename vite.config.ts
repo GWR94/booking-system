@@ -24,6 +24,10 @@ export default defineConfig({
 			'@common': '/src/components/common',
 			'@components': '/src/components',
 			'@hooks': '/src/hooks',
+			'@context': '/src/context',
+			'@assets': '/src/assets',
+			'@pages': '/src/pages',
+			'@utils': '/src/utils',
 		},
 	},
 	test: {

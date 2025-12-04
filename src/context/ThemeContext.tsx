@@ -8,6 +8,7 @@ import { themes } from '../styles/themes';
 
 interface ThemeContextType {
 	currentTheme: Theme;
+	currentThemeId: string;
 	changeTheme: (themeId: string) => void;
 	availableThemes: typeof themes;
 	darkMode: boolean;
@@ -35,6 +36,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
 
 	const theme = createTheme({
 		palette: {
+			mode: darkMode ? 'dark' : 'light',
 			...currentTheme.palette,
 		},
 		typography: {
@@ -53,6 +55,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
 		<ThemeContext.Provider
 			value={{
 				currentTheme: theme,
+				currentThemeId: themeId,
 				changeTheme,
 				availableThemes: themes,
 				darkMode,

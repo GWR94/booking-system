@@ -5,6 +5,7 @@ interface ImportMetaEnv {
 	readonly VITE_STRIPE_PUBLIC_KEY: string;
 	readonly VITE_API_URL: string;
 	readonly NODE_ENV: 'development' | 'production';
+	readonly VITE_CAPTCHA_SITE_KEY: string;
 }
 
 interface ImportMeta {

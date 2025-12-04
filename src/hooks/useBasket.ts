@@ -3,7 +3,7 @@ import { getBasket, saveBasket } from '../api/basket';
 import { GroupedSlot } from '../components/interfaces/SlotContext.i';
 import { useSnackbar } from '../context/SnackbarContext';
 import dayjs from 'dayjs';
-import { HOURLY_RATE } from '../components/booking/CheckoutItem';
+import { HOURLY_RATE } from '../components/checkout/CheckoutItem';
 import { useEffect } from 'react';
 
 export function useBasket() {
@@ -19,11 +19,13 @@ export function useBasket() {
 	useEffect(() => {
 		const fetchBasket = () => {
 			const basketData = getBasket();
-
-			if (dayjs(basketData[0]?.startTime).isBefore(dayjs())) {
+			const updatedBasket = basketData.filter((item) =>
+				dayjs(item.startTime).isAfter(dayjs()),
+			);
+			if (updatedBasket.length !== basket.length) {
 				// If the basket contains past slots, clear it
 				console.error('Basket contains past slots, clearing...');
-				saveBasket([]);
+				saveBasket(updatedBasket);
 				queryClient.setQueryData(['basket'], basketData);
 			}
 		};

@@ -1,8 +1,8 @@
 import { Dayjs } from 'dayjs';
-import { SessionTimes } from '../../pages/Booking';
 import { Booking } from './Booking.i';
 
 export type Bays = 1 | 2 | 3 | 4 | 5;
+export type SessionTimes = 1 | 2 | 3 | 4;
 
 export interface BookingContextType {
 	selectedDate: Dayjs;

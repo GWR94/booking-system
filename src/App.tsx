@@ -4,7 +4,7 @@ import AppRouter from './router/AppRouter';
 import { SnackbarProvider } from './context/SnackbarContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { AnimationProvider } from './context/AnimationContext';
+
 import { ThemeProvider } from './context/ThemeContext';
 import { CssBaseline } from '@mui/material';
 
@@ -20,16 +20,14 @@ const queryClient = new QueryClient({
 const App = () => (
 	<ThemeProvider>
 		<CssBaseline />
-		<AnimationProvider>
-			<QueryClientProvider client={queryClient}>
-				<LocalizationProvider dateAdapter={AdapterDayjs}>
-					<SnackbarProvider>
-						<AppRouter />
-						<ReactQueryDevtools initialIsOpen={false} />
-					</SnackbarProvider>
-				</LocalizationProvider>
-			</QueryClientProvider>
-		</AnimationProvider>
+		<QueryClientProvider client={queryClient}>
+			<LocalizationProvider dateAdapter={AdapterDayjs}>
+				<SnackbarProvider>
+					<AppRouter />
+					<ReactQueryDevtools initialIsOpen={false} />
+				</SnackbarProvider>
+			</LocalizationProvider>
+		</QueryClientProvider>
 	</ThemeProvider>
 );
 

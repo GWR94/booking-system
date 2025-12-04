@@ -1,5 +1,6 @@
 import { Box, Button } from '@mui/material';
 import { GoogleIcon, FacebookIcon } from '../../assets/icons/CustomIcons';
+import { X } from '@mui/icons-material';
 
 interface OAuthButtonsProps {
 	isLogin?: boolean;
@@ -22,6 +23,14 @@ const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => (
 			startIcon={<FacebookIcon />}
 		>
 			Sign {isLogin ? 'in ' : 'up '} with Facebook
+		</Button>
+		<Button
+			fullWidth
+			variant="outlined"
+			href="/api/user/login/x"
+			startIcon={<X />}
+		>
+			Sign {isLogin ? 'in ' : 'up '} with X
 		</Button>
 	</Box>
 );

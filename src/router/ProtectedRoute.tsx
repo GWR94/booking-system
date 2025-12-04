@@ -2,7 +2,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import { useSnackbar } from '../context/SnackbarContext';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@hooks';
 
 const PrivateRoute: React.FC = () => {
 	const { isAuthenticated, isLoading } = useAuth();

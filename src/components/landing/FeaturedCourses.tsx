@@ -9,14 +9,14 @@ import {
 	Button,
 	useTheme,
 } from '@mui/material';
-import { motion, Variants } from 'motion/react';
+
 import { Link as RouterLink } from 'react-router-dom';
 
 const featuredCourses = [
 	{
 		name: 'St. Andrews Links',
 		image:
-			'https://2f1a7f9478.visitscotland.net/binaries/content/gallery/visitscotland/cms-images/2022/07/20/st_andrews_old_course_01-1.jpg',
+			'https://s7d9.scene7.com/is/image/kohlerhospitality/aae41028_rgb?wid=993',
 		location: 'Scotland, UK',
 		description:
 			'Experience the historic home of golf with our highly accurate simulation of the famous Old Course at St. Andrews.',
@@ -40,25 +40,11 @@ const featuredCourses = [
 ];
 
 const FeaturedCourses = () => {
-	const variant: Variants = {
-		hidden: { opacity: 0, y: 40 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: { duration: 0.6, ease: 'easeOut' },
-		},
-	};
 	const theme = useTheme();
-	const MotionBox = motion.create(Box);
 	return (
 		<Box sx={{ p: 10 }}>
 			<Container maxWidth="lg">
-				<MotionBox
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, amount: 0.2 }}
-					variants={variant}
-				>
+				<Box>
 					<Box sx={{ textAlign: 'center', mb: 6 }}>
 						<Typography
 							variant="h3"
@@ -88,19 +74,7 @@ const FeaturedCourses = () => {
 					<Grid container spacing={2}>
 						{featuredCourses.map((course, index) => (
 							<Grid size={{ xs: 12, md: 4 }} key={index}>
-								<MotionBox
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{
-										opacity: 1,
-										y: 0,
-										transition: {
-											delay: index * 0.2,
-											duration: 0.5,
-										},
-									}}
-									sx={{ height: '100%' }}
-									viewport={{ once: true }}
-								>
+								<Box sx={{ height: '100%' }}>
 									<Card
 										elevation={0}
 										sx={{
@@ -154,7 +128,7 @@ const FeaturedCourses = () => {
 											</Typography>
 										</CardContent>
 									</Card>
-								</MotionBox>
+								</Box>
 							</Grid>
 						))}
 					</Grid>
@@ -175,7 +149,7 @@ const FeaturedCourses = () => {
 							View All Courses
 						</Button>
 					</Box>
-				</MotionBox>
+				</Box>
 			</Container>
 		</Box>
 	);

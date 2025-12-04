@@ -1,32 +1,37 @@
-// src/App.tsx
-import { FC } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from '../components/auth/Login';
-import Booking from '../pages/Booking';
-import RegisterUser from '../pages/RegisterUser';
 import ProtectedRoute from './ProtectedRoute';
-import NotFound from '../pages/NotFound';
-import Landing from '../pages/Landing';
-import NavBar from '../navigation/NavBar';
-import Profile from '../pages/Profile';
-import Checkout from '../components/booking/Checkout';
-import { useAuth } from '../hooks/useAuth';
-import Footer from '../components/common/Footer';
-import PrivacyPolicy from '../components/policy/PrivacyPolicy';
-import { Box } from '@mui/material';
-import HelpCenter from '../components/policy/HelpCenter';
-import Terms from '../components/policy/Terms';
-import CookiesPolicy from '../components/policy/CookiesPolicy';
-import Contact from '../pages/Contact';
-import About from '../pages/About';
-import Membership from '../pages/Membership';
-import ScrollToTop from '../hooks/ScrollToTop';
+import { useAuth } from '@hooks';
+import { Footer, NavBar } from '@common';
+import { alpha, Box, useTheme } from '@mui/material';
+import {
+	About,
+	Membership,
+	NotFound,
+	RegisterUser,
+	Checkout,
+	Landing,
+	Login,
+	Profile,
+	Booking,
+	Contact,
+	Terms,
+	PrivacyPolicy,
+	HelpCenter,
+	CookiesPolicy,
+} from '@pages';
+import ScrollToTop from '@utils/ScrollToTop';
 
-const App: FC = () => {
+const App = () => {
 	const { isAuthenticated } = useAuth();
+	const theme = useTheme();
 	return (
 		<Router>
-			<Box sx={{ minHeight: '100vh' }}>
+			<Box
+				sx={{
+					minHeight: '100vh',
+					bgcolor: alpha(theme.palette.primary.main, 0.1),
+				}}
+			>
 				<ScrollToTop />
 				<NavBar />
 				<Routes>
@@ -37,8 +42,8 @@ const App: FC = () => {
 					/>
 					<Route element={<ProtectedRoute />}>
 						<Route path="/profile" element={<Profile />} />
-						<Route path="/checkout/*" element={<Checkout />} />
 					</Route>
+					<Route path="/checkout/*" element={<Checkout />} />
 					<Route path="/privacy" element={<PrivacyPolicy />} />
 					<Route path="/help" element={<HelpCenter />} />
 					<Route path="/book" element={<Booking />} />

@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Avatar, Typography, IconButton } from '@mui/material';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
-import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { Box, Avatar, Typography } from '@mui/material';
 
 const testimonials = [
 	{
@@ -38,6 +36,7 @@ const TestimonialCarousel = () => {
 
 	return (
 		<Box
+			key={currentIndex}
 			sx={{
 				mt: 3,
 				p: 2,
@@ -49,30 +48,21 @@ const TestimonialCarousel = () => {
 				overflow: 'hidden',
 			}}
 		>
-			{/* Testimonial Content */}
-			<motion.div
-				key={currentIndex}
-				initial={{ opacity: 0, x: 100 }}
-				animate={{ opacity: 1, x: 0 }}
-				exit={{ opacity: 0, x: -100 }}
-				transition={{ duration: 0.5 }}
-			>
-				<Box sx={{ display: 'flex', alignItems: 'center', height: '60px' }}>
-					<Avatar
-						src={testimonials[currentIndex].avatar}
-						sx={{ mr: 2, width: 56, height: 56 }}
-					/>
-					<Box>
-						<Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-							{testimonials[currentIndex].comment}
-						</Typography>
-						<Typography variant="caption" sx={{ opacity: 0.8 }}>
-							{testimonials[currentIndex].name},{' '}
-							{testimonials[currentIndex].handicap}
-						</Typography>
-					</Box>
+			<Box sx={{ display: 'flex', alignItems: 'center', height: '60px' }}>
+				<Avatar
+					src={testimonials[currentIndex].avatar}
+					sx={{ mr: 2, width: 56, height: 56 }}
+				/>
+				<Box>
+					<Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+						{testimonials[currentIndex].comment}
+					</Typography>
+					<Typography variant="caption" sx={{ opacity: 0.8 }}>
+						{testimonials[currentIndex].name},{' '}
+						{testimonials[currentIndex].handicap}
+					</Typography>
 				</Box>
-			</motion.div>
+			</Box>
 		</Box>
 	);
 };

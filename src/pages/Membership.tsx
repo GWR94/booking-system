@@ -13,7 +13,6 @@ import {
 	AccordionDetails,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { motion } from 'motion/react';
 
 const membershipTiers = [
 	{
@@ -53,7 +52,6 @@ const membershipTiers = [
 
 const Membership = () => {
 	const theme = useTheme();
-	const MotionBox = motion(Box);
 
 	return (
 		<Box sx={{ py: 10, backgroundColor: theme.palette.background.default }}>
@@ -90,18 +88,7 @@ const Membership = () => {
 				<Grid container spacing={4} sx={{ mb: 8 }}>
 					{membershipTiers.map((tier, index) => (
 						<Grid size={{ xs: 12, md: 4 }} key={index}>
-							<MotionBox
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{
-									opacity: 1,
-									y: 0,
-									transition: {
-										delay: index * 0.2,
-										duration: 0.5,
-									},
-								}}
-								viewport={{ once: true }}
-							>
+							<Box>
 								<Card
 									elevation={3}
 									sx={{
@@ -185,7 +172,7 @@ const Membership = () => {
 										</Button>
 									</CardActions>
 								</Card>
-							</MotionBox>
+							</Box>
 						</Grid>
 					))}
 				</Grid>
