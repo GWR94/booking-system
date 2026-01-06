@@ -18,11 +18,6 @@ const UserProfile = () => {
 		setIsEditing(!isEditing);
 	};
 
-	const handleSave = () => {
-		// TODO
-		setIsEditing(false);
-	};
-
 	return (
 		<Box maxWidth="sm" margin="auto">
 			<Typography
@@ -33,10 +28,7 @@ const UserProfile = () => {
 				User Profile
 			</Typography>
 			{isEditing ? (
-				<EditProfile
-					handleSave={handleSave}
-					handleEditToggle={handleEditToggle}
-				/>
+				<EditProfile handleEditToggle={handleEditToggle} />
 			) : (
 				<ViewProfile handleEditToggle={handleEditToggle} />
 			)}

@@ -1,16 +1,26 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { AuthProvider } from '../context/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackbarProvider } from '../context/SnackbarContext';
-import { BookingProvider } from '../context/BookingContext';
+import { ThemeProvider } from '../context/ThemeContext';
+
+const createTestQueryClient = () =>
+	new QueryClient({
+		defaultOptions: {
+			queries: {
+				retry: false,
+			},
+		},
+	});
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+	const queryClient = createTestQueryClient();
 	return (
-		<SnackbarProvider>
-			<BookingProvider>
-				<AuthProvider>{children}</AuthProvider>
-			</BookingProvider>
-		</SnackbarProvider>
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider>
+				<SnackbarProvider>{children}</SnackbarProvider>
+			</ThemeProvider>
+		</QueryClientProvider>
 	);
 };
 

@@ -13,14 +13,14 @@ vi.mock('../../utils/axiosConfig', () => ({
 const mockOnClose = vi.fn();
 const mockSlots = [
 	{
-		id: 'slot1',
+		id: 1,
 		startTime: dayjs('2024-01-01T10:00:00'),
 		endTime: dayjs('2024-01-01T11:00:00'),
 		slotIds: [101, 102],
 		bayId: 1,
 	},
 	{
-		id: 'slot2',
+		id: 2,
 		startTime: dayjs('2024-01-01T10:00:00'),
 		endTime: dayjs('2024-01-01T11:00:00'),
 		slotIds: [201, 202],
