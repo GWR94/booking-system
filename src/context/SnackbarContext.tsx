@@ -6,7 +6,7 @@ interface SnackbarContextType {
 	hideSnackbar: () => void;
 }
 
-const SnackbarContext = createContext<SnackbarContextType | undefined>(
+export const SnackbarContext = createContext<SnackbarContextType | undefined>(
 	undefined,
 );
 

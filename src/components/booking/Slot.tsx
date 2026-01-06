@@ -1,4 +1,5 @@
 import {
+	Box,
 	Button,
 	Card,
 	CardActions,
@@ -71,38 +72,62 @@ const Slot = ({ timeSlots, slotKey }: SlotProps) => {
 
 	return (
 		<>
-			<Grid size={{ lg: 3, md: 4, sm: 6, xs: 12 }}>
+			<Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
 				<Card
+					elevation={1}
 					sx={{
 						p: { xs: 0, sm: 1 },
+						height: '100%',
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'space-between',
+						borderRadius: 3,
+						transition: 'all 0.3s ease',
+						border: '1px solid transparent',
+						'&:hover': {
+							transform: 'translateY(-4px)',
+							boxShadow: `0 6px 12px rgba(0, 0, 0, 0.22)`,
+						},
 					}}
 				>
 					<CardContent>
-						<Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-							{startTime} - {endTime}
-						</Typography>
+						<Box
+							sx={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'flex-start',
+								mb: 1,
+							}}
+						>
+							<Typography variant="h6" sx={{ fontWeight: 800 }}>
+								{startTime} - {endTime}
+							</Typography>
+						</Box>
 
 						<Typography
 							variant="subtitle2"
 							gutterBottom
-							sx={{ fontWeight: 100, color: 'gray' }}
+							sx={{
+								fontWeight: 500,
+								color: 'text.secondary',
+								display: 'flex',
+								alignItems: 'center',
+								gap: 0.5,
+							}}
 						>
 							{dayjs(slot.startTime).format('dddd Do MMMM')}
 						</Typography>
-						{/* <Typography
-							variant="body2"
-							color="text.secondary"
-							sx={{ mt: 1, mb: 2 }}
-						>
-							{slotPassed
-								? 'This slot has passed.'
-								: `Availability: ${availableSlots.length}/${hourlySlots.length}`}
-						</Typography> */}
+
 						<Chip
 							label={slotPassed ? 'Unavailable' : availabilityText}
 							color={slotPassed ? 'error' : availabilityColor}
 							size="small"
-							sx={{ mt: 1 }}
+							variant={slotPassed ? 'outlined' : 'filled'}
+							sx={{
+								mt: 2,
+								fontWeight: 600,
+								borderRadius: 1.5,
+							}}
 						/>
 					</CardContent>
 					<CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>

@@ -5,7 +5,7 @@ import { useSession } from '@hooks';
 const NextPreviousButtons = () => {
 	const { setSelectedDate, selectedDate } = useSession();
 	return (
-		<Box sx={{ display: 'flex', justifyContent: 'center', pb: 2 }}>
+		<Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
 			<Button
 				variant="outlined"
 				color="primary"

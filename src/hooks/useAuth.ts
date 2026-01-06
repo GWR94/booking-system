@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '../context/SnackbarContext';
+import { useSnackbar } from '@context';
 import { verifyUser, loginUser, logoutUser, registerUser } from '../api/auth';
 
 export function useAuth() {

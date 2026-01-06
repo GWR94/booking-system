@@ -11,10 +11,11 @@ const Landing = () => {
 	return (
 		<Box>
 			<Hero />
-			<Features />
 			<FeaturedCourses />
 			<Stats />
 			<Testimonials />
+			<Features />
+
 			<BookingPreview />
 			<CallToAction />
 		</Box>

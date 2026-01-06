@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography, Paper, useTheme } from '@mui/material';
-import ContactForm from '@common/ContactForm';
-import NavBreadcrumb from '@common/NavBreadcrumb';
+import { ContactForm } from '@common';
 
 const Contact: React.FC = () => {
 	const theme = useTheme();
@@ -9,9 +8,6 @@ const Contact: React.FC = () => {
 	return (
 		<Box sx={{ py: 4 }}>
 			<Container maxWidth="xl">
-				{/* Breadcrumbs navigation */}
-				<NavBreadcrumb />
-
 				<Typography
 					variant="h3"
 					component="h1"
@@ -55,8 +51,6 @@ const Contact: React.FC = () => {
 						>
 							Find Our Location
 						</Typography>
-
-						{/* Google Maps Embed - Replace with your actual location */}
 						<Box
 							sx={{
 								width: '100%',
@@ -108,18 +102,6 @@ const Contact: React.FC = () => {
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
 									Underground: Central Line to Green Park
-								</Typography>
-							</Box>
-
-							<Box>
-								<Typography variant="subtitle1" fontWeight={500}>
-									Opening Hours
-								</Typography>
-								<Typography variant="body2" color="text.secondary">
-									Monday - Friday: 8:00 AM - 10:00 PM
-								</Typography>
-								<Typography variant="body2" color="text.secondary">
-									Saturday - Sunday: 9:00 AM - 8:00 PM
 								</Typography>
 							</Box>
 						</Box>

@@ -53,12 +53,11 @@ const Features = () => {
 			<Container maxWidth="lg" sx={{ mb: 4 }}>
 				<Box sx={{ textAlign: 'center', mb: 6 }}>
 					<Typography
-						variant="h3"
-						component="h2"
-						gutterBottom
+						variant="title"
 						sx={{
 							fontWeight: 700,
 							color: theme.palette.primary.main,
+							mb: 4,
 						}}
 					>
 						Premium Features
@@ -79,7 +78,7 @@ const Features = () => {
 				<Grid container spacing={4} sx={{ mt: 4 }}>
 					{simulatorFeatures.map((feature, index) => (
 						<Grid size={{ xs: 12, md: 3 }} key={index}>
-							<AnimateIn delay={index * 0.1}>
+							<AnimateIn delay={index * 0.1} type="zoom-in" repeat>
 								<Box
 									textAlign="center"
 									sx={{
@@ -111,7 +110,11 @@ const Features = () => {
 										<Typography
 											variant="h6"
 											sx={{
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
 												mb: 1,
+												height: 60,
 											}}
 										>
 											{feature.title}

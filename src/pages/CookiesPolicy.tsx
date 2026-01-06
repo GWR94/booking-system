@@ -18,7 +18,6 @@ import {
 	Alert,
 } from '@mui/material';
 import { ExpandMore, Cookie } from '@mui/icons-material';
-import NavBreadcrumb from '../components/common/NavBreadcrumb';
 
 const saveCookiePreferences = (preferences: Record<string, boolean>) => {
 	//FIXME
@@ -84,9 +83,6 @@ const CookiesPolicy: React.FC = () => {
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>
-			{/* Breadcrumbs navigation */}
-			<NavBreadcrumb />
-
 			{preferencesUpdated && (
 				<Alert
 					severity="success"

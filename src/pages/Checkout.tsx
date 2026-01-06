@@ -1,11 +1,11 @@
 import { Box, CircularProgress } from '@mui/material';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import CheckoutForm from '../components/checkout/CheckoutForm';
+import CheckoutForm from '@components/checkout/CheckoutForm';
 import { Elements } from '@stripe/react-stripe-js';
-import axios from '../utils/axiosConfig';
+import axios from '@utils/axiosConfig';
 import { Appearance, loadStripe } from '@stripe/stripe-js';
-import CompleteBooking from '../components/checkout/CompleteBooking';
+import CompleteBooking from '@components/checkout/CompleteBooking';
 import { useBasket, useAuth } from '@hooks';
 import GuestInfo, { GuestUser } from '../components/checkout/GuestInfo';
 import { useSnackbar } from '@context';
@@ -129,7 +129,7 @@ const Checkout = () => {
 	}
 
 	return (
-		<Box maxWidth="md" sx={{ p: 3, my: 3, mx: 'auto' }}>
+		<Box maxWidth="lg" sx={{ p: 3, my: 3, mx: 'auto' }}>
 			<Elements options={{ clientSecret, appearance, loader }} stripe={stripe}>
 				<Routes>
 					<Route

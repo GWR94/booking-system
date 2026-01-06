@@ -1,42 +1,38 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import {
-	ThemeProvider as MuiThemeProvider,
-	createTheme,
-	Theme,
-} from '@mui/material';
+import React, { ReactNode } from 'react';
+import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material';
+import { CSSObject } from '@mui/system';
 import { themes } from '../styles/themes';
 
-interface ThemeContextType {
-	currentTheme: Theme;
-	currentThemeId: string;
-	changeTheme: (themeId: string) => void;
-	availableThemes: typeof themes;
-	darkMode: boolean;
-	toggleDarkMode: () => void;
+// Extend MUI's Typography types to include custom 'title' variant
+declare module '@mui/material/styles' {
+	interface TypographyVariants {
+		title: CSSObject;
+		subtitle: CSSObject;
+	}
+
+	interface TypographyVariantsOptions {
+		title?: CSSObject;
+		subtitle?: CSSObject;
+	}
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const useThemeContext = () => {
-	const context = useContext(ThemeContext);
-	if (!context) {
-		throw new Error('useThemeContext must be used within a ThemeProvider');
+// Update the Typography's variant prop options
+declare module '@mui/material/Typography' {
+	interface TypographyPropsVariantOverrides {
+		title: true;
+		subtitle: true;
 	}
-	return context;
-};
+}
 
-export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
-	children,
-}) => {
-	const [themeId, setThemeId] = useState('blue-yellow-teal');
-	const [darkMode, setDarkMode] = useState(false);
-
+const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+	// Fixed theme configuration
+	const themeId = 'blue-yellow-teal';
 	const currentTheme =
 		themes.find((theme) => theme.id === themeId) || themes[0];
 
 	const theme = createTheme({
 		palette: {
-			mode: darkMode ? 'dark' : 'light',
+			mode: 'light',
 			...currentTheme.palette,
 		},
 		typography: {
@@ -45,24 +41,30 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
 				fontSize: '2.5rem',
 				fontWeight: 500,
 			},
+			title: {
+				fontSize: '2.5rem',
+				fontWeight: 700,
+				color: currentTheme.palette.primary?.main,
+				position: 'relative',
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center',
+				textAlign: 'center',
+				'&:after': {
+					content: '""',
+					position: 'absolute',
+					bottom: -10,
+					left: '50%',
+					transform: 'translateX(-50%)',
+					width: '40%',
+					height: 4,
+					backgroundColor: currentTheme.palette.secondary?.main,
+				},
+			},
 		},
 	});
 
-	const changeTheme = (id: string) => setThemeId(id);
-	const toggleDarkMode = () => setDarkMode((prev) => !prev);
-
-	return (
-		<ThemeContext.Provider
-			value={{
-				currentTheme: theme,
-				currentThemeId: themeId,
-				changeTheme,
-				availableThemes: themes,
-				darkMode,
-				toggleDarkMode,
-			}}
-		>
-			<MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
-		</ThemeContext.Provider>
-	);
+	return <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>;
 };
+
+export { ThemeProvider };

@@ -11,5 +11,4 @@ export { default as NotFound } from './NotFound';
 export { default as RegisterUser } from './RegisterUser';
 export { default as Landing } from './Landing';
 export { default as Booking } from './Booking';
-export { default as Home } from './Home';
 export { default as Profile } from './Profile';

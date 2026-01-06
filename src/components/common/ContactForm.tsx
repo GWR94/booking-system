@@ -22,6 +22,8 @@ import {
 	Person,
 	Subject,
 } from '@mui/icons-material';
+import axios from 'axios';
+import { useSnackbar } from '@context';
 
 interface ContactFormProps {
 	maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -34,6 +36,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 }) => {
 	const theme = useTheme();
 
+	const { showSnackbar } = useSnackbar();
 	const [formData, setFormData] = useState({
 		name: '',
 		email: '',
@@ -51,11 +54,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
 
 	const [loading, setLoading] = useState(false);
 	const [submitted, setSubmitted] = useState(false);
-	const [snackbarOpen, setSnackbarOpen] = useState(false);
-	const [snackbarMessage, setSnackbarMessage] = useState('');
-	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
-		'success',
-	);
 
 	const subjectOptions = [
 		'General Inquiry',
@@ -107,17 +105,17 @@ const ContactForm: React.FC<ContactFormProps> = ({
 		setLoading(true);
 
 		try {
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+			const response = await axios.post('/api/contact', formData);
 
-			setSnackbarMessage(
+			if (!response.data.success) {
+				throw new Error('Failed to send message');
+			}
+
+			showSnackbar(
 				'Your message has been sent successfully. We will get back to you soon.',
+				'success',
 			);
-			setSnackbarSeverity('success');
-			setSnackbarOpen(true);
 			setSubmitted(true);
-
-			// Reset form
 			setFormData({
 				name: '',
 				email: '',
@@ -127,11 +125,10 @@ const ContactForm: React.FC<ContactFormProps> = ({
 			});
 		} catch (error) {
 			console.error('Error sending message:', error);
-			setSnackbarMessage(
+			showSnackbar(
 				'There was an error sending your message. Please try again later.',
+				'error',
 			);
-			setSnackbarSeverity('error');
-			setSnackbarOpen(true);
 		} finally {
 			setLoading(false);
 		}
@@ -172,6 +169,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 							<Typography
 								variant="body2"
 								sx={{ color: 'rgba(255,255,255,0.8)' }}
+								textAlign="justify"
 							>
 								Have questions about our services? Need to book a slot or
 								inquire about membership? Feel free to get in touch with us
@@ -180,7 +178,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 
 							<Box sx={{ mt: 3 }}>
 								<Box sx={{ display: 'flex', mb: 3 }}>
-									<LocationOn sx={{ mr: 2, fontSize: 22 }} />
+									<LocationOn sx={{ mr: 2, fontSize: 22 }} color="accent" />
 									<Box>
 										<Typography variant="body2" fontWeight={500}>
 											Our Location
@@ -189,13 +187,13 @@ const ContactForm: React.FC<ContactFormProps> = ({
 											variant="body2"
 											sx={{ color: 'rgba(255,255,255,0.8)' }}
 										>
-											123 Golf Lane, London, SW1 2AB
+											Royal Star Arcade, High St, Maidstone ME14 1JL
 										</Typography>
 									</Box>
 								</Box>
 
 								<Box sx={{ display: 'flex', mb: 3 }}>
-									<Phone sx={{ mr: 2, fontSize: 22 }} />
+									<Phone sx={{ mr: 2, fontSize: 22 }} color="accent" />
 									<Box>
 										<Typography variant="body2" fontWeight={500}>
 											Phone Number
@@ -210,7 +208,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 								</Box>
 
 								<Box sx={{ display: 'flex' }}>
-									<Email sx={{ mr: 2, fontSize: 22 }} />
+									<Email sx={{ mr: 2, fontSize: 22 }} color="accent" />
 									<Box>
 										<Typography variant="body2" fontWeight={500}>
 											Email Address
@@ -239,16 +237,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
 									variant="body2"
 									sx={{ color: 'rgba(255,255,255,0.8)' }}
 								>
-									Monday - Friday: 8:00 AM - 10:00 PM
-								</Typography>
-								<Typography
-									variant="body2"
-									sx={{
-										color: 'rgba(255,255,255,0.8)',
-										mb: 2,
-									}}
-								>
-									Saturday - Sunday: 9:00 AM - 8:00 PM
+									Monday - Saturday <br />
+									10:00 AM - 10:00 PM
 								</Typography>
 							</Box>
 						</Box>
@@ -311,12 +301,14 @@ const ContactForm: React.FC<ContactFormProps> = ({
 												helperText={errors.name ? 'Name is required' : ''}
 												required
 												variant="outlined"
-												InputProps={{
-													startAdornment: (
-														<InputAdornment position="start">
-															<Person color="action" fontSize="small" />
-														</InputAdornment>
-													),
+												slotProps={{
+													input: {
+														startAdornment: (
+															<InputAdornment position="start">
+																<Person color="action" fontSize="small" />
+															</InputAdornment>
+														),
+													},
 												}}
 											/>
 										</Grid>
@@ -334,12 +326,14 @@ const ContactForm: React.FC<ContactFormProps> = ({
 												}
 												required
 												variant="outlined"
-												InputProps={{
-													startAdornment: (
-														<InputAdornment position="start">
-															<Email color="action" fontSize="small" />
-														</InputAdornment>
-													),
+												slotProps={{
+													input: {
+														startAdornment: (
+															<InputAdornment position="start">
+																<Email color="action" fontSize="small" />
+															</InputAdornment>
+														),
+													},
 												}}
 											/>
 										</Grid>
@@ -351,12 +345,14 @@ const ContactForm: React.FC<ContactFormProps> = ({
 												value={formData.phone}
 												onChange={handleChange}
 												variant="outlined"
-												InputProps={{
-													startAdornment: (
-														<InputAdornment position="start">
-															<Phone color="action" fontSize="small" />
-														</InputAdornment>
-													),
+												slotProps={{
+													input: {
+														startAdornment: (
+															<InputAdornment position="start">
+																<Phone color="action" fontSize="small" />
+															</InputAdornment>
+														),
+													},
 												}}
 											/>
 										</Grid>
@@ -374,12 +370,14 @@ const ContactForm: React.FC<ContactFormProps> = ({
 												}
 												required
 												variant="outlined"
-												InputProps={{
-													startAdornment: (
-														<InputAdornment position="start">
-															<Subject color="action" fontSize="small" />
-														</InputAdornment>
-													),
+												slotProps={{
+													input: {
+														startAdornment: (
+															<InputAdornment position="start">
+																<Subject color="action" fontSize="small" />
+															</InputAdornment>
+														),
+													},
 												}}
 											>
 												{subjectOptions.map((option) => (
@@ -441,22 +439,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
 					</Grid>
 				</Grid>
 			</Paper>
-
-			<Snackbar
-				open={snackbarOpen}
-				autoHideDuration={6000}
-				onClose={() => setSnackbarOpen(false)}
-				anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-			>
-				<Alert
-					onClose={() => setSnackbarOpen(false)}
-					severity={snackbarSeverity}
-					variant="filled"
-					sx={{ width: '100%' }}
-				>
-					{snackbarMessage}
-				</Alert>
-			</Snackbar>
 		</Container>
 	);
 };

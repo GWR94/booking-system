@@ -13,24 +13,19 @@ import {
 	AccordionSummary,
 	AccordionDetails,
 	InputAdornment,
-	Breadcrumbs,
-	Link,
 	useTheme,
 } from '@mui/material';
 import {
 	Search,
 	ExpandMore,
-	NavigateNext,
-	ContactSupport,
 	HelpOutline,
 	LocalOffer,
 	CreditCard,
 	SportsGolf,
 	EditCalendar,
 } from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
 import { FaqItem, faqData } from '../data/faq';
-import NavBreadcrumb from '../components/common/NavBreadcrumb';
+import { ContactForm } from '@components/common';
 
 const HelpCenter: React.FC = () => {
 	const theme = useTheme();
@@ -106,21 +101,8 @@ const HelpCenter: React.FC = () => {
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>
-			{/* Breadcrumbs navigation */}
-			<NavBreadcrumb />
-
 			<Box sx={{ mb: 5 }}>
-				<Typography
-					variant="h3"
-					component="h1"
-					align="center"
-					gutterBottom
-					sx={{
-						color: theme.palette.primary.main,
-						fontWeight: 600,
-						mb: 2,
-					}}
-				>
+				<Typography variant="title" sx={{ mb: 4 }}>
 					Help Center
 				</Typography>
 				<Typography
@@ -164,15 +146,25 @@ const HelpCenter: React.FC = () => {
 								},
 							},
 						}}
-						InputProps={{
-							startAdornment: (
-								<InputAdornment position="start">
-									<Search color="action" />
-								</InputAdornment>
-							),
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<Search color="action" />
+									</InputAdornment>
+								),
+							},
 						}}
 					/>
-					<Button variant="contained" color="primary" sx={{ ml: 1 }}>
+					<Button
+						variant="contained"
+						color="primary"
+						sx={{
+							ml: 1,
+							borderTopLeftRadius: 0,
+							borderBottomLeftRadius: 0,
+						}}
+					>
 						Search
 					</Button>
 				</Paper>
@@ -276,87 +268,7 @@ const HelpCenter: React.FC = () => {
 					)}
 				</Box>
 			</Paper>
-
-			{/* Contact Support Section */}
-			<Paper
-				elevation={0}
-				sx={{
-					mt: 5,
-					p: 4,
-					borderRadius: 2,
-					border: `1px solid ${theme.palette.divider}`,
-					backgroundColor: theme.palette.primary.main + '08',
-				}}
-			>
-				<Grid container spacing={4} alignItems="center">
-					<Grid size={{ xs: 12, md: 6 }}>
-						<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-							<ContactSupport
-								sx={{ color: theme.palette.primary.main, fontSize: 28 }}
-							/>
-							<Typography
-								variant="h5"
-								sx={{
-									ml: 1,
-									fontWeight: 600,
-									color: theme.palette.primary.main,
-								}}
-							>
-								Need More Help?
-							</Typography>
-						</Box>
-						<Typography variant="body1" paragraph>
-							Can't find what you're looking for? Our customer service team is
-							here to help you with any questions or issues.
-						</Typography>
-						<Typography variant="body1" paragraph>
-							<strong>Email:</strong> support@gwrgolf.com
-						</Typography>
-						<Typography variant="body1">
-							<strong>Phone:</strong> +44 (0) 123 456 7890 (Mon-Fri, 9am-5pm)
-						</Typography>
-					</Grid>
-					<Grid size={{ xs: 12, md: 6 }}>
-						<Box component="form">
-							<Typography variant="h6" gutterBottom sx={{ fontWeight: 500 }}>
-								Send us a message
-							</Typography>
-							<TextField
-								fullWidth
-								label="Name"
-								variant="outlined"
-								margin="normal"
-								required
-							/>
-							<TextField
-								fullWidth
-								label="Email"
-								variant="outlined"
-								margin="normal"
-								type="email"
-								required
-							/>
-							<TextField
-								fullWidth
-								label="Message"
-								variant="outlined"
-								margin="normal"
-								multiline
-								rows={4}
-								required
-							/>
-							<Button
-								variant="contained"
-								color="primary"
-								fullWidth
-								sx={{ mt: 2 }}
-							>
-								Submit
-							</Button>
-						</Box>
-					</Grid>
-				</Grid>
-			</Paper>
+			<ContactForm />
 		</Container>
 	);
 };

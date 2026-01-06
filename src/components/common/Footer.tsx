@@ -21,6 +21,7 @@ import {
 	LocationOn,
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
@@ -38,30 +39,34 @@ const Footer: React.FC = () => {
 			<Container>
 				<Grid container spacing={2}>
 					{/* Logo and Description */}
-					<Grid size={{ xs: 12, md: 4 }}>
-						<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-							<GolfCourse sx={{ mr: 1, fontSize: '2rem' }} />
-							<Typography
-								variant="h6"
-								component={RouterLink}
-								to="/"
-								sx={{
-									fontFamily: 'monospace',
-									fontWeight: 700,
-									letterSpacing: '.3rem',
-									color: 'inherit',
-									textDecoration: 'none',
-								}}
-							>
-								[GWR-GLF]
-							</Typography>
+					<Grid
+						size={{ xs: 12, md: 4 }}
+						sx={{
+							px: 2,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							flexDirection: 'column',
+						}}
+					>
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								mb: 1,
+								height: 60,
+								justifyContent: 'center',
+							}}
+						>
+							<Logo />
 						</Box>
-						<Typography variant="body2" sx={{ mb: 2, pr: 2 }}>
-							Improve your golf game in our state-of-the-art simulator facility.
-							Three private Trackman booths await to elevate your golfing
-							experience.
-						</Typography>
-						<Box>
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+							}}
+						>
 							<IconButton
 								color="inherit"
 								aria-label="Facebook"
@@ -258,35 +263,6 @@ const Footer: React.FC = () => {
 						© {new Date().getFullYear()} GWR Golf Simulators. All rights
 						reserved.
 					</Typography>
-					<Box sx={{ display: 'flex', gap: 2 }}>
-						<Link
-							component={RouterLink}
-							to="/terms"
-							color="inherit"
-							underline="hover"
-							variant="body2"
-						>
-							Terms
-						</Link>
-						<Link
-							component={RouterLink}
-							to="/privacy"
-							color="inherit"
-							underline="hover"
-							variant="body2"
-						>
-							Privacy
-						</Link>
-						<Link
-							component={RouterLink}
-							to="/cookies"
-							color="inherit"
-							underline="hover"
-							variant="body2"
-						>
-							Cookies
-						</Link>
-					</Box>
 				</Box>
 			</Container>
 		</Box>

@@ -12,12 +12,7 @@ import {
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DatePicker } from '@mui/x-date-pickers';
-import {
-	GolfCourse,
-	KeyboardArrowUp,
-	CalendarMonth,
-	Timer,
-} from '@mui/icons-material';
+import { GolfCourse, KeyboardArrowUp } from '@mui/icons-material';
 import dayjs, { Dayjs } from 'dayjs';
 import { Bays, SessionTimes } from '../interfaces/SlotContext.i';
 import { useSession } from '@hooks';
@@ -52,63 +47,78 @@ const SessionPicker = () => {
 			sx={{
 				width: '100%',
 				position: 'relative',
-				pt: 3,
+				zIndex: 2,
 			}}
 		>
 			<motion.div
 				layout
 				transition={{ duration: 0.3, ease: 'easeIn' }}
-				style={{ overflow: 'hidden' }}
+				style={{ overflow: 'visible' }}
 			>
-				<Box sx={{ pb: 2 }}>
+				<Box sx={{ pb: 3 }}>
 					<Paper
-						elevation={3}
+						elevation={0}
 						sx={{
-							maxWidth: 600,
-							mx: { xs: 2, sm: 'auto' },
-							borderBottom: `2px solid ${theme.palette.primary.main}`,
-							borderBottomLeftRadius: 0,
-							borderBottomRightRadius: 0,
-							p: 2,
-							transition: 'padding 0.3s ease',
+							maxWidth: 800,
+							mx: 'auto',
+							background: 'rgba(255, 255, 255, 0.8)',
+							backdropFilter: 'blur(12px)',
+							border: `1px solid rgba(255, 255, 255, 0.1)`,
+							borderRadius: 4,
+							p: 3,
+							boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)',
+							transition: 'all 0.3s ease',
 						}}
 					>
 						<AnimatePresence mode="wait">
 							{isExpanded ? (
 								<motion.div
 									key="expanded"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
+									initial={{ opacity: 0, y: -10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -10 }}
 									transition={{ duration: 0.2 }}
 								>
-									<Typography
-										variant="h6"
-										gutterBottom
+									<Box
 										sx={{
-											fontWeight: 600,
-											color: theme.palette.primary.main,
 											display: 'flex',
 											alignItems: 'center',
-											mb: { xs: 1, sm: 2 },
+											mb: 3,
+											borderBottom: 1,
+											borderColor: 'divider',
+											pb: 2,
 										}}
 									>
-										<GolfCourse
-											sx={{ mr: 1, color: theme.palette.secondary.main }}
-										/>
-										Find Available Sessions
-									</Typography>
+										<Box
+											sx={{
+												p: 1,
+												borderRadius: 2,
+												mr: 2,
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+											}}
+										>
+											<GolfCourse color="primary" fontSize="medium" />
+										</Box>
+										<Box>
+											<Typography
+												variant="h6"
+												sx={{
+													fontWeight: 700,
+													lineHeight: 1.2,
+												}}
+											>
+												Find Available Sessions
+											</Typography>
+											<Typography variant="body2" color="text.secondary">
+												Customize your search below
+											</Typography>
+										</Box>
+									</Box>
 
-									<Typography
-										variant="body1"
-										sx={{ mb: 3, color: 'text.secondary' }}
-									>
-										Select your preferred date, duration, and bay to find
-										available time slots for your golf simulator session.
-									</Typography>
-
-									<Grid container spacing={2}>
-										<Grid size={{ xs: 12, sm: 6 }}>
+									<Grid container spacing={3}>
+										<Grid size={{ xs: 12, md: 6 }}>
 											<DatePicker
 												label="Select Date"
 												value={selectedDate}
@@ -121,37 +131,41 @@ const SessionPicker = () => {
 												sx={{
 													width: '100%',
 													'& .MuiOutlinedInput-root': {
-														'&:hover fieldset': {
-															borderColor: theme.palette.primary.main,
-														},
+														borderRadius: 2,
+														bgcolor: 'background.paper',
 													},
 												}}
 												slotProps={{
 													textField: {
 														size: 'small',
-														id: 'select-date',
+														fullWidth: true,
 													},
 												}}
 											/>
 										</Grid>
 
-										<Grid size={{ xs: 6, sm: 3 }}>
+										<Grid size={{ xs: 6, md: 3 }}>
 											<FormControl
-												sx={{ width: '100%' }}
-												variant="outlined"
-												size="small"
+												fullWidth
+												// variant="filled" // Used filled or outlined based on preference, standardizing on outlined for cleanliness
 											>
 												<InputLabel id="session-length-label">
-													Session Length
+													Duration
 												</InputLabel>
 												<Select
 													labelId="session-length-label"
 													id="session-length"
 													value={selectedSession}
-													label="Session Length"
+													label="Duration"
+													size="small"
 													onChange={(e) =>
 														setSelectedSession(e.target.value as SessionTimes)
 													}
+													sx={{
+														borderRadius: 2,
+														bgcolor: 'background.paper',
+													}}
+													MenuProps={{ disableScrollLock: true }}
 												>
 													<MenuItem value={1}>1 Hour</MenuItem>
 													<MenuItem value={2}>2 Hours</MenuItem>
@@ -160,21 +174,23 @@ const SessionPicker = () => {
 											</FormControl>
 										</Grid>
 
-										<Grid size={{ xs: 6, sm: 3 }}>
-											<FormControl
-												sx={{ width: '100%' }}
-												variant="outlined"
-												size="small"
-											>
+										<Grid size={{ xs: 6, md: 3 }}>
+											<FormControl fullWidth>
 												<InputLabel id="bay-selection-label">Bay</InputLabel>
 												<Select
 													labelId="bay-selection-label"
 													id="bay-selection"
 													value={selectedBay}
 													label="Bay"
+													size="small"
 													onChange={(e) =>
 														setSelectedBay(e.target.value as Bays)
 													}
+													sx={{
+														borderRadius: 2,
+														bgcolor: 'background.paper',
+													}}
+													MenuProps={{ disableScrollLock: true }}
 												>
 													<MenuItem value={5}>Any Bay</MenuItem>
 													<MenuItem value={1}>Bay 1</MenuItem>
@@ -197,7 +213,7 @@ const SessionPicker = () => {
 			<Box
 				sx={{
 					position: 'absolute',
-					bottom: 8,
+					bottom: 0,
 					left: '50%',
 					transform: 'translate(-50%, 50%)',
 					zIndex: 10,
@@ -205,27 +221,29 @@ const SessionPicker = () => {
 			>
 				<IconButton
 					onClick={() => setIsExpanded(!isExpanded)}
+					size="small"
 					sx={{
-						backgroundColor: theme.palette.primary.main,
-						color: 'white',
-						boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-						width: 20,
-						borderBottomLeftRadius: isExpanded ? '50%' : 0,
-						borderBottomRightRadius: isExpanded ? '50%' : 0,
-						borderTopLeftRadius: isExpanded ? 0 : '50%',
-						borderTopRightRadius: isExpanded ? 0 : '50%',
-						height: 20,
+						backgroundColor: 'background.paper',
+						border: '1px solid',
+						borderColor: 'divider',
+						color: 'text.primary',
+						boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
 						'&:hover': {
-							backgroundColor: theme.palette.primary.dark,
+							backgroundColor: 'action.hover',
+							transform: 'scale(1.1)',
 						},
-						transition: 'all 0.5s ease',
-						transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)',
+						transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
 					}}
 					aria-label={
 						isExpanded ? 'Hide filter options' : 'Show filter options'
 					}
 				>
-					<KeyboardArrowUp fontSize="small" />
+					<KeyboardArrowUp
+						sx={{
+							transition: 'transform 0.3s ease',
+							transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)',
+						}}
+					/>
 				</IconButton>
 			</Box>
 		</Box>

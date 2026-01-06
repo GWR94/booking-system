@@ -10,9 +10,10 @@ const Logo = () => {
 				display: 'flex',
 				alignItems: 'center',
 				cursor: 'pointer',
+				height: '100%',
 			}}
 		>
-			<img src="GLF-logo.png" alt="GWR.GLF" width={50} />
+			<img src="GLF-logo.png" alt="GWR.GLF" style={{ height: '100%' }} />
 		</Box>
 	);
 };

@@ -1,7 +1,7 @@
 // PrivateRoute.tsx
 import { Navigate, Outlet } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
-import { useSnackbar } from '../context/SnackbarContext';
+import { useSnackbar } from '@context';
 import { useAuth } from '@hooks';
 
 const PrivateRoute: React.FC = () => {

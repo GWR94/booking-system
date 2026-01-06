@@ -14,6 +14,7 @@ import TestimonialCarousel from './TestimonialCarousel';
 import { StarOutline, SportsGolf, LocationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import AnimateIn from '../common/AnimateIn';
+import logo from '/GLF-logo.png';
 
 const Hero = () => {
 	const navigate = useNavigate();
@@ -29,51 +30,65 @@ const Hero = () => {
 				overflow: 'hidden',
 			}}
 		>
-			<Container maxWidth="lg">
+			<Box
+				sx={{
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					transform: 'translate(-50%, -50%)',
+					width: '120%',
+					height: '120%',
+					backgroundImage: `url(${logo})`,
+					backgroundRepeat: 'no-repeat',
+					backgroundPosition: 'center',
+					backgroundSize: 'contain',
+					opacity: 0.05,
+					pointerEvents: 'none',
+					zIndex: 0,
+				}}
+			/>
+			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
 				<Grid key="hero-content" container spacing={4} alignItems="center">
 					<Grid size={{ xs: 12, md: 7 }}>
-						<AnimateIn>
-							{/* Hero badge */}
-							<Chip
-								icon={<StarOutline color="accent" />}
-								label="PREMIUM GOLF EXPERIENCE"
-								color="secondary"
-								sx={{
-									mb: 3,
-									fontWeight: 500,
-									color: theme.palette.accent.light,
-									px: 1.5,
-									backgroundColor: 'rgba(255, 255, 255, 0.15)',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.3)',
-								}}
-							/>
+						<Typography
+							variant="h2"
+							sx={{
+								fontWeight: 700,
+								display: 'block',
+								mb: 2,
+								textShadow: '0px 2px 4px rgba(0,0,0,0.25)',
+								fontSize: { xs: '2.5rem', md: '3.5rem' },
+							}}
+						>
+							Tee Up Your Perfect Game
+						</Typography>
 
-							<Typography
-								variant="h2"
-								sx={{
-									fontWeight: 700,
-									mb: 2,
-									textShadow: '0px 2px 4px rgba(0,0,0,0.15)',
-									fontSize: { xs: '2.5rem', md: '3.5rem' },
-								}}
-							>
-								Tee Up Your Perfect Game
-							</Typography>
-
-							<Typography
-								variant="h5"
-								gutterBottom
-								sx={{
-									fontWeight: 400,
-									mb: 3,
-									opacity: 0.9,
-									maxWidth: 600,
-								}}
-							>
-								Indoor Golf Simulator Experience in the Heart of Maidstone
-							</Typography>
-
+						<Typography
+							variant="h5"
+							gutterBottom
+							sx={{
+								fontWeight: 400,
+								mb: 3,
+								opacity: 0.9,
+							}}
+						>
+							Indoor Golf Simulator Experience in the Heart of Maidstone
+						</Typography>
+						<Chip
+							icon={<StarOutline color="accent" />}
+							label="PREMIUM GOLF EXPERIENCE"
+							color="secondary"
+							sx={{
+								mb: 3,
+								fontWeight: 500,
+								color: theme.palette.accent.light,
+								px: 1.5,
+								backgroundColor: 'rgba(255, 255, 255, 0.15)',
+								backdropFilter: 'blur(10px)',
+								border: '1px solid rgba(255, 255, 255, 0.3)',
+							}}
+						/>
+						<AnimateIn type="fade-right">
 							<Typography
 								variant="body1"
 								sx={{
@@ -103,19 +118,19 @@ const Hero = () => {
 									}}
 								>
 									<SportsGolf
-										sx={{ mr: 1, color: theme.palette.secondary.light }}
+										sx={{ mr: 1, color: theme.palette.accent.main }}
 									/>
 									<Typography variant="body2">4 Premium Bays</Typography>
 								</Box>
 								<Box sx={{ display: 'flex', alignItems: 'center' }}>
 									<LocationOn
-										sx={{ mr: 1, color: theme.palette.secondary.light }}
+										sx={{ mr: 1, color: theme.palette.accent.main }}
 									/>
 									<Typography variant="body2">Central Maidstone</Typography>
 								</Box>
 								<Box sx={{ display: 'flex', alignItems: 'center' }}>
 									<StarOutline
-										sx={{ mr: 1, color: theme.palette.secondary.light }}
+										sx={{ mr: 1, color: theme.palette.accent.main }}
 									/>
 									<Typography variant="body2">TrackMan Technology</Typography>
 								</Box>
@@ -159,66 +174,38 @@ const Hero = () => {
 						size={{ xs: 12, md: 5 }}
 						sx={{ display: { xs: 'none', md: 'block' } }}
 					>
-						<AnimateIn delay={0.2}>
-							{/* Hero image or visual element */}
-							<Box
-								sx={{
-									position: 'relative',
-									height: 400,
-									borderRadius: 4,
-									overflow: 'hidden',
-									boxShadow:
-										'0 24px 38px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)',
-									border: '5px solid rgba(255,255,255,0.1)',
-								}}
-							>
+						<AnimateIn delay={0.2} type="fade-left">
+							<Box sx={{ position: 'relative', perspective: '1000px' }}>
 								<Box
 									component="img"
-									src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80"
-									alt="Premium golf simulator"
+									src="/hero-image.png"
+									alt="Premium Golf Simulator"
 									sx={{
 										width: '100%',
-										height: '100%',
-										objectFit: 'cover',
+										borderRadius: 4,
+										boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+										transform: 'rotateY(-5deg) rotateX(2deg)',
+										transition: 'transform 0.5s ease',
+										'&:hover': {
+											transform: 'rotateY(0deg) rotateX(0deg)',
+										},
+										mb: { xs: 2, md: -6 }, // Negative margin to pull carousel up
+										position: 'relative',
+										zIndex: 1,
 										display: 'block',
 									}}
 								/>
-								{/* Overlay with logo or branding */}
 								<Box
 									sx={{
-										position: 'absolute',
-										bottom: 0,
-										left: 0,
-										right: 0,
-										py: 2,
-										px: 3,
-										background:
-											'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'space-between',
+										position: 'relative',
+										zIndex: 2,
+										mx: { md: 4 },
+										mt: { xs: -4, md: 0 },
 									}}
 								>
-									<Typography
-										variant="h6"
-										sx={{ fontWeight: 600, color: 'white' }}
-									>
-										GWR Golf
-									</Typography>
-									<Chip
-										label="TrackMan Certified"
-										size="small"
-										sx={{
-											bgcolor: 'rgba(255,255,255,0.15)',
-											color: 'white',
-											fontWeight: 500,
-										}}
-									/>
+									<TestimonialCarousel />
 								</Box>
 							</Box>
-
-							{/* Testimonial snippet */}
-							<TestimonialCarousel />
 						</AnimateIn>
 					</Grid>
 				</Grid>
@@ -240,7 +227,7 @@ const Hero = () => {
 						Located at: High St, Maidstone ME14 1JL, UK
 					</Typography>
 					<Typography variant="body2" sx={{ opacity: 0.7 }}>
-						Open 7 days a week | 8:00 AM - 10:00 PM
+						Open Mon-Sat | 10:00 AM - 10:00 PM
 					</Typography>
 					<Typography variant="body2" sx={{ opacity: 0.7 }}>
 						+44 79874 45123

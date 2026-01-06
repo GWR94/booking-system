@@ -42,116 +42,109 @@ const featuredCourses = [
 const FeaturedCourses = () => {
 	const theme = useTheme();
 	return (
-		<Box sx={{ p: 10 }}>
-			<Container maxWidth="lg">
-				<Box>
-					<Box sx={{ textAlign: 'center', mb: 6 }}>
-						<Typography
-							variant="h3"
-							component="h2"
-							gutterBottom
-							sx={{
-								fontWeight: 700,
-								color: theme.palette.primary.main,
-							}}
-						>
-							Featured Courses
-						</Typography>
-						<Typography
-							variant="h6"
-							color="text.secondary"
-							sx={{
-								maxWidth: 700,
-								mx: 'auto',
-								fontWeight: 400,
-							}}
-						>
-							Experience world-class golf courses from the comfort of our
-							premium simulator bays
-						</Typography>
-					</Box>
+		<Container sx={{ textAlign: 'center', py: 10, px: 4 }} maxWidth="xl">
+			<Box>
+				<Typography
+					variant="title"
+					sx={{
+						fontWeight: 700,
+						color: theme.palette.primary.main,
+						mb: 4,
+					}}
+				>
+					Featured Courses
+				</Typography>
+				<Typography
+					variant="h6"
+					color="text.secondary"
+					sx={{
+						maxWidth: 700,
+						mx: 'auto',
+						fontWeight: 400,
+						mb: 4,
+					}}
+				>
+					Experience world-class golf courses from the comfort of our premium
+					simulator bays
+				</Typography>
+			</Box>
 
-					<Grid container spacing={2}>
-						{featuredCourses.map((course, index) => (
-							<Grid size={{ xs: 12, md: 4 }} key={index}>
-								<Box sx={{ height: '100%' }}>
-									<Card
-										elevation={0}
-										sx={{
-											height: '100%',
-											display: 'flex',
-											flexDirection: 'column',
-											borderRadius: 3,
-											justifyContent: 'space-evenly',
-											overflow: 'hidden',
-											border: `1px solid ${theme.palette.divider}`,
-											transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-											'&:hover': {
-												transform: 'translateY(-8px)',
-												boxShadow: 6,
-											},
-										}}
+			<Grid container spacing={2}>
+				{featuredCourses.map((course, index) => (
+					<Grid size={{ xs: 12, md: 4 }} key={index}>
+						<Box sx={{ height: '100%' }}>
+							<Card
+								elevation={0}
+								sx={{
+									height: '100%',
+									display: 'flex',
+									flexDirection: 'column',
+									borderRadius: 3,
+									justifyContent: 'space-evenly',
+									overflow: 'hidden',
+									border: `1px solid ${theme.palette.divider}`,
+									transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+									'&:hover': {
+										transform: 'translateY(-8px)',
+										boxShadow: 6,
+									},
+								}}
+							>
+								<CardMedia
+									component="img"
+									height="220"
+									image={course.image}
+									alt={course.name}
+								/>
+								<CardContent
+									sx={{
+										flexGrow: 1,
+										display: 'flex',
+										flexDirection: 'column',
+										justifyContent: 'space-evenly',
+									}}
+								>
+									<Typography
+										variant="h5"
+										component="h3"
+										gutterBottom
+										sx={{ fontWeight: 600 }}
 									>
-										<CardMedia
-											component="img"
-											height="220"
-											image={course.image}
-											alt={course.name}
-										/>
-										<CardContent
-											sx={{
-												flexGrow: 1,
-												// p: 3,
-												display: 'flex',
-												flexDirection: 'column',
-												justifyContent: 'space-evenly',
-											}}
-										>
-											<Typography
-												variant="h5"
-												component="h3"
-												gutterBottom
-												sx={{ fontWeight: 600 }}
-											>
-												{course.name}
-											</Typography>
-											<Typography
-												variant="body2"
-												color="primary.main"
-												gutterBottom
-												sx={{ fontWeight: 500, mb: 2 }}
-											>
-												{course.location}
-											</Typography>
-											<Typography variant="body1">
-												{course.description}
-											</Typography>
-										</CardContent>
-									</Card>
-								</Box>
-							</Grid>
-						))}
+										{course.name}
+									</Typography>
+									<Typography
+										variant="body2"
+										color="primary.main"
+										gutterBottom
+										sx={{ fontWeight: 500, mb: 2 }}
+									>
+										{course.location}
+									</Typography>
+									<Typography variant="body1">{course.description}</Typography>
+								</CardContent>
+							</Card>
+						</Box>
 					</Grid>
+				))}
+			</Grid>
 
-					<Box sx={{ textAlign: 'center', mt: 6 }}>
-						<Button
-							variant="outlined"
-							color="primary"
-							size="large"
-							component={RouterLink}
-							to="/book"
-							sx={{
-								fontWeight: 500,
-								px: 4,
-								borderRadius: 2,
-							}}
-						>
-							View All Courses
-						</Button>
-					</Box>
-				</Box>
-			</Container>
-		</Box>
+			<Box sx={{ textAlign: 'center', mt: 6 }}>
+				<Button
+					variant="outlined"
+					color="primary"
+					size="large"
+					component={RouterLink}
+					to="/book"
+					sx={{
+						fontWeight: 500,
+						px: 4,
+						borderRadius: 2,
+					}}
+				>
+					Continue to Booking
+				</Button>
+			</Box>
+		</Container>
 	);
 };
 

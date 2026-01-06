@@ -12,10 +12,9 @@ import {
 	Typography,
 } from '@mui/material';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
-import { useSnackbar } from '../../context/SnackbarContext';
+import { useSnackbar } from '@context';
 import CheckoutItem from './CheckoutItem';
-import { useBasket } from '../../hooks/useBasket';
-import { useAuth } from '../../hooks/useAuth';
+import { useBasket, useAuth } from '@hooks';
 import { GuestUser } from './GuestInfo';
 import { useNavigate } from 'react-router-dom';
 
@@ -64,14 +63,6 @@ const CheckoutForm = ({ guest, recaptchaToken }: CheckoutFormProps) => {
 			setLoading(false);
 			return;
 		}
-
-		// const bookingCreated = isAuthenticated
-		// 	? await createBooking()
-		// 	: await createGuestBooking();
-
-		// if (!bookingCreated) {
-		// 	return setLoading(false);
-		// }
 
 		const { error } = await stripe.confirmPayment({
 			elements,

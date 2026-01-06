@@ -27,7 +27,7 @@ const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => (
 		<Button
 			fullWidth
 			variant="outlined"
-			href="/api/user/login/x"
+			href="/api/user/login/twitter"
 			startIcon={<X />}
 		>
 			Sign {isLogin ? 'in ' : 'up '} with X

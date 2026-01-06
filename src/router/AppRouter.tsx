@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '@hooks';
-import { Footer, NavBar } from '@common';
-import { alpha, Box, useTheme } from '@mui/material';
+import { Footer, NavBar, GoogleAnalytics, CookieConsentBanner } from '@common';
+import { Box } from '@mui/material';
 import {
 	About,
 	Membership,
@@ -23,16 +23,18 @@ import ScrollToTop from '@utils/ScrollToTop';
 
 const App = () => {
 	const { isAuthenticated } = useAuth();
-	const theme = useTheme();
+
 	return (
 		<Router>
 			<Box
 				sx={{
 					minHeight: '100vh',
-					bgcolor: alpha(theme.palette.primary.main, 0.1),
+					// bgcolor: alpha(theme.palette.primary.main, 0.1),
 				}}
 			>
 				<ScrollToTop />
+				<GoogleAnalytics />
+				<CookieConsentBanner />
 				<NavBar />
 				<Routes>
 					<Route path="/" element={<Landing />} />

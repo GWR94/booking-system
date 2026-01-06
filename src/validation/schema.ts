@@ -51,20 +51,25 @@ export const loginSchema = Joi.object<LoginForm>({
 		}),
 	password: Joi.string()
 		.min(8)
-		// .pattern(new RegExp("(?=.*[A-Z])(?=.*[!@#$&*])"))
+		.pattern(new RegExp('(?=.*[A-Z])(?=.*[!@#$&*])'))
 		.required()
 		.messages({
-			// "string.min": "Password must be at least 8 characters long",
-			// "string.pattern.base":
-			//   "Password must contain an uppercase letter and a special character",
+			'string.min': 'Password must be at least 8 characters long',
+			'string.pattern.base':
+				'Password must contain an uppercase letter and a special character',
 			'string.empty': 'Password is required',
 		}),
 });
 
 export const guestSchema = Joi.object({
-	name: Joi.string().required().messages({
-		'string.empty': 'Name is required',
-	}),
+	name: Joi.string()
+		.pattern(/^\s*\S+\s+\S+.*$/)
+		.required()
+		.messages({
+			'string.empty': 'Name is required',
+			'string.pattern.base':
+				'Please enter your full name (first and last name)',
+		}),
 	email: Joi.string()
 		.email({
 			tlds: { allow: false },

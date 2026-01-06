@@ -14,7 +14,11 @@ const GenerateSlots = () => {
 
 	return (
 		<Container maxWidth="xl" sx={{ flexGrow: 1, p: 3 }}>
-			<Grid container spacing={2}>
+			<Grid
+				container
+				spacing={2}
+				columns={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 10 }}
+			>
 				{isLoading ? (
 					<Box sx={{ display: 'flex', justifyContent: 'center' }}>
 						<CircularProgress />

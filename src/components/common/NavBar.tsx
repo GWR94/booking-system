@@ -13,7 +13,6 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
 	BasketButton,
-	ThemePickerButton,
 	DesktopNavigation,
 	DesktopAccountButton,
 	MobileNavigationMenu,
@@ -124,6 +123,8 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 									display: 'flex',
 									justifyContent: 'center',
 									width: 'auto',
+									height: '100%',
+									padding: '4px 0',
 								}}
 							>
 								<Logo />
@@ -138,7 +139,6 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 									ml: 'auto',
 								}}
 							>
-								<ThemePickerButton isMobile={isMobile} navbarHidden={hidden} />
 								<BasketButton
 									isMobile={isMobile}
 									onMobileBasketClick={setMobileNavBarToBasket}

@@ -16,7 +16,6 @@ import {
 import { FormatQuote, Verified } from '@mui/icons-material';
 import AnimateIn from '../common/AnimateIn';
 
-// Enhanced testimonial data with additional details
 const testimonials = [
 	{
 		name: 'James Wilson',
@@ -24,7 +23,7 @@ const testimonials = [
 		handicap: '9',
 		quote:
 			"The best simulator experience I've found in Kent. TrackMan technology has helped me identify and fix flaws in my swing that I never knew existed.",
-		avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+		avatar: 'https://randomuser.me/api/portraits/men/85.jpg',
 		stars: 5,
 		verified: true,
 	},
@@ -34,7 +33,7 @@ const testimonials = [
 		handicap: '12',
 		quote:
 			'Perfect for practicing year-round regardless of weather. The data insights are incredible - my driving accuracy has improved dramatically in just a month.',
-		avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+		avatar: 'https://randomuser.me/api/portraits/women/54.jpg',
 		stars: 5,
 		verified: true,
 	},
@@ -44,8 +43,8 @@ const testimonials = [
 		handicap: '16',
 		quote:
 			'As a beginner, I was intimidated at first, but the staff are incredibly supportive. Playing virtual courses has helped me prepare for real games.',
-		avatar: 'https://randomuser.me/api/portraits/men/68.jpg',
-		stars: 4,
+		avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
+		stars: 4.5,
 		verified: true,
 	},
 ];
@@ -78,15 +77,7 @@ const Testimonials = () => {
 		>
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
 				<Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
-					<Typography
-						variant="h3"
-						gutterBottom
-						sx={{
-							fontWeight: 700,
-							color: theme.palette.primary.main,
-							fontSize: { xs: '2.5rem', md: '3rem' },
-						}}
-					>
+					<Typography variant="title" sx={{ mb: 4 }}>
 						What Our Customers Say
 					</Typography>
 
@@ -108,13 +99,13 @@ const Testimonials = () => {
 						sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}
 					>
 						<Rating
-							value={4.9}
+							value={4.8}
 							precision={0.1}
 							readOnly
 							sx={{ color: theme.palette.secondary.main }}
 						/>
 						<Typography variant="body2" fontWeight={500} color="text.secondary">
-							4.9/5 from over 200 reviews
+							4.8/5 from over 200 reviews
 						</Typography>
 					</Box>
 				</Box>
@@ -122,7 +113,7 @@ const Testimonials = () => {
 				<Grid container spacing={4} sx={{ mt: 4 }}>
 					{testimonials.map((testimonial, i) => (
 						<Grid size={{ xs: 12, md: 4 }} key={i}>
-							<AnimateIn delay={i * 0.1}>
+							<AnimateIn delay={i * 0.1} style={{ height: '100%' }}>
 								<Card
 									sx={{
 										height: '100%',
@@ -163,6 +154,7 @@ const Testimonials = () => {
 											<Rating
 												value={testimonial.stars}
 												readOnly
+												precision={0.5}
 												size="small"
 												sx={{ color: theme.palette.secondary.main }}
 											/>
@@ -199,7 +191,11 @@ const Testimonials = () => {
 												}}
 											/>
 
-											<Box sx={{ flex: 1 }}>
+											<Box
+												sx={{
+													flex: 1,
+												}}
+											>
 												<Box
 													sx={{
 														display: 'flex',
@@ -224,10 +220,11 @@ const Testimonials = () => {
 												<Typography
 													variant="caption"
 													color="text.secondary"
+													textAlign="center"
 													sx={{ display: 'block' }}
 												>
-													{testimonial.position} • Handicap:{' '}
-													{testimonial.handicap}
+													{testimonial.position} • {testimonial.handicap}{' '}
+													Handicap
 												</Typography>
 											</Box>
 										</Stack>

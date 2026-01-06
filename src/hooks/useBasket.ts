@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBasket, saveBasket } from '../api/basket';
 import { GroupedSlot } from '../components/interfaces/SlotContext.i';
-import { useSnackbar } from '../context/SnackbarContext';
+import { useSnackbar } from '@context';
 import dayjs from 'dayjs';
 import { HOURLY_RATE } from '../components/checkout/CheckoutItem';
 import { useEffect } from 'react';

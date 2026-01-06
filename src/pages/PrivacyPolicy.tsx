@@ -7,21 +7,14 @@ import {
 	Paper,
 	useTheme,
 } from '@mui/material';
-import NavBreadcrumb from '../components/common/NavBreadcrumb';
+import dayjs from 'dayjs';
 
 const PrivacyPolicy: React.FC = () => {
 	const theme = useTheme();
-	const currentDate = new Date().toLocaleDateString('en-GB', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	});
+	const currentDate = dayjs().format('Do MMMM YYYY');
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>
-			{/* Breadcrumbs navigation */}
-			<NavBreadcrumb />
-
 			<Paper
 				elevation={0}
 				sx={{

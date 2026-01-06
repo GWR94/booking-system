@@ -15,10 +15,9 @@ import { FacebookIcon, GoogleIcon } from '@assets/icons/CustomIcons';
 
 type EditProfileProps = {
 	handleEditToggle: () => void;
-	handleSave: () => void;
 };
 
-const EditProfile = ({ handleEditToggle, handleSave }: EditProfileProps) => {
+const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 	const { user } = useAuth();
 	const theme = useTheme();
 	const [changePassword, setChangePassword] = useState(false);
@@ -33,6 +32,8 @@ const EditProfile = ({ handleEditToggle, handleSave }: EditProfileProps) => {
 		newPassword: '',
 		confirmPassword: '',
 	});
+
+	const handleSave = () => {};
 
 	if (!user) return null;
 
