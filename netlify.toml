@@ -1,2 +1,7 @@
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "VITE_BACKEND_API,VITE_FRONT_END,VITE_STRIPE_PUBLISHABLE_KEY,VITE_CAPTCHA_SITE_KEY,VITE_GOOGLE_ANALYTICS_ID"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

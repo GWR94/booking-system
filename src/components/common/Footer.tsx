@@ -231,7 +231,7 @@ const Footer: React.FC = () => {
 							<Typography variant="body2">
 								<Box
 									component="a"
-									href="mailto:info@gwrgolf.com"
+									href="mailto:golf@jamesgower.dev"
 									sx={{
 										color: '#fff',
 										textDecoration: 'none',
@@ -240,7 +240,7 @@ const Footer: React.FC = () => {
 										},
 									}}
 								>
-									info@gwrgolf.com
+									golf@jamesgower.dev
 								</Box>
 							</Typography>
 						</Box>
@@ -260,8 +260,7 @@ const Footer: React.FC = () => {
 						variant="body2"
 						sx={{ color: theme.palette.grey[500], mb: { xs: 2, sm: 0 } }}
 					>
-						© {new Date().getFullYear()} GWR Golf Simulators. All rights
-						reserved.
+						© {new Date().getFullYear()} The Short Grass. All rights reserved.
 					</Typography>
 				</Box>
 			</Container>

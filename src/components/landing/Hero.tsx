@@ -11,10 +11,16 @@ import {
 } from '@mui/material';
 
 import TestimonialCarousel from './TestimonialCarousel';
-import { StarOutline, SportsGolf, LocationOn } from '@mui/icons-material';
+import {
+	StarOutline,
+	SportsGolf,
+	LocationOn,
+	CardMembership,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import AnimateIn from '../common/AnimateIn';
 import logo from '/GLF-logo.png';
+import { Logo } from '@components/common';
 
 const Hero = () => {
 	const navigate = useNavigate();
@@ -50,6 +56,15 @@ const Hero = () => {
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
 				<Grid key="hero-content" container spacing={4} alignItems="center">
 					<Grid size={{ xs: 12, md: 7 }}>
+						<Box
+							sx={{
+								display: { xs: 'none', md: 'flex' },
+								alignItems: 'center',
+								mb: { xs: 0, md: 4 },
+							}}
+						>
+							<Logo logoOnly />
+						</Box>
 						<Typography
 							variant="h2"
 							sx={{
@@ -74,20 +89,39 @@ const Hero = () => {
 						>
 							Indoor Golf Simulator Experience in the Heart of Maidstone
 						</Typography>
-						<Chip
-							icon={<StarOutline color="accent" />}
-							label="PREMIUM GOLF EXPERIENCE"
-							color="secondary"
-							sx={{
-								mb: 3,
-								fontWeight: 500,
-								color: theme.palette.accent.light,
-								px: 1.5,
-								backgroundColor: 'rgba(255, 255, 255, 0.15)',
-								backdropFilter: 'blur(10px)',
-								border: '1px solid rgba(255, 255, 255, 0.3)',
-							}}
-						/>
+						<Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+							<Chip
+								icon={<StarOutline color="accent" />}
+								label="PREMIUM GOLF EXPERIENCE"
+								color="secondary"
+								sx={{
+									fontWeight: 500,
+									color: theme.palette.accent.light,
+									px: 1.5,
+									backgroundColor: 'rgba(255, 255, 255, 0.15)',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(255, 255, 255, 0.3)',
+								}}
+							/>
+							<Chip
+								icon={<CardMembership color="accent" />}
+								label="MEMBERSHIPS AVAILABLE"
+								color="primary"
+								onClick={() => navigate('/membership')}
+								sx={{
+									fontWeight: 500,
+									color: theme.palette.accent.light,
+									px: 1.5,
+									backgroundColor: 'rgba(74, 124, 89, 0.4)', // Using primary green with opacity
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(255, 255, 255, 0.3)',
+									cursor: 'pointer',
+									'&:hover': {
+										backgroundColor: 'rgba(74, 124, 89, 0.6)',
+									},
+								}}
+							/>
+						</Stack>
 						<AnimateIn type="fade-right">
 							<Typography
 								variant="body1"
@@ -133,6 +167,12 @@ const Hero = () => {
 										sx={{ mr: 1, color: theme.palette.accent.main }}
 									/>
 									<Typography variant="body2">TrackMan Technology</Typography>
+								</Box>
+								<Box sx={{ display: 'flex', alignItems: 'center' }}>
+									<CardMembership
+										sx={{ mr: 1, color: theme.palette.accent.main }}
+									/>
+									<Typography variant="body2">Flexible Memberships</Typography>
 								</Box>
 							</Stack>
 

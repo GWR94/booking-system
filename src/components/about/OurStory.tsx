@@ -55,9 +55,9 @@ const OurStory = () => {
 								component="p"
 								sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 3 }}
 							>
-								Founded in 2018, GWR Golf Simulators was born from a simple
-								idea: to make the joy of golf accessible year-round, regardless
-								of weather or daylight.
+								Founded in 2018, The Short Grass was born from a simple idea: to
+								make the joy of golf accessible year-round, regardless of
+								weather or daylight.
 							</Typography>
 
 							<Typography

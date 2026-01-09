@@ -23,10 +23,12 @@ export function useBasket() {
 				dayjs(item.startTime).isAfter(dayjs()),
 			);
 			if (updatedBasket.length !== basket.length) {
-				// If the basket contains past slots, clear it
-				console.error('Basket contains past slots, clearing...');
+				showSnackbar(
+					'Basket contains slots which have passed. Removing the slot.',
+					'warning',
+				);
 				saveBasket(updatedBasket);
-				queryClient.setQueryData(['basket'], basketData);
+				queryClient.setQueryData(['basket'], updatedBasket);
 			}
 		};
 

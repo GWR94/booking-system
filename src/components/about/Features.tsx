@@ -28,7 +28,7 @@ const Features = () => {
 				gutterBottom
 				sx={{ color: theme.palette.primary.main, fontWeight: 600, mb: 4 }}
 			>
-				Why Choose GWR Golf Simulators
+				Why Choose The Short Grass?
 			</Typography>
 
 			<Grid container spacing={3}>

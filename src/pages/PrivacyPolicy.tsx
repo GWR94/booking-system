@@ -47,7 +47,7 @@ const PrivacyPolicy: React.FC = () => {
 						1. Introduction
 					</Typography>
 					<Typography variant="body1">
-						Welcome to GWR Golf Simulators. This Privacy Policy explains how we
+						Welcome to The Short Grass. This Privacy Policy explains how we
 						collect, use, disclose, and safeguard your information when you use
 						our website and services. Please read this privacy policy carefully.
 						If you do not agree with the terms of this privacy policy, please do
@@ -244,7 +244,7 @@ const PrivacyPolicy: React.FC = () => {
 					</ul>
 					<Typography variant="body1" sx={{ mt: 2 }}>
 						To exercise any of these rights, please contact us at
-						privacy@gwrgolf.com. We will respond to your request within 30 days.
+						golf@jamesgower.dev. We will respond to your request within 30 days.
 					</Typography>
 				</Box>
 
@@ -341,7 +341,7 @@ const PrivacyPolicy: React.FC = () => {
 						contact us at:
 					</Typography>
 					<Typography variant="body1">
-						GWR Golf Simulators
+						The Short Grass
 						<br />
 						123 Golf Lane
 						<br />
@@ -349,7 +349,7 @@ const PrivacyPolicy: React.FC = () => {
 						<br />
 						United Kingdom
 						<br />
-						privacy@gwrgolf.com
+						golf@jamesgower.dev
 						<br />
 						+44 (0) 123 456 7890
 					</Typography>

@@ -2,12 +2,12 @@ import { Stack, Card as MuiCard, ThemeOptions } from '@mui/material';
 import { Palette, PaletteColorOptions, styled } from '@mui/material/styles';
 
 export const SignInContainer = styled(Stack)(({ theme }) => ({
-	height: 'calc(100vh - 70px)', // Change from '100dvh' to '100vh'
+	height: 'calc(100vh - 70px)',
 	minHeight: '100%',
 	padding: theme.spacing(2),
-	display: 'flex', // Ensure it uses flexbox
-	justifyContent: 'center', // Center vertically
-	alignItems: 'center', // Center horizontally
+	display: 'flex',
+	justifyContent: 'center',
+	alignItems: 'center',
 	[theme.breakpoints.up('sm')]: {
 		padding: theme.spacing(4),
 	},
@@ -161,53 +161,4 @@ const blueTealYellowTheme: ThemePalette = {
 	},
 };
 
-const modernCalmTheme: ThemePalette = {
-	id: 'modern-calm',
-	name: 'Modern Calm',
-	palette: {
-		primary: {
-			main: '#4a7c59', // Muted Green
-			light: '#6fa97c', // Lighter Green
-			dark: '#2f523b', // Darker Green
-			contrastText: '#ffffff', // White text
-		},
-		secondary: {
-			main: '#2b6777', // Deep Blue
-			light: '#4d8ca0', // Lighter Blue
-			dark: '#1a4550', // Darker Blue
-			contrastText: '#ffffff', // White text
-		},
-		accent: {
-			main: '#f4a261', // Soft Orange
-			light: '#f7c08a', // Lighter Orange
-			dark: '#c17a3e', // Darker Orange
-			contrastText: '#000000', // Black text
-		},
-		warning: {
-			main: '#e9c46a', // Warm Yellow
-			light: '#f3d89a', // Lighter Yellow
-			dark: '#b89a4a', // Darker Yellow
-			contrastText: '#000000', // Black text
-		},
-		error: {
-			main: '#e76f51', // Coral Red
-			light: '#f29b82', // Lighter Coral Red
-			dark: '#b54a34', // Darker Coral Red
-			contrastText: '#ffffff', // White text
-		},
-		success: {
-			main: '#2a9d8f', // Teal Green
-			light: '#5fc2b3', // Lighter Teal Green
-			dark: '#1b6d63', // Darker Teal Green
-			contrastText: '#ffffff', // White text
-		},
-		link: {
-			main: '#64d8ff', // Bright sky blue for good contrast on medium-dark primary background
-			light: '#8ee4ff', // Lighter sky blue
-			dark: '#3db8e6', // Darker sky blue
-			contrastText: '#000000',
-		},
-	},
-};
-
-export const themes: ThemePalette[] = [blueTealYellowTheme, modernCalmTheme];
+export const themes: ThemePalette[] = [blueTealYellowTheme];

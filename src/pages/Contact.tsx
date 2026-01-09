@@ -68,7 +68,7 @@ const Contact: React.FC = () => {
 								allowFullScreen
 								loading="lazy"
 								referrerPolicy="no-referrer-when-downgrade"
-								title="GWR Golf Simulators Location"
+								title="The Short Grass Location"
 							></iframe>
 						</Box>
 

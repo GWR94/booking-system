@@ -137,7 +137,7 @@ const CookiesPolicy: React.FC = () => {
 						improve your browsing experience.
 					</Typography>
 					<Typography variant="body1">
-						At GWR Golf Simulators, we use cookies and similar technologies to
+						At The Short Grass, we use cookies and similar technologies to
 						distinguish you from other users of our website. This helps us to
 						provide you with a good experience when you browse our website and
 						also allows us to improve our site.
@@ -536,7 +536,7 @@ const CookiesPolicy: React.FC = () => {
 						at:
 					</Typography>
 					<Typography variant="body1">
-						GWR Golf Simulators
+						The Short Grass
 						<br />
 						123 Golf Lane
 						<br />
@@ -544,7 +544,7 @@ const CookiesPolicy: React.FC = () => {
 						<br />
 						United Kingdom
 						<br />
-						privacy@gwrgolf.com
+						golf@jamesgower.dev
 						<br />
 						+44 (0) 123 456 7890
 					</Typography>

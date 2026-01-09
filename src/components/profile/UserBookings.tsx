@@ -18,6 +18,7 @@ import {
 	KeyboardArrowUp,
 	KeyboardArrowDown,
 	OpenInNew,
+	Delete as DeleteIcon,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { StatusType } from '../interfaces/Booking.i';
@@ -25,8 +26,13 @@ import dayjs from 'dayjs';
 import axios from '../../utils/axiosConfig';
 import { useAuth } from '../../hooks/useAuth';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useSnackbar } from '../../context';
+
 const UserBookings = () => {
 	const { user } = useAuth();
+	const queryClient = useQueryClient();
+	const { showSnackbar } = useSnackbar();
 	const [expandedRow, setExpandedRow] = useState<string | null>(null);
 	const renderBookingStatus = (status: StatusType) => {
 		const statusColors: Partial<
@@ -43,10 +49,12 @@ const UserBookings = () => {
 
 	const handleDeleteBooking = async (bookingId: number) => {
 		try {
-			const { data } = await axios.delete(`/api/bookings/${bookingId}`);
-			console.log(data);
+			await axios.delete(`/api/bookings/${bookingId}`);
+			queryClient.invalidateQueries({ queryKey: ['auth'] });
+			showSnackbar('Booking deleted successfully', 'success');
 		} catch (error) {
 			console.error(error);
+			showSnackbar('Failed to delete booking', 'error');
 		}
 	};
 
@@ -117,14 +125,13 @@ const UserBookings = () => {
 											)}
 										</TableCell>
 										<TableCell>
-											<Button
-												variant="outlined"
+											<IconButton
 												size="small"
-												color="primary"
+												color="error"
 												onClick={() => handleDeleteBooking(booking.id)}
 											>
-												Delete
-											</Button>
+												<DeleteIcon />
+											</IconButton>
 										</TableCell>
 									</TableRow>
 									<TableRow>

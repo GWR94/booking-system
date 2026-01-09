@@ -27,7 +27,7 @@ const Intro = () => {
 						gutterBottom
 						sx={{ fontWeight: 700 }}
 					>
-						Premium Golf Simulation
+						The Short Grass.
 					</Typography>
 
 					<Typography
@@ -35,10 +35,9 @@ const Intro = () => {
 						color="text.secondary"
 						sx={{ fontWeight: 400, mb: 4, lineHeight: 1.6 }}
 					>
-						Welcome to GWR Golf Simulators, Maidstone's premier indoor facility.
-						We combine state-of-the-art technology with a welcoming atmosphere
-						to create the ultimate golfing environment for players of all
-						levels.
+						Welcome to The Short Grass, Maidstone's premier indoor facility. We
+						combine state-of-the-art technology with a welcoming atmosphere to
+						create the ultimate golfing environment for players of all levels.
 					</Typography>
 
 					<Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>

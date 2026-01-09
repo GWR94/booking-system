@@ -29,7 +29,6 @@ const App = () => {
 			<Box
 				sx={{
 					minHeight: '100vh',
-					// bgcolor: alpha(theme.palette.primary.main, 0.1),
 				}}
 			>
 				<ScrollToTop />

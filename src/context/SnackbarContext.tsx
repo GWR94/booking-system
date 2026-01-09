@@ -50,8 +50,8 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
 				<Alert
 					onClose={hideSnackbar}
 					severity={snackbar.severity}
-					sx={{ width: '100%' }}
-					variant="filled"
+					sx={{ width: '100%', background: '#fff' }}
+					variant="outlined"
 				>
 					{snackbar.message}
 				</Alert>

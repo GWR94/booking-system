@@ -1,5 +1,10 @@
 import { useMotionValueEvent, useScroll, motion } from 'framer-motion';
-import { Home, Info, EventAvailable } from '@mui/icons-material';
+import {
+	Home,
+	Info,
+	EventAvailable,
+	CardMembership,
+} from '@mui/icons-material';
 import {
 	AppBar,
 	Container,
@@ -95,50 +100,37 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 						borderBottom: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
 					}}
 				>
-					<Container maxWidth="xl">
+					<Container maxWidth="lg">
 						<Toolbar
 							disableGutters
 							sx={{
 								py: 0.5,
 								minHeight: '74px',
 								position: 'relative',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'space-between',
+								width: '100%',
 							}}
 						>
-							<Box sx={{ display: 'flex', alignItems: 'center' }}>
-								<MobileMenuButton
-									setMenuContent={setMenuContent}
-									isMenuOpen={isMenuOpen}
-									setIsMenuOpen={setIsMenuOpen}
-								/>
+							<MobileMenuButton
+								setMenuContent={setMenuContent}
+								isMenuOpen={isMenuOpen}
+								setIsMenuOpen={setIsMenuOpen}
+							/>
 
-								<DesktopNavigation />
-							</Box>
+							<DesktopNavigation />
 
-							<Box
+							<Logo
 								sx={{
+									height: '65px',
 									position: 'absolute',
 									left: '50%',
 									transform: 'translateX(-50%)',
-									flexGrow: 0,
-									display: 'flex',
-									justifyContent: 'center',
-									width: 'auto',
-									height: '100%',
-									padding: '4px 0',
 								}}
-							>
-								<Logo />
-							</Box>
+							/>
 
-							{/* Action Icons */}
-							<Box
-								sx={{
-									display: 'flex',
-									alignItems: 'center',
-									gap: 0.5,
-									ml: 'auto',
-								}}
-							>
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
 								<BasketButton
 									isMobile={isMobile}
 									onMobileBasketClick={setMobileNavBarToBasket}

@@ -40,4 +40,6 @@ export interface User {
 	googleId: string | null;
 	facebookId: string | null;
 	appleId: string | null;
+	membershipTier?: string;
+	membershipStatus?: string;
 }

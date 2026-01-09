@@ -49,8 +49,8 @@ const Terms: React.FC = () => {
 					<Typography variant="body1" gutterBottom>
 						These Terms and Conditions constitute a legally binding agreement
 						made between you, whether personally or on behalf of an entity
-						("you") and GWR Golf Simulators ("we," "us" or "our"), concerning
-						your access to and use of our website and services.
+						("you") and The Short Grass ("we," "us" or "our"), concerning your
+						access to and use of our website and services.
 					</Typography>
 					<Typography variant="body1">
 						By accessing or using our services, you agree to be bound by these
@@ -178,14 +178,14 @@ const Terms: React.FC = () => {
 					</Typography>
 					<Typography variant="body1">
 						The Service and its original content, features, and functionality
-						are and will remain the exclusive property of GWR Golf Simulators
-						and its licensors. The Service is protected by copyright, trademark,
-						and other laws.
+						are and will remain the exclusive property of The Short Grass and
+						its licensors. The Service is protected by copyright, trademark, and
+						other laws.
 					</Typography>
 					<Typography variant="body1">
 						Our trademarks and trade dress may not be used in connection with
-						any product or service without the prior written consent of GWR Golf
-						Simulators.
+						any product or service without the prior written consent of The
+						Short Grass.
 					</Typography>
 				</Box>
 
@@ -198,7 +198,7 @@ const Terms: React.FC = () => {
 						6. Limitation of Liability
 					</Typography>
 					<Typography variant="body1">
-						In no event shall GWR Golf Simulators, nor its directors, employees,
+						In no event shall The Short Grass, nor its directors, employees,
 						partners, agents, suppliers, or affiliates, be liable for any
 						indirect, incidental, special, consequential or punitive damages,
 						including without limitation, loss of profits, data, use, goodwill,
@@ -233,8 +233,8 @@ const Terms: React.FC = () => {
 						7. Indemnification
 					</Typography>
 					<Typography variant="body1">
-						You agree to defend, indemnify and hold harmless GWR Golf Simulators
-						and its licensee and licensors, and their employees, contractors,
+						You agree to defend, indemnify and hold harmless The Short Grass and
+						its licensee and licensors, and their employees, contractors,
 						agents, officers and directors, from and against any and all claims,
 						damages, obligations, losses, liabilities, costs or debt, and
 						expenses (including but not limited to attorney's fees), resulting
@@ -312,7 +312,7 @@ const Terms: React.FC = () => {
 						If you have any questions about these Terms, please contact us at:
 					</Typography>
 					<Typography variant="body1">
-						GWR Golf Simulators
+						The Short Grass
 						<br />
 						123 Golf Lane
 						<br />
@@ -320,7 +320,7 @@ const Terms: React.FC = () => {
 						<br />
 						United Kingdom
 						<br />
-						legal@gwrgolf.com
+						golf@jamesgower.dev
 						<br />
 						+44 (0) 123 456 7890
 					</Typography>

@@ -217,7 +217,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 											variant="body2"
 											sx={{ color: 'rgba(255,255,255,0.8)' }}
 										>
-											info@gwrgolf.com
+											golf@jamesgower.dev
 										</Typography>
 									</Box>
 								</Box>

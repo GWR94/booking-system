@@ -12,6 +12,17 @@ import { useSlots } from '../../hooks/useSlots';
 const GenerateSlots = () => {
 	const { groupedTimeSlots, isLoading } = useSlots();
 
+	const filteredSlots = Object.keys(groupedTimeSlots)
+		.filter((key: string) => {
+			const firstSlot = groupedTimeSlots[key][0];
+			return dayjs(firstSlot.startTime).isAfter(dayjs());
+		})
+		.sort((a, b) => {
+			const aTime = dayjs(groupedTimeSlots[a][0].startTime).valueOf();
+			const bTime = dayjs(groupedTimeSlots[b][0].startTime).valueOf();
+			return aTime - bTime;
+		});
+
 	return (
 		<Container maxWidth="xl" sx={{ flexGrow: 1, p: 3 }}>
 			<Grid
@@ -23,7 +34,7 @@ const GenerateSlots = () => {
 					<Box sx={{ display: 'flex', justifyContent: 'center' }}>
 						<CircularProgress />
 					</Box>
-				) : Object.keys(groupedTimeSlots).length === 0 ? (
+				) : filteredSlots.length === 0 ? (
 					<Box
 						sx={{
 							m: '10px auto',
@@ -37,21 +48,9 @@ const GenerateSlots = () => {
 						</Typography>
 					</Box>
 				) : (
-					Object.keys(groupedTimeSlots)
-						.filter((key: string) => {
-							const firstSlot = groupedTimeSlots[key][0];
-							return dayjs(firstSlot.startTime).isAfter(
-								dayjs().subtract(30, 'minutes'),
-							);
-						})
-						.sort((a, b) => {
-							const aTime = dayjs(groupedTimeSlots[a][0].startTime).valueOf();
-							const bTime = dayjs(groupedTimeSlots[b][0].startTime).valueOf();
-							return aTime - bTime;
-						})
-						.map((key: string, i: number) => (
-							<Slot key={i} slotKey={key} timeSlots={groupedTimeSlots} />
-						))
+					filteredSlots.map((key: string, i: number) => (
+						<Slot key={i} slotKey={key} timeSlots={groupedTimeSlots} />
+					))
 				)}
 			</Grid>
 		</Container>

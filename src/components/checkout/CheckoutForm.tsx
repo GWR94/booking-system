@@ -17,13 +17,21 @@ import CheckoutItem from './CheckoutItem';
 import { useBasket, useAuth } from '@hooks';
 import { GuestUser } from './GuestInfo';
 import { useNavigate } from 'react-router-dom';
+import TestPaymentNotice from './TestPaymentNotice';
+
+import axiosInstance from '@utils/axiosConfig';
 
 interface CheckoutFormProps {
 	guest: GuestUser | null;
 	recaptchaToken?: string;
+	isFree?: boolean;
 }
 
-const CheckoutForm = ({ guest, recaptchaToken }: CheckoutFormProps) => {
+const CheckoutForm = ({
+	guest,
+	recaptchaToken,
+	isFree = false,
+}: CheckoutFormProps) => {
 	const stripe = useStripe();
 	const elements = useElements();
 	const { user, isAuthenticated } = useAuth();
@@ -46,23 +54,46 @@ const CheckoutForm = ({ guest, recaptchaToken }: CheckoutFormProps) => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
+		if (isFree) {
+			setLoading(true);
+			setMessage('');
+			try {
+				// Determine if guest or user booking
+				const endpoint = isAuthenticated
+					? '/api/bookings/create'
+					: '/api/bookings/guest/create';
+				// Note: The logic for create-payment-intent returned 0 amount, but we didn't create a booking yet.
+				// We need to call the booking creation endpoint directly now.
+				// But wait, the standard flow relies on WEBHOOK or post-payment confirmation??
+				// Checking `booking.controller.ts`:
+				// `createBooking` expects `slotIds`, `paymentId`, `paymentStatus`.
+				// For free booking, paymentId could be 'FREE' and status 'succeeded'.
+
+				const slotIds = basket.map((b) => b.slotIds).flat();
+
+				await axiosInstance.post(endpoint, {
+					slotIds,
+					paymentId: 'FREE_MEMBERSHIP',
+					paymentStatus: 'succeeded',
+					guestInfo: guest,
+				});
+
+				// Redirect to completion
+				window.location.href = `${
+					import.meta.env.VITE_FRONT_END
+				}/checkout/complete`;
+			} catch (err) {
+				console.error(err);
+				setMessage('Failed to confirm free booking.');
+			} finally {
+				setLoading(false);
+			}
+			return;
+		}
+
 		if (!stripe || !elements) return;
 		setLoading(true);
 		setMessage('');
-
-		// Validate reCAPTCHA for guest users
-		if (!isAuthenticated && !recaptchaToken) {
-			setMessage('Please complete the reCAPTCHA.');
-			setLoading(false);
-			return;
-		}
-
-		// Validate guest info if not authenticated
-		if (!isAuthenticated && (!guest?.name || !guest?.email)) {
-			setMessage('Please provide your name and email for guest checkout.');
-			setLoading(false);
-			return;
-		}
 
 		const { error } = await stripe.confirmPayment({
 			elements,
@@ -70,9 +101,9 @@ const CheckoutForm = ({ guest, recaptchaToken }: CheckoutFormProps) => {
 				return_url: `${import.meta.env.VITE_FRONT_END}/checkout/complete`,
 			},
 		});
-		if (error.type === 'card_error' || error.type === 'validation_error') {
+		if (error.type === 'card_error') {
 			setMessage(error.message as string);
-		} else {
+		} else if (error.type !== 'validation_error') {
 			setMessage('An unexpected error occurred.');
 		}
 
@@ -113,15 +144,6 @@ const CheckoutForm = ({ guest, recaptchaToken }: CheckoutFormProps) => {
 			{basket.map((slot) => (
 				<CheckoutItem slot={slot} key={slot.id} />
 			))}
-			<Typography
-				variant="subtitle2"
-				fontWeight="300"
-				textAlign="justify"
-				gutterBottom
-			>
-				If you have any promotional codes or vouchers, please input them below
-				before completing payment.
-			</Typography>
 			<Grid container alignItems="center" sx={{ my: 2 }}>
 				<Grid size={{ xs: 12, sm: 6 }} />
 				<Grid size={{ xs: 12, sm: 6 }}>
@@ -161,12 +183,19 @@ const CheckoutForm = ({ guest, recaptchaToken }: CheckoutFormProps) => {
 			</Grid>
 
 			<form id="payment-form" onSubmit={handleSubmit}>
-				<PaymentElement id="payment-element" options={paymentElementOptions} />
+				{!isFree && (
+					<>
+						<TestPaymentNotice />
+						<PaymentElement
+							id="payment-element"
+							options={paymentElementOptions}
+						/>
+					</>
+				)}
 				<Button
 					disabled={
 						isLoading ||
-						!stripe ||
-						!elements ||
+						(!isFree && (!stripe || !elements)) ||
 						(!isAuthenticated && !recaptchaToken)
 					}
 					fullWidth

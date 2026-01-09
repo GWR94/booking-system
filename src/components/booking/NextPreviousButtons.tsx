@@ -16,7 +16,7 @@ const NextPreviousButtons = () => {
 					mr: 2,
 				}}
 			>
-				Previous
+				Previous Day
 			</Button>
 			<Button
 				variant="contained"
@@ -24,7 +24,7 @@ const NextPreviousButtons = () => {
 				size="small"
 				onClick={() => setSelectedDate(dayjs(selectedDate).add(1, 'day'))}
 			>
-				Next
+				Next Day
 			</Button>
 		</Box>
 	);

@@ -6,6 +6,11 @@ import {
 	DialogActions,
 	Button,
 } from '@mui/material';
+import axios from '@utils/axiosConfig';
+import { useAuth } from '@hooks';
+import { useSnackbar } from '@context';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 interface DeleteAccountDialogProps {
 	dialogOpen: boolean;
@@ -18,8 +23,25 @@ const DeleteAccountDialog = ({
 	onClose,
 	fullscreen,
 }: DeleteAccountDialogProps) => {
-	const handleDelete = () => {
-		// TODO
+	const { logout } = useAuth();
+	const { showSnackbar } = useSnackbar();
+	const navigate = useNavigate();
+	const [loading, setLoading] = useState(false);
+
+	const handleDelete = async () => {
+		setLoading(true);
+		try {
+			await axios.delete('/api/user/profile/delete');
+			await logout();
+			showSnackbar('Account deleted successfully', 'success');
+			navigate('/');
+		} catch (error) {
+			console.error('Error deleting account:', error);
+			showSnackbar('Failed to delete account', 'error');
+		} finally {
+			setLoading(false);
+			onClose();
+		}
 	};
 
 	return (
@@ -39,6 +61,7 @@ const DeleteAccountDialog = ({
 					variant="outlined"
 					onClick={onClose}
 					size={fullscreen ? 'small' : 'medium'}
+					disabled={loading}
 				>
 					Cancel
 				</Button>
@@ -47,8 +70,9 @@ const DeleteAccountDialog = ({
 					color="error"
 					onClick={handleDelete}
 					size={fullscreen ? 'small' : 'medium'}
+					disabled={loading}
 				>
-					Delete Account
+					{loading ? 'Deleting...' : 'Delete Account'}
 				</Button>
 			</DialogActions>
 		</Dialog>

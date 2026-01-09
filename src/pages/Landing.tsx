@@ -6,6 +6,7 @@ import CallToAction from '../components/common/CallToAction';
 import BookingPreview from '../components/landing/BookingPreview';
 import Stats from '../components/landing/Stats';
 import FeaturedCourses from '../components/landing/FeaturedCourses';
+import MembershipPreview from '../components/landing/MembershipPreview';
 
 const Landing = () => {
 	return (
@@ -15,6 +16,7 @@ const Landing = () => {
 			<Stats />
 			<Testimonials />
 			<Features />
+			<MembershipPreview />
 
 			<BookingPreview />
 			<CallToAction />

@@ -1,5 +1,6 @@
 import { Box, Typography, Button } from '@mui/material';
 import { FacebookIcon, GoogleIcon } from '../../assets/icons/CustomIcons';
+import SubscriptionManagement from './SubscriptionManagement';
 import { useAuth } from '@hooks';
 
 type ViewProfileProps = {
@@ -74,15 +75,9 @@ const ViewProfile = ({ handleEditToggle }: ViewProfileProps) => {
 					</Box>
 				</>
 			)}
-			<Box
-				sx={{
-					display: 'flex',
-					justifyContent: 'flex-end',
-					width: '100%',
-					p: 2,
-				}}
-			>
-				<Button variant="contained" color="primary" onClick={handleEditToggle}>
+			<SubscriptionManagement user={user} />
+			<Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+				<Button variant="contained" onClick={handleEditToggle}>
 					Edit Profile
 				</Button>
 			</Box>
