@@ -6,33 +6,37 @@ interface OAuthButtonsProps {
 	isLogin?: boolean;
 }
 
-const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => (
-	<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-		<Button
-			fullWidth
-			variant="outlined"
-			href="/api/user/login/google"
-			startIcon={<GoogleIcon />}
-		>
-			Sign {isLogin ? 'in ' : 'up '} with Google
-		</Button>
-		<Button
-			fullWidth
-			variant="outlined"
-			href="/api/user/login/facebook"
-			startIcon={<FacebookIcon />}
-		>
-			Sign {isLogin ? 'in ' : 'up '} with Facebook
-		</Button>
-		<Button
-			fullWidth
-			variant="outlined"
-			href="/api/user/login/twitter"
-			startIcon={<X />}
-		>
-			Sign {isLogin ? 'in ' : 'up '} with X
-		</Button>
-	</Box>
-);
+const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => {
+	const backendUrl = import.meta.env.VITE_BACKEND_API || '';
+
+	return (
+		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+			<Button
+				fullWidth
+				variant="outlined"
+				href={`${backendUrl}/api/user/login/google`}
+				startIcon={<GoogleIcon />}
+			>
+				Sign {isLogin ? 'in ' : 'up '} with Google
+			</Button>
+			<Button
+				fullWidth
+				variant="outlined"
+				href={`${backendUrl}/api/user/login/facebook`}
+				startIcon={<FacebookIcon />}
+			>
+				Sign {isLogin ? 'in ' : 'up '} with Facebook
+			</Button>
+			<Button
+				fullWidth
+				variant="outlined"
+				href={`${backendUrl}/api/user/login/twitter`}
+				startIcon={<X />}
+			>
+				Sign {isLogin ? 'in ' : 'up '} with X
+			</Button>
+		</Box>
+	);
+};
 
 export default OAuthButtons;
