@@ -1,9 +1,5 @@
 import dayjs from 'dayjs';
-import {
-	TimeSlot,
-	GroupedTimeSlots,
-	GroupedSlot,
-} from '../components/interfaces/SlotContext.i';
+import { TimeSlot, GroupedTimeSlots, GroupedSlot } from '@components/booking';
 
 export const getGroupedTimeSlots = (
 	slots: TimeSlot[],
@@ -36,8 +32,6 @@ export const getGroupedTimeSlots = (
 		}
 		slotsByBay[slot.bayId].push(slot);
 	});
-
-	// Process each bay's slots
 
 	// Process each bay's slots
 	Object.entries(slotsByBay).forEach(([bayId, baySlots]) => {

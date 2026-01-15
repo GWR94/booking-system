@@ -1,17 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import Slot from './Slot';
+import { Slot } from '@components/booking';
 import dayjs from 'dayjs';
 
 // Mock Hooks
-vi.mock('../../hooks/useBasket', () => ({
+vi.mock('@hooks', () => ({
 	useBasket: () => ({
 		addToBasket: vi.fn(),
 		basket: [],
 	}),
-}));
-
-vi.mock('../../hooks/useAuth', () => ({
 	useAuth: () => ({
 		isAdmin: false,
 	}),
@@ -45,9 +42,6 @@ describe('Slot Component', () => {
 		],
 	};
 
-	// Using loose type casting for mock data simplicity if specific rigid types from interfaces are hard to replicate exactly in test without importing everything
-	// But structure should match what Slot uses: startTime/endTime are Dayjs objects.
-
 	it('renders an available slot correctly', () => {
 		render(<Slot timeSlots={mockTimeSlots as any} slotKey="10:00" />);
 		expect(screen.getByText(/10:00am/i)).toBeInTheDocument();
@@ -62,7 +56,7 @@ describe('Slot Component', () => {
 					startTime: dayjs().add(1, 'day').hour(10).minute(0),
 					endTime: dayjs().add(1, 'day').hour(11).minute(0),
 					slotIds: [1],
-					isBooked: true, // Key property often checked if passed directly, but logic uses basket filter primarily
+					isBooked: true,
 				},
 			],
 		};
@@ -81,9 +75,6 @@ describe('Slot Component', () => {
 		};
 
 		render(<Slot timeSlots={pastTimeSlots as any} slotKey="10:00" />);
-
-		// Should show "Unavailable" Chip and disabled button
-		// Chip label logic: "label={slotPassed ? 'Unavailable' : availabilityText}"
 		expect(screen.getByText(/Unavailable/i)).toBeInTheDocument();
 	});
 });

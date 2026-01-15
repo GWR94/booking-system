@@ -1,15 +1,13 @@
-import { Business, HistoryEdu } from '@mui/icons-material';
+import { Business } from '@mui/icons-material';
 import {
 	Grid2 as Grid,
 	Box,
 	Typography,
 	Paper,
 	Container,
-	Chip,
 } from '@mui/material';
-import { useTheme } from '@mui/material';
-import { alpha } from '@mui/material/styles';
-import AnimateIn from '../common/AnimateIn';
+import { useTheme, alpha } from '@mui/material';
+import { AnimateIn } from '@common';
 
 const OurStory = () => {
 	const theme = useTheme();
@@ -38,16 +36,9 @@ const OurStory = () => {
 									WebkitTextFillColor: 'transparent',
 								}}
 							>
-								From a Simple Idea <br />
-								<Box
-									component="span"
-									sx={{
-										color: theme.palette.text.primary,
-										WebkitTextFillColor: 'initial',
-									}}
-								>
-									To a Premium Experience
-								</Box>
+								<Box component="span">Play. </Box>
+								<Box component="span">Practice. </Box>
+								<Box component="span">Perform.</Box>
 							</Typography>
 
 							<Typography

@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import ForgotPassword from '../components/auth/ForgotPasswordDialog';
+import {
+	OAuthButtons,
+	FormInput,
+	ForgotPasswordDialog,
+} from '@components/auth';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -13,11 +17,9 @@ import {
 	Checkbox,
 	Divider,
 } from '@mui/material';
-import validateInputs from '../utils/validateInput';
-import OAuthButtons from '../components/auth/OAuthButtons';
+import validateInputs from '@utils/validateInput';
 import { Card, SignInContainer } from '../styles/themes';
-import { FormInput } from '../components/interfaces/auth.i';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@hooks';
 
 const Login = () => {
 	const { login } = useAuth();
@@ -181,7 +183,7 @@ const Login = () => {
 								</Link>
 							</Grid>
 						</Grid>
-						<ForgotPassword open={open} handleClose={handleClose} />
+						<ForgotPasswordDialog open={open} handleClose={handleClose} />
 						<LoadingButton
 							type="submit"
 							fullWidth

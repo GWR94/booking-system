@@ -9,8 +9,6 @@ import {
 	Paper,
 	useTheme,
 	MenuItem,
-	Alert,
-	Snackbar,
 	InputAdornment,
 	CircularProgress,
 } from '@mui/material';
@@ -22,7 +20,7 @@ import {
 	Person,
 	Subject,
 } from '@mui/icons-material';
-import axios from 'axios';
+import { sendContactMessage } from '@api';
 import { useSnackbar } from '@context';
 
 interface ContactFormProps {
@@ -105,9 +103,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
 		setLoading(true);
 
 		try {
-			const response = await axios.post('/api/contact', formData);
+			const response = await sendContactMessage(formData);
 
-			if (!response.data.success) {
+			if (!response.success) {
 				throw new Error('Failed to send message');
 			}
 

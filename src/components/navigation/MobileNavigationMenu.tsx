@@ -8,11 +8,10 @@ import {
 	useTheme,
 	Collapse,
 } from '@mui/material';
-
 import BasketContent from './BasketContent';
 import { useNavigate } from 'react-router';
-import { useAuth } from '../../hooks/useAuth';
-import { NavItem } from '../common/NavBar';
+import { useAuth } from '@hooks';
+import { NavItem } from './NavBar';
 
 type MobileNavigationMenuProps = {
 	menuContent: 'nav' | 'basket';
@@ -136,7 +135,7 @@ const MobileNavigationMenu = ({
 							)}
 						</Stack>
 					) : (
-						<BasketContent onClose={() => setIsMenuOpen(false)} />
+						<BasketContent onClose={() => setIsMenuOpen(false)} isMobile />
 					)}
 				</Box>
 			</Box>

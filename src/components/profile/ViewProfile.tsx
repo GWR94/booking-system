@@ -1,6 +1,5 @@
 import { Box, Typography, Button } from '@mui/material';
-import { FacebookIcon, GoogleIcon } from '../../assets/icons/CustomIcons';
-import SubscriptionManagement from './SubscriptionManagement';
+import { FacebookIcon, GoogleIcon, XIcon } from '@assets/icons/CustomIcons';
 import { useAuth } from '@hooks';
 
 type ViewProfileProps = {
@@ -9,7 +8,8 @@ type ViewProfileProps = {
 
 const ViewProfile = ({ handleEditToggle }: ViewProfileProps) => {
 	const { user } = useAuth();
-	const socialLogin = !!user?.appleId || !!user?.googleId || !!user?.facebookId;
+	const socialLogin =
+		!!user?.googleId || !!user?.facebookId || !!user?.twitterId;
 
 	if (!user) return null;
 	return (
@@ -71,11 +71,11 @@ const ViewProfile = ({ handleEditToggle }: ViewProfileProps) => {
 						<div>
 							{user.facebookId && <FacebookIcon />}
 							{user.googleId && <GoogleIcon />}
+							{user.twitterId && <XIcon />}
 						</div>
 					</Box>
 				</>
 			)}
-			<SubscriptionManagement user={user} />
 			<Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
 				<Button variant="contained" onClick={handleEditToggle}>
 					Edit Profile

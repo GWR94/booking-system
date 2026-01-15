@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@context';
-import { verifyUser, loginUser, logoutUser, registerUser } from '../api/auth';
+import { verifyUser, loginUser, logoutUser, registerUser } from '@api';
 
 export function useAuth() {
 	const queryClient = useQueryClient();

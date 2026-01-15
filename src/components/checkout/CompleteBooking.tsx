@@ -12,18 +12,19 @@ import {
 	Stack,
 } from '@mui/material';
 import {
-	CheckCircle,
-	Error,
-	Info,
-	Warning,
-	Done,
-	Print,
+	CheckCircle as CheckCircleIcon,
+	Error as ErrorIcon,
+	Info as InfoIcon,
+	Warning as WarningIcon,
+	Done as DoneIcon,
+	Print as PrintIcon,
 } from '@mui/icons-material';
 import CheckoutItem from './CheckoutItem';
-import { GroupedSlot } from '../interfaces/SlotContext.i';
 import { useBasket, useBookingManager } from '@hooks';
-import axios from '../../utils/axiosConfig';
+import { getBookingByPaymentIntent } from '@api';
 import dayjs from 'dayjs';
+import { useSnackbar } from '@context';
+import { GroupedSlot } from '@components/booking';
 
 interface StatusContent {
 	text: string;
@@ -35,37 +36,37 @@ const STATUS_CONTENT_MAP: Record<PaymentIntent.Status, StatusContent> = {
 	succeeded: {
 		text: 'Booking Confirmed',
 		iconColor: '#30B130',
-		icon: <Done />,
+		icon: <DoneIcon />,
 	},
 	processing: {
 		text: 'Your payment is processing.',
 		iconColor: '#6D6E78',
-		icon: <Info />,
+		icon: <InfoIcon />,
 	},
 	requires_payment_method: {
 		text: 'Your payment was not successful, please try again.',
 		iconColor: '#ff8040',
-		icon: <Warning />,
+		icon: <WarningIcon />,
 	},
 	canceled: {
 		text: 'Payment was cancelled.',
 		iconColor: '#6D6E78',
-		icon: <Error />,
+		icon: <ErrorIcon />,
 	},
 	requires_action: {
 		text: 'Your payment requires additional action.',
 		iconColor: '#6D6E78',
-		icon: <Warning />,
+		icon: <WarningIcon />,
 	},
 	requires_capture: {
 		text: 'Your payment requires capture.',
 		iconColor: '#6D6E78',
-		icon: <Info />,
+		icon: <InfoIcon />,
 	},
 	requires_confirmation: {
 		text: 'Your payment requires confirmation.',
 		iconColor: '#6D6E78',
-		icon: <Warning />,
+		icon: <WarningIcon />,
 	},
 };
 
@@ -73,6 +74,7 @@ const CompletePage = () => {
 	const stripe = useStripe();
 	const { clearBasket } = useBasket();
 	const { booking, setBooking } = useBookingManager();
+	const { showSnackbar } = useSnackbar();
 
 	const [status, setStatus] = useState<PaymentIntent.Status>('processing');
 	const [intentId, setIntentId] = useState('');
@@ -147,32 +149,48 @@ const CompletePage = () => {
 							.join(' ');
 				}
 			}
+
 			setPaymentMethod(methodName);
 
-			try {
-				const { data } = await axios.get(
-					`/api/bookings/payment/${paymentIntent.id}`,
-				);
-				if (data.booking && data.groupedSlots) {
-					setBooking(data.booking);
-					const grouped = data.groupedSlots.map((slot: any) => ({
-						id: slot.slotIds[0],
-						startTime: dayjs(slot.startTimeISO),
-						endTime: dayjs(slot.endTimeISO),
-						bayId: slot.bayId,
-						slotIds: slot.slotIds,
-					}));
-					setItems(grouped);
+			const fetchBookingWithRetry = async (
+				retryCount = 0,
+				maxRetries = 5,
+			): Promise<void> => {
+				try {
+					const data = await getBookingByPaymentIntent(paymentIntent.id);
+					if (data.booking && data.groupedSlots) {
+						setBooking(data.booking);
+						const grouped = data.groupedSlots.map((slot: any) => ({
+							id: slot.slotIds[0],
+							startTime: dayjs(slot.startTimeISO),
+							endTime: dayjs(slot.endTimeISO),
+							bayId: slot.bayId,
+							slotIds: slot.slotIds,
+						}));
+						setItems(grouped);
+						setLoading(false);
+						clearBasket();
+					} else {
+						throw new Error('Incomplete booking data');
+					}
+				} catch (error) {
+					console.error(
+						`Error fetching booking (attempt ${retryCount + 1}/${maxRetries}):`,
+						error,
+					);
+					if (retryCount < maxRetries) {
+						// Wait 2 seconds before retrying
+						await new Promise((resolve) => setTimeout(resolve, 2000));
+						return fetchBookingWithRetry(retryCount + 1, maxRetries);
+					} else {
+						console.error('Failed to fetch booking after multiple attempts');
+						showSnackbar('Unable to fetch booking. Please refresh the page.');
+						setLoading(false);
+					}
 				}
-			} catch (error) {
-				console.error('Error fetching booking:', error);
-				// Fallback to metadata if booking fetch fails (e.g. race condition)
-				// Fallback removed as grouping logic is now backend-only
-				console.warn('Booking not found immediately. Please refresh.');
-			}
+			};
 
-			clearBasket();
-			setLoading(false);
+			await fetchBookingWithRetry();
 		};
 		fetchPaymentIntent();
 	}, [stripe]);
@@ -198,9 +216,9 @@ const CompletePage = () => {
 					maxWidth="sm"
 				>
 					{status === 'succeeded' ? (
-						<CheckCircle sx={{ fontSize: 48, color: 'white' }} />
+						<CheckCircleIcon sx={{ fontSize: 48, color: 'white' }} />
 					) : (
-						<Error sx={{ fontSize: 48, color: 'white' }} />
+						<ErrorIcon sx={{ fontSize: 48, color: 'white' }} />
 					)}
 				</Box>
 
@@ -381,7 +399,11 @@ const CompletePage = () => {
 												alignItems: 'start',
 											}}
 										>
-											<Info fontSize="small" color="action" sx={{ mt: 0.2 }} />
+											<InfoIcon
+												fontSize="small"
+												color="action"
+												sx={{ mt: 0.2 }}
+											/>
 											<Typography variant="caption" color="text.secondary">
 												A confirmation email has been sent to{' '}
 												{booking.user.email}
@@ -398,7 +420,7 @@ const CompletePage = () => {
 				<Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
 					<Button
 						variant="outlined"
-						startIcon={<Print />}
+						startIcon={<PrintIcon />}
 						onClick={() => window.print()}
 					>
 						Print Receipt
@@ -414,18 +436,20 @@ const CompletePage = () => {
 				<Divider sx={{ width: '100%', my: 4 }} />
 
 				{/* Booked Slots */}
-				<Box sx={{ width: '100%' }}>
-					<Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-						Your Sessions
-					</Typography>
-					<Grid container spacing={2}>
-						{items.map((item, index) => (
-							<Grid size={{ xs: 12 }} key={index}>
-								<CheckoutItem slot={item} isCompleted />
-							</Grid>
-						))}
-					</Grid>
-				</Box>
+				{items && (
+					<Box sx={{ width: '100%' }}>
+						<Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
+							Your Sessions
+						</Typography>
+						<Grid container spacing={2}>
+							{items.map((item, index) => (
+								<Grid size={{ xs: 12 }} key={index}>
+									<CheckoutItem slot={item} isCompleted />
+								</Grid>
+							))}
+						</Grid>
+					</Box>
+				)}
 			</Box>
 		</Container>
 	);

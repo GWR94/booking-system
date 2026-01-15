@@ -1,11 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
-import SessionPicker from './SessionPicker';
+import { SessionPicker } from '@components/booking';
 import dayjs from 'dayjs';
 
-// Mock mui date picker to avoid complex localization setup in tests if possible,
-// or just wrap in LocalizationProvider if we want real usage.
-// For unit testing the logic, mocking the hook is key.
 const mockSetSelectedDate = vi.fn();
 const mockSetSelectedSession = vi.fn();
 const mockSetSelectedBay = vi.fn();
@@ -52,17 +49,10 @@ describe('SessionPicker', () => {
 
 	it('calls setSelectedSession when duration changes', () => {
 		render(<SessionPicker />);
-		// Material UI Select is hard to access by label directly sometimes due to how it renders.
-		// We can find the input or the combobox.
-		// For Select with `native=false` (default), it renders a div with role=combobox (sometimes) or just a hidden input.
-
-		// Let's use getByRole for the Select button
 		const durationSelect = screen.getByRole('combobox', { name: /Duration/i });
 		expect(durationSelect).toBeInTheDocument();
 
-		// Interacting with MUI Select in tests:
 		fireEvent.mouseDown(durationSelect);
-		// Now options are visible
 		const option2Hours = screen.getByRole('option', { name: /2 Hours/i });
 		fireEvent.click(option2Hours);
 

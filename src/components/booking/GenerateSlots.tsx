@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import Slot from './Slot';
 import dayjs from 'dayjs';
-import { useSlots } from '../../hooks/useSlots';
+import { useSlots } from '@hooks';
 
 const GenerateSlots = () => {
 	const { groupedTimeSlots, isLoading } = useSlots();

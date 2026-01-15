@@ -1,24 +1,24 @@
-import { Box } from '@mui/material';
-import Features from '../components/landing/Features';
-import Hero from '../components/landing/Hero';
-import Testimonials from '../components/landing/Testimonials';
-import CallToAction from '../components/common/CallToAction';
-import BookingPreview from '../components/landing/BookingPreview';
-import Stats from '../components/landing/Stats';
-import FeaturedCourses from '../components/landing/FeaturedCourses';
-import MembershipPreview from '../components/landing/MembershipPreview';
+import { Box, useTheme } from '@mui/material';
+import {
+	Features,
+	Hero,
+	Testimonials,
+	Stats,
+	FeaturedCourses,
+	MembershipPreview,
+} from '@components/landing';
+import { CallToAction } from '@common';
 
 const Landing = () => {
+	const theme = useTheme();
 	return (
 		<Box>
 			<Hero />
 			<FeaturedCourses />
-			<Stats />
-			<Testimonials />
 			<Features />
+			<Stats />
 			<MembershipPreview />
-
-			<BookingPreview />
+			<Testimonials />
 			<CallToAction />
 		</Box>
 	);

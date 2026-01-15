@@ -1,11 +1,12 @@
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AppRouter from './router/AppRouter';
-import { SnackbarProvider } from './context/SnackbarContext';
+import { SnackbarProvider } from '@context/SnackbarContext';
+import { CookieProvider } from '@context/CookieContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from '@context/ThemeContext';
 import { CssBaseline } from '@mui/material';
 
 const queryClient = new QueryClient({
@@ -22,10 +23,12 @@ const App = () => (
 		<CssBaseline />
 		<QueryClientProvider client={queryClient}>
 			<LocalizationProvider dateAdapter={AdapterDayjs}>
-				<SnackbarProvider>
-					<AppRouter />
-					<ReactQueryDevtools initialIsOpen={false} />
-				</SnackbarProvider>
+				<CookieProvider>
+					<SnackbarProvider>
+						<AppRouter />
+						<ReactQueryDevtools initialIsOpen={false} />
+					</SnackbarProvider>
+				</CookieProvider>
 			</LocalizationProvider>
 		</QueryClientProvider>
 	</ThemeProvider>

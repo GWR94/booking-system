@@ -6,7 +6,7 @@ import {
 	DialogActions,
 	Button,
 } from '@mui/material';
-import axios from '@utils/axiosConfig';
+import { deleteAccount } from '@api';
 import { useAuth } from '@hooks';
 import { useSnackbar } from '@context';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ const DeleteAccountDialog = ({
 	const handleDelete = async () => {
 		setLoading(true);
 		try {
-			await axios.delete('/api/user/profile/delete');
+			await deleteAccount();
 			await logout();
 			showSnackbar('Account deleted successfully', 'success');
 			navigate('/');

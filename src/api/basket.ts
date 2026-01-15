@@ -1,5 +1,5 @@
-import axios from '../utils/axiosConfig';
-import { TimeSlot, GroupedSlot } from '../components/interfaces/SlotContext.i';
+import { GroupedSlot, TimeSlot } from '@components/booking';
+import { axios } from '@utils';
 import { Dayjs } from 'dayjs';
 
 // Constants

@@ -1,13 +1,8 @@
 import { Box, Button } from '@mui/material';
-import { GoogleIcon, FacebookIcon } from '../../assets/icons/CustomIcons';
-import { X } from '@mui/icons-material';
+import { GoogleIcon, FacebookIcon, XIcon } from '@assets/icons/CustomIcons';
 
-interface OAuthButtonsProps {
-	isLogin?: boolean;
-}
-
-const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => {
-	const backendUrl = import.meta.env.VITE_BACKEND_API || '';
+const OAuthButtons = () => {
+	const backendUrl = import.meta.env.VITE_BACKEND_API!;
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -17,7 +12,7 @@ const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => {
 				href={`${backendUrl}/api/user/login/google`}
 				startIcon={<GoogleIcon />}
 			>
-				Sign {isLogin ? 'in ' : 'up '} with Google
+				Continue with Google
 			</Button>
 			<Button
 				fullWidth
@@ -25,15 +20,15 @@ const OAuthButtons = ({ isLogin = true }: OAuthButtonsProps) => {
 				href={`${backendUrl}/api/user/login/facebook`}
 				startIcon={<FacebookIcon />}
 			>
-				Sign {isLogin ? 'in ' : 'up '} with Facebook
+				Continue with Facebook
 			</Button>
 			<Button
 				fullWidth
 				variant="outlined"
 				href={`${backendUrl}/api/user/login/twitter`}
-				startIcon={<X />}
+				startIcon={<XIcon />}
 			>
-				Sign {isLogin ? 'in ' : 'up '} with X
+				Continue with X
 			</Button>
 		</Box>
 	);

@@ -13,15 +13,17 @@ import {
 	AccordionDetails,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import axios from '../utils/axiosConfig';
+import { axios } from '@utils';
 import { useSnackbar } from '@context';
 import { useState } from 'react';
 import { useAuth } from '@hooks';
 import { useNavigate } from 'react-router-dom';
-import MembershipFAQ from '@components/membership/FAQ';
-import Tiers from '@components/membership/Tiers';
-import CallToAction from '@components/membership/CallToAction';
-import HowItWorks from '@components/membership/HowItWorks';
+import {
+	FAQ as MembershipFAQ,
+	Tiers,
+	CallToAction,
+	HowItWorks,
+} from '@components/membership';
 
 const Membership = () => {
 	const theme = useTheme();
@@ -32,10 +34,10 @@ const Membership = () => {
 				{/* Page Header */}
 				<Box sx={{ textAlign: 'center', mb: 6 }}>
 					<Typography
-						variant="h3"
+						variant="title"
 						component="h1"
-						gutterBottom
 						sx={{
+							mb: 4,
 							fontWeight: 700,
 							color: theme.palette.primary.main,
 							textShadow: '2px 2px 4px rgba(0,0,0,0.1)',

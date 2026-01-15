@@ -7,19 +7,17 @@ import {
 	useTheme,
 	useMediaQuery,
 	InputAdornment,
-	Paper,
 	Divider,
 	Chip,
-	alpha,
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from '@context';
-import { guestSchema } from '../../validation/schema';
-import validateGuestInput from '../../utils/validGuestInput';
+import { guestSchema } from '../../validation/schema'; // No alias for validation yet
+import { validateGuestInput } from '@utils';
+import { checkEmailExists } from '@api';
 import ReCAPTCHA from 'react-google-recaptcha';
-import axios from 'axios';
-import { useBasket } from '@hooks/useBasket';
+import { useBasket } from '@hooks';
 import { LoadingButton } from '@mui/lab';
 import {
 	PersonOutline as PersonOutlineIcon,
@@ -29,12 +27,7 @@ import {
 	VerifiedUserOutlined as VerifiedUserOutlinedIcon,
 	InfoOutlined as InfoOutlinedIcon,
 } from '@mui/icons-material';
-
-export interface GuestUser {
-	name: string;
-	email: string;
-	phone?: string;
-}
+import { GuestUser } from './types';
 
 const initialGuest: GuestUser = {
 	name: '',
@@ -72,10 +65,8 @@ const GuestInfo = ({ onSubmit }: GuestInfoProps) => {
 			return;
 		}
 
-		const response = await axios.get(
-			`/api/user/check-email?email=${guest.email}`,
-		);
-		if (response.data.exists && response.data.role !== 'guest') {
+		const response = await checkEmailExists(guest.email);
+		if (response.exists && response.role !== 'guest') {
 			showSnackbar(
 				'You have an account with this email. Please sign in.',
 				'error',

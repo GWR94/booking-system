@@ -9,7 +9,6 @@ import {
 	useTheme,
 } from '@mui/material';
 
-// Team member data
 const teamMembers = [
 	{
 		name: 'Michael Wright',

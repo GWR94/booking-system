@@ -1,5 +1,5 @@
 import { CalendarMonth, Timer, GolfCourse } from '@mui/icons-material';
-import { Box, Paper, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useSession } from '@hooks';
 import { motion } from 'framer-motion';
 

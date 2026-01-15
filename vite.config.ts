@@ -7,8 +7,8 @@ export default defineConfig({
 	plugins: [react()],
 	server: {
 		port: 3000,
-		host: true, // Listen on all local IPs
-		open: true, // Open browser on start
+		host: true,
+		open: true,
 		proxy: {
 			'/api': {
 				target: 'http://localhost:4000',
@@ -17,7 +17,6 @@ export default defineConfig({
 			},
 		},
 		cors: true,
-		// https: true, // Enable if needed
 	},
 	resolve: {
 		alias: {
@@ -28,6 +27,7 @@ export default defineConfig({
 			'@assets': '/src/assets',
 			'@pages': '/src/pages',
 			'@utils': '/src/utils',
+			'@api': '/src/api',
 		},
 	},
 	test: {

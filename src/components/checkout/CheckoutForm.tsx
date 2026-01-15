@@ -10,16 +10,18 @@ import {
 	CircularProgress,
 	Grid2 as Grid,
 	Typography,
+	Alert,
 } from '@mui/material';
+import dayjs from 'dayjs';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
 import { useSnackbar } from '@context';
 import CheckoutItem from './CheckoutItem';
-import { useBasket, useAuth } from '@hooks';
-import { GuestUser } from './GuestInfo';
-import { useNavigate } from 'react-router-dom';
 import TestPaymentNotice from './TestPaymentNotice';
-
-import axiosInstance from '@utils/axiosConfig';
+import { GuestUser } from './types';
+import { useBasket, useAuth } from '@hooks';
+import { useNavigate } from 'react-router-dom';
+import { confirmFreeBooking } from '@api';
+import { Booking } from '@components/booking';
 
 interface CheckoutFormProps {
 	guest: GuestUser | null;
@@ -42,6 +44,60 @@ const CheckoutForm = ({
 	const [message, setMessage] = useState('');
 	const [isLoading, setLoading] = useState(false);
 
+	const TIER_LIMITS: { [key: string]: number } = {
+		PAR: 5,
+		BIRDIE: 10,
+		HOLEINONE: 15,
+	};
+
+	const membershipTier = user?.membershipTier;
+	const includedHours = membershipTier ? TIER_LIMITS[membershipTier] : 0;
+
+	const currentPeriodStart = user?.currentPeriodStart
+		? dayjs(user.currentPeriodStart)
+		: null;
+	const currentPeriodEnd = user?.currentPeriodEnd
+		? dayjs(user.currentPeriodEnd)
+		: null;
+
+	// Calculate used hours from past bookings in this period
+	const usedHours = React.useMemo(() => {
+		if (!user?.bookings || !currentPeriodStart || !currentPeriodEnd) return 0;
+
+		return user.bookings.reduce((total: number, booking: Booking) => {
+			// Only count confirmed bookings in the current period
+			if (
+				booking.status === 'confirmed' &&
+				dayjs(booking.bookingTime).isAfter(currentPeriodStart) &&
+				dayjs(booking.bookingTime).isBefore(currentPeriodEnd)
+			) {
+				return total + booking.slots.length;
+			}
+			return total;
+		}, 0);
+	}, [user, currentPeriodStart, currentPeriodEnd]);
+
+	// Calculate hours currently in basket that are eligible for "Free" usage
+	const basketEligibleHours = React.useMemo(() => {
+		if (!membershipTier) return 0;
+		return basket.reduce((count, slot) => {
+			// Check eligibility rules (e.g. Par has weekend restriction)
+			const slotDate = dayjs(slot.startTime);
+			const isWeekend = slotDate.day() === 0 || slotDate.day() === 6;
+			// Par cannot use included hours on weekends
+			if (membershipTier === 'PAR' && isWeekend) {
+				return count; // Not eligible
+			}
+			// Birdie/Eagle: All slots eligible
+			return count + slot.slotIds.length;
+		}, 0);
+	}, [basket, membershipTier]);
+
+	const remainingIncluded = Math.max(0, includedHours - usedHours);
+	// Actual hours deducted from allowance for this basket
+	const hoursToDeduct = Math.min(remainingIncluded, basketEligibleHours);
+	const remainingAfter = Math.max(0, remainingIncluded - hoursToDeduct);
+
 	useEffect(() => {
 		if (basket.length === 0) {
 			setLoading(false);
@@ -58,25 +114,9 @@ const CheckoutForm = ({
 			setLoading(true);
 			setMessage('');
 			try {
-				// Determine if guest or user booking
-				const endpoint = isAuthenticated
-					? '/api/bookings/create'
-					: '/api/bookings/guest/create';
-				// Note: The logic for create-payment-intent returned 0 amount, but we didn't create a booking yet.
-				// We need to call the booking creation endpoint directly now.
-				// But wait, the standard flow relies on WEBHOOK or post-payment confirmation??
-				// Checking `booking.controller.ts`:
-				// `createBooking` expects `slotIds`, `paymentId`, `paymentStatus`.
-				// For free booking, paymentId could be 'FREE' and status 'succeeded'.
-
 				const slotIds = basket.map((b) => b.slotIds).flat();
 
-				await axiosInstance.post(endpoint, {
-					slotIds,
-					paymentId: 'FREE_MEMBERSHIP',
-					paymentStatus: 'succeeded',
-					guestInfo: guest,
-				});
+				await confirmFreeBooking(slotIds, guest);
 
 				// Redirect to completion
 				window.location.href = `${
@@ -141,9 +181,78 @@ const CheckoutForm = ({
 				Please check that all of the below details are correct, and continue
 				with payment.
 			</Typography>
+
+			{isAuthenticated &&
+				user?.membershipTier === 'PAR' &&
+				basket.some((slot) => {
+					const day = dayjs(slot.startTime).day();
+					return day === 0 || day === 6;
+				}) && (
+					<Alert severity="warning" sx={{ mb: 2 }}>
+						Note: Weekend slots are excluded from Par membership included hours.
+						Your 10% discount has still been applied.
+					</Alert>
+				)}
+
 			{basket.map((slot) => (
 				<CheckoutItem slot={slot} key={slot.id} />
 			))}
+
+			{includedHours > 0 && (
+				<Box
+					sx={{
+						my: 3,
+						p: 2,
+						bgcolor: 'background.paper',
+						borderRadius: 1,
+						border: '1px solid #e0e0e0',
+					}}
+				>
+					<Typography variant="h6" gutterBottom>
+						Membership Allowance
+					</Typography>
+					<Grid container spacing={2}>
+						<Grid size={{ xs: 6, sm: 3 }}>
+							<Typography variant="caption" color="text.secondary">
+								Included
+							</Typography>
+							<Typography variant="body1" fontWeight="bold">
+								{includedHours} hrs
+							</Typography>
+						</Grid>
+						<Grid size={{ xs: 6, sm: 3 }}>
+							<Typography variant="caption" color="text.secondary">
+								Used
+							</Typography>
+							<Typography variant="body1">{usedHours} hrs</Typography>
+						</Grid>
+						<Grid size={{ xs: 6, sm: 3 }}>
+							<Typography variant="caption" color="text.secondary">
+								Using Now
+							</Typography>
+							<Typography
+								variant="body1"
+								color="primary.main"
+								fontWeight="bold"
+							>
+								{hoursToDeduct > 0 ? `-${hoursToDeduct} hrs` : '0 hrs'}
+							</Typography>
+						</Grid>
+						<Grid size={{ xs: 6, sm: 3 }}>
+							<Typography variant="caption" color="text.secondary">
+								Remaining
+							</Typography>
+							<Typography
+								variant="body1"
+								color={remainingAfter === 0 ? 'error.main' : 'success.main'}
+							>
+								{remainingAfter} hrs
+							</Typography>
+						</Grid>
+					</Grid>
+				</Box>
+			)}
+
 			<Grid container alignItems="center" sx={{ my: 2 }}>
 				<Grid size={{ xs: 12, sm: 6 }} />
 				<Grid size={{ xs: 12, sm: 6 }}>

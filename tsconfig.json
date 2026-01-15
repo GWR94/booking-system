@@ -9,9 +9,12 @@
 			"@hooks/*": ["./src/hooks/*"],
 			"@assets/*": ["./src/assets/*"],
 			"@utils/*": ["./src/utils/*"],
+			"@utils": ["./src/utils"],
 			"@context": ["./src/context"],
 			"@context/*": ["./src/context/*"],
-			"@pages": ["./src/pages"]
+			"@api": ["./src/api"],
+			"@pages": ["./src/pages"],
+			"@pages/*": ["./src/pages/*"]
 		},
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 		"types": ["vitest/globals", "@testing-library/jest-dom", "node"],

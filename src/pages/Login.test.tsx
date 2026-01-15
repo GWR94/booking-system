@@ -7,7 +7,7 @@ import Login from './Login';
 const mockLogin = vi.fn();
 const mockNavigate = vi.fn();
 
-vi.mock('../hooks/useAuth', () => ({
+vi.mock('@hooks', () => ({
 	useAuth: () => ({
 		login: mockLogin,
 	}),
@@ -19,12 +19,9 @@ vi.mock('react-router-dom', () => ({
 }));
 
 // Mock child components that strictly aren't under test to simplify
-vi.mock('../components/auth/OAuthButtons', () => ({
-	default: () => <div>OAuth Buttons</div>,
-}));
-
-vi.mock('../components/auth/ForgotPasswordDialog', () => ({
-	default: () => <div>Forgot Password Dialog</div>,
+vi.mock('@components/auth', () => ({
+	OAuthButtons: () => <div>OAuth Buttons</div>,
+	ForgotPasswordDialog: () => <div>Forgot Password Dialog</div>,
 }));
 
 describe('Login Page', () => {

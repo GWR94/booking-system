@@ -19,7 +19,7 @@ import {
 	HelpCenter,
 	CookiesPolicy,
 } from '@pages';
-import ScrollToTop from '@utils/ScrollToTop';
+import { ScrollToTop } from '@utils';
 
 const App = () => {
 	const { isAuthenticated } = useAuth();

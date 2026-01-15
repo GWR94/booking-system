@@ -1,5 +1,4 @@
-import { Theme } from '@emotion/react';
-import { SxProps, Box } from '@mui/material';
+import { SxProps, Box, Theme } from '@mui/material';
 
 interface FloatingButtonProps {
 	children: React.ReactNode;

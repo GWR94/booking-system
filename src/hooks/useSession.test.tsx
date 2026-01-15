@@ -1,6 +1,6 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useSession } from './useSession';
-import { createWrapper } from '../utils/test-utils';
+import createWrapper from '@utils/test-utils';
 import { describe, it, expect } from 'vitest';
 import dayjs from 'dayjs';
 

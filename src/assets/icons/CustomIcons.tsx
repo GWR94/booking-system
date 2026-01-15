@@ -66,3 +66,22 @@ export function GoogleIcon() {
 		</SvgIcon>
 	);
 }
+
+export function XIcon() {
+	return (
+		<SvgIcon>
+			<svg
+				width="16"
+				height="16"
+				viewBox="0 0 16 16"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M9.47167 6.47648L15.3926 0H13.9897L8.84776 5.62464L4.74103 0H0.00537109L6.22556 8.51733L0.00537109 15.3216H1.40828L6.8488 9.3703L11.2185 15.3216H15.9542L9.47116 6.47648H9.47167ZM7.55018 8.57868L6.92095 7.71887L1.91278 0.875204H4.06733L8.10976 6.39868L8.73898 7.25848L14.0089 14.4593H11.8544L7.55018 8.5792V8.57868Z"
+					fill="currentColor"
+				/>
+			</svg>
+		</SvgIcon>
+	);
+}

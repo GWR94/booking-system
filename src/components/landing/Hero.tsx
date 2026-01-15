@@ -7,20 +7,20 @@ import {
 	Grid2 as Grid,
 	Stack,
 	Chip,
-	Avatar,
+	alpha,
 } from '@mui/material';
-
 import TestimonialCarousel from './TestimonialCarousel';
 import {
 	StarOutline,
 	SportsGolf,
 	LocationOn,
 	CardMembership,
+	CalendarToday,
+	Diamond,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import AnimateIn from '../common/AnimateIn';
 import logo from '/GLF-logo.png';
-import { Logo } from '@components/common';
+import { Logo, AnimateIn } from '@common';
 
 const Hero = () => {
 	const navigate = useNavigate();
@@ -54,16 +54,19 @@ const Hero = () => {
 				}}
 			/>
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-				<Grid key="hero-content" container spacing={4} alignItems="center">
+				<Grid container spacing={4} alignItems="center">
 					<Grid size={{ xs: 12, md: 7 }}>
 						<Box
 							sx={{
 								display: { xs: 'none', md: 'flex' },
 								alignItems: 'center',
+								justifyContent: 'center',
 								mb: { xs: 0, md: 4 },
 							}}
 						>
-							<Logo logoOnly />
+							<AnimateIn type="fade-right">
+								<Logo logoOnly sx={{ height: 100 }} />
+							</AnimateIn>
 						</Box>
 						<Typography
 							variant="h2"
@@ -75,7 +78,7 @@ const Hero = () => {
 								fontSize: { xs: '2.5rem', md: '3.5rem' },
 							}}
 						>
-							Tee Up Your Perfect Game
+							<AnimateIn type="fade-right">Tee Up Your Perfect Game</AnimateIn>
 						</Typography>
 
 						<Typography
@@ -87,42 +90,11 @@ const Hero = () => {
 								opacity: 0.9,
 							}}
 						>
-							Indoor Golf Simulator Experience in the Heart of Maidstone
+							<AnimateIn type="fade-right">
+								Indoor Golf Simulator Experience in the Heart of Maidstone
+							</AnimateIn>
 						</Typography>
-						<Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-							<Chip
-								icon={<StarOutline color="accent" />}
-								label="PREMIUM GOLF EXPERIENCE"
-								color="secondary"
-								sx={{
-									fontWeight: 500,
-									color: theme.palette.accent.light,
-									px: 1.5,
-									backgroundColor: 'rgba(255, 255, 255, 0.15)',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.3)',
-								}}
-							/>
-							<Chip
-								icon={<CardMembership color="accent" />}
-								label="MEMBERSHIPS AVAILABLE"
-								color="primary"
-								onClick={() => navigate('/membership')}
-								sx={{
-									fontWeight: 500,
-									color: theme.palette.accent.light,
-									px: 1.5,
-									backgroundColor: 'rgba(74, 124, 89, 0.4)', // Using primary green with opacity
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.3)',
-									cursor: 'pointer',
-									'&:hover': {
-										backgroundColor: 'rgba(74, 124, 89, 0.6)',
-									},
-								}}
-							/>
-						</Stack>
-						<AnimateIn type="fade-right">
+						<AnimateIn type="fade-right" delay={0.4}>
 							<Typography
 								variant="body1"
 								sx={{
@@ -148,31 +120,46 @@ const Hero = () => {
 								<Box
 									sx={{
 										display: 'flex',
+										flexDirection: 'column',
 										alignItems: 'center',
 									}}
 								>
-									<SportsGolf
-										sx={{ mr: 1, color: theme.palette.accent.main }}
-									/>
-									<Typography variant="body2">4 Premium Bays</Typography>
+									<SportsGolf sx={{ color: theme.palette.accent.main }} />
+									<Typography variant="caption">4 Premium Bays</Typography>
 								</Box>
-								<Box sx={{ display: 'flex', alignItems: 'center' }}>
-									<LocationOn
-										sx={{ mr: 1, color: theme.palette.accent.main }}
-									/>
-									<Typography variant="body2">Central Maidstone</Typography>
+								<Box
+									sx={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+									}}
+								>
+									<LocationOn sx={{ color: theme.palette.accent.main }} />
+									<Typography variant="caption">Central Maidstone</Typography>
 								</Box>
-								<Box sx={{ display: 'flex', alignItems: 'center' }}>
-									<StarOutline
-										sx={{ mr: 1, color: theme.palette.accent.main }}
-									/>
-									<Typography variant="body2">TrackMan Technology</Typography>
+								<Box
+									sx={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+									}}
+								>
+									<StarOutline sx={{ color: theme.palette.accent.main }} />
+									<Typography variant="caption">TrackMan Technology</Typography>
 								</Box>
-								<Box sx={{ display: 'flex', alignItems: 'center' }}>
+								<Box
+									sx={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+									}}
+								>
 									<CardMembership
-										sx={{ mr: 1, color: theme.palette.accent.main }}
+										sx={{ mx: 1, color: theme.palette.accent.main }}
 									/>
-									<Typography variant="body2">Flexible Memberships</Typography>
+									<Typography variant="caption">
+										Flexible Memberships
+									</Typography>
 								</Box>
 							</Stack>
 
@@ -196,17 +183,40 @@ const Hero = () => {
 									variant="outlined"
 									color="accent"
 									size="large"
-									onClick={() => navigate('/about')}
+									onClick={() => navigate('/membership')}
+									startIcon={<Diamond />}
 									sx={{
 										px: 4,
 										py: 1.5,
-										fontWeight: 500,
+										fontWeight: 600,
 										borderRadius: 2,
+										borderWidth: 2,
+										background: 'rgba(255, 215, 0, 0.1)',
+										borderColor: theme.palette.accent.main,
+										'&:hover': {
+											background: 'rgba(255, 215, 0, 0.2)',
+											borderWidth: 2,
+										},
 									}}
 								>
-									Learn More
+									View Plans
 								</Button>
 							</Stack>
+
+							<Typography
+								variant="caption"
+								sx={{
+									display: 'block',
+									mt: 2,
+									opacity: 0.8,
+									maxWidth: 500,
+									fontStyle: 'italic',
+								}}
+							>
+								Secure your monthly practice time with{' '}
+								<strong>Par, Birdie & Hole-In-One</strong> memberships including
+								5, 10 or 15 hours of simulator access.
+							</Typography>
 						</AnimateIn>
 					</Grid>
 
@@ -229,7 +239,7 @@ const Hero = () => {
 										'&:hover': {
 											transform: 'rotateY(0deg) rotateX(0deg)',
 										},
-										mb: { xs: 2, md: -6 }, // Negative margin to pull carousel up
+										mb: { xs: 2, md: -6 },
 										position: 'relative',
 										zIndex: 1,
 										display: 'block',
@@ -249,10 +259,92 @@ const Hero = () => {
 						</AnimateIn>
 					</Grid>
 				</Grid>
+				<AnimateIn type="fade-right" delay={1}>
+					<Box
+						sx={{
+							mb: 3,
+							width: '100%',
+							display: { xs: 'none', md: 'flex' },
+							flexDirection: 'row',
+							justifyContent: 'center',
+							flexWrap: 'wrap',
+							gap: 2,
+						}}
+					>
+						<Chip
+							icon={<StarOutline color="secondary" />}
+							label="PREMIUM GOLF EXPERIENCE"
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.secondary.light,
+								px: 1,
+								backgroundColor: alpha(theme.palette.secondary.main, 0.15),
+								backdropFilter: 'blur(10px)',
+								border: `1px solid ${theme.palette.secondary.main}`,
+							}}
+						/>
+						<Chip
+							icon={<SportsGolf color="info" />}
+							label="TRACKMAN POWERED"
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.info.light,
+								px: 1,
+								backgroundColor: alpha(theme.palette.info.main, 0.15),
+								backdropFilter: 'blur(10px)',
+								border: `1px solid ${theme.palette.info.main}`,
+							}}
+						/>
+						<Chip
+							icon={<CardMembership color="success" />}
+							label="MEMBERSHIPS AVAILABLE"
+							onClick={() => navigate('/membership')}
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.success.light,
+								px: 1,
+								backgroundColor: alpha(theme.palette.success.main, 0.15),
+								backdropFilter: 'blur(10px)',
+								border: `1px solid ${theme.palette.success.main}`,
+								cursor: 'pointer',
+								'&:hover': {
+									backgroundColor: alpha(theme.palette.success.main, 0.3),
+								},
+							}}
+						/>
+						<Chip
+							icon={<CalendarToday color="warning" />}
+							label="24/7 ONLINE BOOKING"
+							onClick={() => navigate('/book')}
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.warning.light,
+								px: 1,
+								backgroundColor: alpha(theme.palette.warning.main, 0.15),
+								backdropFilter: 'blur(10px)',
+								border: `1px solid ${theme.palette.warning.main}`,
+								cursor: 'pointer',
+								'&:hover': {
+									backgroundColor: alpha(theme.palette.warning.main, 0.3),
+								},
+							}}
+						/>
+						<Chip
+							icon={<LocationOn sx={{ color: theme.palette.error.light }} />}
+							label="CENTRAL MAIDSTONE"
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.error.light,
+								px: 1,
+								backgroundColor: alpha(theme.palette.error.main, 0.15),
+								backdropFilter: 'blur(10px)',
+								border: `1px solid ${theme.palette.error.main}`,
+							}}
+						/>
+					</Box>
+				</AnimateIn>
 
-				{/* Bottom info bar */}
 				<Box
-					key="hero-info-bar"
 					sx={{
 						mt: { xs: 6, md: 10 },
 						pt: 3,

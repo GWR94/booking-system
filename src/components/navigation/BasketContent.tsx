@@ -1,33 +1,20 @@
-import { Delete, ShoppingBag, ShoppingCart } from '@mui/icons-material';
-import {
-	Typography,
-	Button,
-	Box,
-	Tooltip,
-	IconButton,
-	Badge,
-	useTheme,
-	List,
-	Avatar,
-	useMediaQuery,
-} from '@mui/material';
-import dayjs from 'dayjs';
-import { HOURLY_RATE } from '../checkout/CheckoutItem';
+import { ShoppingCart } from '@mui/icons-material';
+import { Typography, Button, Box, Badge, useTheme, List } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useBasket } from '../../hooks/useBasket';
-import { useAuth } from '../../hooks/useAuth';
+import { useBasket, useAuth } from '@hooks';
+import EmptyBasket from './EmptyBasket';
+import BasketItem from './BasketItem';
 
 interface BasketContentProps {
+	isMobile: boolean;
 	onClose?: () => void;
 }
 
-const BasketContent = ({ onClose }: BasketContentProps) => {
+const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 	const navigate = useNavigate();
 	const { isAuthenticated } = useAuth();
-	const { basket, removeFromBasket, basketPrice, clearBasket } = useBasket();
+	const { basket, basketPrice, clearBasket } = useBasket();
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
 	return (
 		<Box
 			sx={{
@@ -35,7 +22,6 @@ const BasketContent = ({ onClose }: BasketContentProps) => {
 				p: 3,
 			}}
 		>
-			{/* Header */}
 			<Box
 				sx={{
 					display: 'flex',
@@ -63,55 +49,7 @@ const BasketContent = ({ onClose }: BasketContentProps) => {
 
 			{/* Empty basket state */}
 			{basket.length === 0 ? (
-				<Box
-					sx={{
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-					}}
-				>
-					<ShoppingBag
-						sx={{
-							fontSize: 50,
-							color: isMobile ? 'rgba(255,255,255,0.8)' : 'text.disabled',
-							mb: 1,
-							mt: 2,
-						}}
-					/>
-					<Typography
-						variant="body1"
-						align="center"
-						sx={{
-							color: isMobile ? 'white' : 'text.secondary',
-							mb: 3,
-							fontWeight: 'medium',
-						}}
-					>
-						Your basket is empty
-					</Typography>
-					<Button
-						fullWidth
-						variant="contained"
-						color="primary"
-						sx={{
-							py: 1,
-							px: 3,
-							borderRadius: 2,
-							boxShadow: 2,
-							fontWeight: 'medium',
-							...(isMobile && {
-								backgroundColor: 'white',
-								color: 'primary.main',
-							}),
-						}}
-						onClick={() => {
-							navigate('/book');
-							onClose && onClose();
-						}}
-					>
-						Browse Available Slots
-					</Button>
-				</Box>
+				<EmptyBasket isMobile={isMobile} onClose={onClose} />
 			) : (
 				// Basket items
 				<Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -133,86 +71,8 @@ const BasketContent = ({ onClose }: BasketContentProps) => {
 							},
 						}}
 					>
-						{basket.map((item, i) => (
-							<Box
-								key={i}
-								sx={{
-									mb: 1,
-									p: 1.5,
-									borderRadius: 1,
-									backgroundColor: isMobile
-										? 'rgba(255,255,255,0.1)'
-										: 'background.default',
-									'&:hover': {
-										backgroundColor: isMobile
-											? 'rgba(255,255,255,0.15)'
-											: theme.palette.action.hover,
-									},
-									display: 'flex',
-									justifyContent: 'space-between',
-									alignItems: 'center',
-								}}
-							>
-								<Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-									{/* Optional: Add an Avatar for the bay */}
-									<Avatar
-										sx={{
-											bgcolor: theme.palette.secondary.main,
-											width: 20,
-											height: 20,
-											mr: 1,
-											fontSize: '0.9rem',
-										}}
-									>
-										{item.bayId}
-									</Avatar>
-									<Box>
-										<Typography variant="body1" fontWeight="medium">
-											{dayjs(item.startTime).format('ddd, MMM D')}
-										</Typography>
-										<Typography
-											variant="body2"
-											sx={{
-												color: isMobile
-													? 'rgba(255,255,255,0.6)'
-													: theme.palette.primary.main,
-											}}
-										>
-											{`${dayjs(item.startTime).format('h:mm A')} - ${dayjs(
-												item.endTime,
-											).format('h:mm A')}`}
-										</Typography>
-										<Typography
-											variant="body2"
-											sx={{
-												fontWeight: 'bold',
-												color: isMobile
-													? 'rgba(255,255,255,0.8)'
-													: theme.palette.primary.main,
-
-												mt: 0.5,
-											}}
-										>
-											£{((item.slotIds.length * HOURLY_RATE) / 100).toFixed(2)}
-										</Typography>
-									</Box>
-								</Box>
-								<Tooltip title="Remove" arrow placement="top">
-									<IconButton
-										size="small"
-										onClick={() => removeFromBasket(item)}
-										sx={{
-											color: theme.palette.error.main,
-											'&:hover': {
-												backgroundColor: `${theme.palette.error.light}30`,
-											},
-											ml: 2,
-										}}
-									>
-										<Delete fontSize="small" />
-									</IconButton>
-								</Tooltip>
-							</Box>
+						{basket.map((item) => (
+							<BasketItem key={item.id} item={item} isMobile={isMobile} />
 						))}
 					</List>
 

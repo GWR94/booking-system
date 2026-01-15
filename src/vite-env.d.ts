@@ -1,5 +1,13 @@
 /// <reference types="vite/client" />
 
+interface Window {
+	gtag: (
+		command: 'consent' | 'config' | 'event' | 'js',
+		action: string,
+		params?: Record<string, any>,
+	) => void;
+}
+
 interface ImportMetaEnv {
 	readonly VITE_BACKEND_API: string;
 	readonly VITE_STRIPE_PUBLIC_KEY: string;

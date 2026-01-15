@@ -1,16 +1,13 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useSlots } from './useSlots';
-import { createWrapper } from '../utils/test-utils';
-import { fetchSlots } from '../api/basket';
+import createWrapper from '@utils/test-utils';
+import { fetchSlots } from '@api';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-vi.mock('../api/basket', () => ({
+vi.mock('@api/basket', () => ({
 	fetchSlots: vi.fn(),
 	getBasket: vi.fn().mockReturnValue([]), // Used by useBasket internally
 }));
-
-// Mock utils if complex, or let it run.
-// Let's assert on the raw slots first to ensure data fetching works.
 
 describe('useSlots', () => {
 	beforeEach(() => {

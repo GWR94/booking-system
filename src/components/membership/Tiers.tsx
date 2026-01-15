@@ -9,26 +9,27 @@ import {
 	CardContent,
 	Typography,
 	CardActions,
-	Button,
 	useTheme,
 } from '@mui/material';
-import axios from '@utils/axiosConfig';
+import { createSubscriptionSession } from '@api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const membershipTiers = [
 	{
-		name: 'Bronze',
+		id: 'PAR',
+		name: 'Par',
 		price: '£199.99/month',
 		perks: [
 			'5 hours of simulator access per month',
 			'Access to weekday bookings only',
 			'10% discount on additional bookings',
 		],
-		color: 'bronze',
+		color: '#000000', // Black (Par - Neutral)
 	},
 	{
-		name: 'Silver',
+		id: 'BIRDIE',
+		name: 'Birdie',
 		price: '£299.99/month',
 		perks: [
 			'10 hours of simulator access per month',
@@ -36,11 +37,12 @@ const membershipTiers = [
 			'15% discount on additional bookings',
 			'Priority booking slots',
 		],
-		color: 'silver',
+		color: '#D22B2B', // Golf Scorecard Red (Birdie - Circle)
 	},
 	{
-		name: 'Gold',
-		price: '£499.99 / month',
+		id: 'HOLEINONE',
+		name: 'Hole-In-One',
+		price: '£399.99/month',
 		perks: [
 			'15 hours of simulator access per month',
 			'Access to all booking times',
@@ -48,7 +50,7 @@ const membershipTiers = [
 			'Priority booking slots',
 			'Free monthly coaching session',
 		],
-		color: 'gold',
+		color: '#FFD700', // Gold (Hole-In-One - Circle)
 	},
 ];
 
@@ -67,17 +69,12 @@ const Tiers = () => {
 		}
 		try {
 			setLoadingTier(tierName);
-			const response = await axios.post(
-				'/api/user/subscription/create-session',
-				{
-					tier: tierName,
-				},
-			);
+			const response = await createSubscriptionSession(tierName);
 
 			setLoadingTier(null);
 
-			if (response.data.url) {
-				window.location.href = response.data.url;
+			if (response.url) {
+				window.location.href = response.url;
 			}
 		} catch (error) {
 			setLoadingTier(null);
@@ -99,13 +96,7 @@ const Tiers = () => {
 								flexDirection: 'column',
 								borderRadius: 3,
 								overflow: 'hidden',
-								border: `2px solid ${
-									tier.color === 'gold'
-										? '#FFD700'
-										: tier.color === 'silver'
-										? '#C0C0C0'
-										: '#CD7F32'
-								}`,
+								border: `2px solid ${tier.color}`,
 								transition: 'transform 0.3s ease, box-shadow 0.3s ease',
 								'&:hover': {
 									transform: 'translateY(-8px)',
@@ -118,35 +109,40 @@ const Tiers = () => {
 									flexGrow: 1,
 									display: 'flex',
 									flexDirection: 'column',
-									justifyContent: 'space-between',
+									justifyContent: 'space-evenly',
 								}}
 							>
-								<Typography
-									variant="h5"
-									component="h2"
-									gutterBottom
+								<Box
 									sx={{
-										fontWeight: 700,
-										color:
-											tier.color === 'gold'
-												? '#FFD700'
-												: tier.color === 'silver'
-												? '#C0C0C0'
-												: '#CD7F32',
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'space-between',
 									}}
 								>
-									{tier.name}
-								</Typography>
-								<Typography
-									variant="h6"
-									sx={{
-										fontWeight: 600,
-										color: theme.palette.text.primary,
-										mb: 2,
-									}}
-								>
-									{tier.price}
-								</Typography>
+									<Typography
+										variant="h5"
+										component="h2"
+										gutterBottom
+										sx={{
+											fontWeight: 700,
+											color: tier.color,
+										}}
+									>
+										{tier.name}
+									</Typography>
+									<Typography
+										variant="h6"
+										sx={{
+											fontWeight: 600,
+											color: theme.palette.text.primary,
+											mb: 2,
+										}}
+									>
+										{tier.price}
+									</Typography>
+								</Box>
+
 								<Box>
 									{tier.perks.map((perk, i) => (
 										<Typography
@@ -164,25 +160,20 @@ const Tiers = () => {
 								<LoadingButton
 									variant="outlined"
 									color="inherit"
-									loading={loadingTier === tier.name.toUpperCase()}
+									loading={loadingTier === tier.id}
 									sx={{
 										px: 4,
 										borderRadius: 2,
-										borderColor:
-											tier.color === 'gold'
-												? '#FFD700'
-												: tier.color === 'silver'
-												? '#C0C0C0'
-												: '#CD7F32',
+										borderColor: tier.color,
 									}}
-									onClick={() => handleSubscribe(tier.name.toUpperCase())}
+									onClick={() => handleSubscribe(tier.id)}
 									disabled={
-										user?.membershipTier === tier.name.toUpperCase() &&
-										user?.membershipStatus === 'active'
+										user?.membershipTier === tier.id &&
+										user?.membershipStatus === 'ACTIVE'
 									}
 								>
-									{user?.membershipTier === tier.name.toUpperCase() &&
-									user?.membershipStatus === 'active'
+									{user?.membershipTier === tier.id &&
+									user?.membershipStatus === 'ACTIVE'
 										? 'Current Plan'
 										: `Choose ${tier.name}`}
 								</LoadingButton>

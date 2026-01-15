@@ -17,9 +17,9 @@ import {
 	Divider,
 	useTheme,
 } from '@mui/material';
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@hooks';
 
 type DesktopAccountButtonProps = {
 	isMobile: boolean;
@@ -29,8 +29,27 @@ const DesktopAccountButton = ({ isMobile }: DesktopAccountButtonProps) => {
 	const navigate = useNavigate();
 	const theme = useTheme();
 	const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
-	const menuRef = useRef<HTMLElement>(null);
 	const { isAuthenticated, user, logout } = useAuth();
+
+	// Close menu on scroll to prevent it from floating detached
+	useEffect(() => {
+		const handleScroll = () => {
+			if (anchorElMenu) {
+				setAnchorElMenu(null);
+			}
+		};
+
+		if (anchorElMenu) {
+			window.addEventListener('scroll', handleScroll, { passive: true });
+			// Also listen to the main document/body in case of different scrolling context
+			document.addEventListener('scroll', handleScroll, { passive: true });
+		}
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+			document.removeEventListener('scroll', handleScroll);
+		};
+	}, [anchorElMenu]);
 
 	return (
 		<>
@@ -55,7 +74,7 @@ const DesktopAccountButton = ({ isMobile }: DesktopAccountButtonProps) => {
 				</Box>
 			)}
 
-			<Box ref={menuRef}>
+			<Box>
 				<Menu
 					anchorEl={anchorElMenu}
 					open={Boolean(anchorElMenu)}
@@ -68,6 +87,8 @@ const DesktopAccountButton = ({ isMobile }: DesktopAccountButtonProps) => {
 						vertical: 'top',
 						horizontal: 'right',
 					}}
+					disableScrollLock={true}
+					TransitionProps={{ timeout: 0 }}
 					slotProps={{
 						paper: {
 							elevation: 4,
@@ -93,9 +114,6 @@ const DesktopAccountButton = ({ isMobile }: DesktopAccountButtonProps) => {
 							},
 						},
 					}}
-					container={
-						menuRef.current ? (menuRef.current.parentNode as HTMLElement) : null
-					}
 				>
 					{isAuthenticated && (
 						<Box
@@ -128,19 +146,20 @@ const DesktopAccountButton = ({ isMobile }: DesktopAccountButtonProps) => {
 					)}
 
 					{isAuthenticated && (
-						<MenuItem
-							onClick={() => {
-								navigate('/settings');
-								setAnchorElMenu(null);
-							}}
-							sx={{ py: 1.5 }}
-						>
-							<Settings sx={{ mr: 1.5, fontSize: 20 }} />
-							<Typography variant="body2">Settings</Typography>
-						</MenuItem>
+						<>
+							<MenuItem
+								onClick={() => {
+									navigate('/settings');
+									setAnchorElMenu(null);
+								}}
+								sx={{ py: 1.5 }}
+							>
+								<Settings sx={{ mr: 1.5, fontSize: 20 }} />
+								<Typography variant="body2">Settings</Typography>
+							</MenuItem>
+							<Divider />
+						</>
 					)}
-
-					{isAuthenticated && <Divider />}
 
 					<MenuItem
 						onClick={() => {

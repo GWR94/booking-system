@@ -1,35 +1,17 @@
-import { Home, Info, EventAvailable } from '@mui/icons-material';
 import { alpha, Box, Button, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { NavItem } from './NavBar';
 
-const DesktopNavigation = () => {
+interface DesktopNavigationProps {
+	navItems: NavItem[];
+}
+
+const DesktopNavigation = ({ navItems }: DesktopNavigationProps) => {
 	const navigate = useNavigate();
 	const theme = useTheme();
 
-	const navItems = [
-		{
-			name: 'Home',
-			path: '/',
-			icon: <Home fontSize="small" sx={{ color: theme.palette.link.light }} />,
-		},
-		{
-			name: 'About',
-			path: '/about',
-			icon: <Info fontSize="small" sx={{ color: theme.palette.link.light }} />,
-		},
-		{
-			name: 'Book',
-			path: '/book',
-			icon: (
-				<EventAvailable
-					fontSize="small"
-					sx={{ color: theme.palette.link.light }}
-				/>
-			),
-		},
-	];
-
 	const isActive = (path: string) => location.pathname === path;
+
 	return (
 		<Box
 			sx={{

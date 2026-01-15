@@ -1,22 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Badge, Box, IconButton, Popover, Tooltip } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useBasket } from '@hooks';
 import BasketContent from './BasketContent';
 import { useTheme, alpha } from '@mui/material/styles';
 
-interface BasketButtonProps {
+interface BasketProps {
 	isMobile: boolean;
 	onMobileBasketClick: () => void;
 }
 
-const BasketButton = ({
-	isMobile = false,
-	onMobileBasketClick,
-}: BasketButtonProps) => {
+const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 	const theme = useTheme();
 	const { basket } = useBasket();
-	const buttonRef = useRef<HTMLDivElement>(null);
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
 	const handleBasketButtonClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -26,6 +22,30 @@ const BasketButton = ({
 			setAnchorEl(event.currentTarget);
 		}
 	};
+
+	// Close menu on scroll to prevent it from floating detached
+	useEffect(() => {
+		const handleScroll = () => {
+			if (anchorEl) {
+				setAnchorEl(null);
+			}
+		};
+
+		if (anchorEl) {
+			window.addEventListener('scroll', handleScroll, { passive: true });
+			// Also listen to the main document/body in case of different scrolling context
+			document.addEventListener('scroll', handleScroll, { passive: true });
+		}
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+			document.removeEventListener('scroll', handleScroll);
+		};
+	}, [anchorEl]);
+
+	useEffect(() => {
+		setAnchorEl(null);
+	}, [location.pathname]);
 
 	const basketButton = (
 		<Tooltip title="Your basket" arrow>
@@ -48,25 +68,16 @@ const BasketButton = ({
 		</Tooltip>
 	);
 
-	useEffect(() => {
-		setAnchorEl(null);
-	}, [location.pathname]);
-
 	// For mobile, just return the button with no popover
 	if (isMobile) return basketButton;
 
 	return (
 		<Box>
-			<Box ref={buttonRef}>{basketButton}</Box>
+			{basketButton}
 			<Popover
 				open={!!anchorEl}
 				anchorEl={anchorEl}
 				onClose={() => setAnchorEl(null)}
-				container={
-					buttonRef.current
-						? (buttonRef.current.parentNode as HTMLElement)
-						: null
-				}
 				anchorOrigin={{
 					vertical: 'bottom',
 					horizontal: 'right',
@@ -75,6 +86,8 @@ const BasketButton = ({
 					vertical: 'top',
 					horizontal: 'right',
 				}}
+				disableScrollLock={true}
+				TransitionProps={{ timeout: 0 }}
 				sx={{ zIndex: theme.zIndex.modal + 1 }}
 				slotProps={{
 					paper: {
@@ -87,6 +100,7 @@ const BasketButton = ({
 							maxWidth: 'calc(100% - 32px)',
 							minWidth: 320,
 							'&:before': {
+								//speech bubble
 								content: '""',
 								display: 'block',
 								position: 'absolute',
@@ -103,10 +117,10 @@ const BasketButton = ({
 					},
 				}}
 			>
-				<BasketContent onClose={() => setAnchorEl(null)} />
+				<BasketContent onClose={() => setAnchorEl(null)} isMobile={isMobile} />
 			</Popover>
 		</Box>
 	);
 };
 
-export default BasketButton;
+export default Basket;

@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import AdminBookingDialog from './AdminBookingDialog';
-import axios from '../../utils/axiosConfig';
+import { axios } from '@utils';
 import dayjs from 'dayjs';
 
-vi.mock('../../utils/axiosConfig', () => ({
+vi.mock('@utils/axiosConfig', () => ({
 	default: {
 		post: vi.fn(),
 	},

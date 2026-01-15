@@ -1,7 +1,9 @@
 import { Box, Container, Typography } from '@mui/material';
-import GenerateSlots from '@components/booking/GenerateSlots';
-import SessionPicker from '@components/booking/SessionPicker';
-import NextPreviousButtons from '@components/booking/NextPreviousButtons';
+import {
+	GenerateSlots,
+	SessionPicker,
+	NextPreviousButtons,
+} from '@components/booking';
 import { LoadingSpinner } from '@common';
 import { useSlots } from '@hooks';
 

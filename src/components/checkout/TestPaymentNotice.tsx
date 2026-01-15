@@ -13,7 +13,6 @@ import {
 	ContentCopy as ContentCopyIcon,
 	CreditCard as CreditCardIcon,
 	Close as CloseIcon,
-	InfoOutlined as InfoOutlinedIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from '@context';
 

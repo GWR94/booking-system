@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
 	Box,
 	Button,
@@ -6,40 +5,15 @@ import {
 	Paper,
 	Container,
 	Stack,
+	useTheme,
 } from '@mui/material';
-import ReactGA from 'react-ga4';
-import { useTheme } from '@mui/material/styles';
+import { useCookie } from '@context';
 
 const CookieConsentBanner = () => {
-	const [isVisible, setIsVisible] = useState(false);
+	const { isConsentSet, acceptAll, rejectAll } = useCookie();
 	const theme = useTheme();
 
-	useEffect(() => {
-		const savedConsent = localStorage.getItem('cookieConsent');
-		if (!savedConsent) {
-			setIsVisible(true);
-		}
-	}, []);
-
-	const handleUpdateConsent = (status: 'granted' | 'denied') => {
-		// Update Google Analytics Consent Mode
-		ReactGA.gtag('consent', 'update', {
-			ad_storage: status,
-			ad_user_data: status,
-			ad_personalization: status,
-			analytics_storage: status,
-		});
-
-		// Save choice to localStorage
-		localStorage.setItem(
-			'cookieConsent',
-			status === 'granted' ? 'accepted' : 'declined',
-		);
-
-		setIsVisible(false);
-	};
-
-	if (!isVisible) return null;
+	if (isConsentSet) return null;
 
 	return (
 		<Paper
@@ -73,18 +47,10 @@ const CookieConsentBanner = () => {
 						</Typography>
 					</Box>
 					<Stack direction="row" spacing={2} sx={{ minWidth: 'fit-content' }}>
-						<Button
-							variant="contained"
-							color="primary"
-							onClick={() => handleUpdateConsent('granted')}
-						>
+						<Button variant="contained" color="primary" onClick={acceptAll}>
 							Accept
 						</Button>
-						<Button
-							variant="outlined"
-							color="inherit"
-							onClick={() => handleUpdateConsent('denied')}
-						>
+						<Button variant="outlined" color="inherit" onClick={rejectAll}>
 							Decline
 						</Button>
 					</Stack>

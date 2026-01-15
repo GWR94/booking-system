@@ -1,5 +1,38 @@
 import { Dayjs } from 'dayjs';
-import { Booking } from './Booking.i';
+
+export interface Booking {
+	id: number;
+	userId: number;
+	slotId: number;
+	bookingTime: Dayjs;
+	status: StatusType;
+	slots: iSlot[];
+	paymentId: string;
+	paymentStatus: string;
+	user?: {
+		name: string;
+		email: string;
+		phone?: string;
+	};
+}
+
+export type StatusType =
+	| 'available'
+	| 'booked'
+	| 'unavailable'
+	| 'confirmed'
+	| 'pending'
+	| 'cancelled';
+
+export interface iSlot {
+	id: number;
+	startTime: Dayjs;
+	endTime: Dayjs;
+	status: StatusType;
+	bookings: Booking[];
+	slots: number[];
+	bayId: number;
+}
 
 export type Bays = 1 | 2 | 3 | 4 | 5;
 export type SessionTimes = 1 | 2 | 3 | 4;

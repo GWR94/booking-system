@@ -9,9 +9,8 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from 'dayjs';
 import React from 'react';
-import { GroupedSlot } from '../interfaces/SlotContext.i';
-import { useSession } from '../../hooks/useSession';
-import { useBasket } from '../../hooks/useBasket';
+import { useBasket } from '@hooks';
+import { GroupedSlot } from '@components/booking';
 
 type CheckoutItemProps = {
 	slot: GroupedSlot;
@@ -21,7 +20,6 @@ type CheckoutItemProps = {
 export const HOURLY_RATE = 4500;
 
 const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
-	const { selectedDate } = useSession();
 	const { removeFromBasket } = useBasket();
 	const SESSION_LENGTH = slot.slotIds.length;
 	const totalPrice = ((HOURLY_RATE / 100) * SESSION_LENGTH).toFixed(2);

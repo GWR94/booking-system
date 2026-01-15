@@ -24,8 +24,8 @@ import {
 	SportsGolf,
 	EditCalendar,
 } from '@mui/icons-material';
-import { FaqItem, faqData } from '../data/faq';
-import { ContactForm } from '@components/common';
+import { ContactForm } from '@common';
+import { FaqItem, faqData } from '@components/membership/data';
 
 const HelpCenter: React.FC = () => {
 	const theme = useTheme();

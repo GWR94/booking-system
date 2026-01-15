@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { GuestUser } from '../components/checkout/GuestInfo';
+import { GuestUser } from '@components/checkout';
 
 interface ValidationResult {
 	isValid: boolean;

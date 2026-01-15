@@ -11,12 +11,18 @@ import {
 	Alert,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import axiosInstance from '../../utils/axiosConfig';
+import { createPortalSession } from '@api';
 import dayjs from 'dayjs';
 
 interface SubscriptionManagementProps {
 	user: any; // Ideally user interface
 }
+
+const TIER_DISPLAY_NAMES: { [key: string]: string } = {
+	PAR: 'Par',
+	BIRDIE: 'Birdie',
+	HOLEINONE: 'Hole-In-One',
+};
 
 const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 	user,
@@ -29,11 +35,9 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 		setLoading(true);
 		setError(null);
 		try {
-			const response = await axiosInstance.post(
-				'/api/user/subscription/portal-session',
-			);
-			if (response.data.url) {
-				window.location.href = response.data.url;
+			const response = await createPortalSession();
+			if (response.url) {
+				window.location.href = response.url;
 			}
 		} catch (err) {
 			console.error(err);
@@ -110,7 +114,7 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 							Current Plan
 						</Typography>
 						<Typography variant="h5" color="primary" fontWeight="bold">
-							{user.membershipTier}
+							{TIER_DISPLAY_NAMES[user.membershipTier] || user.membershipTier}
 						</Typography>
 					</Box>
 					<Box>

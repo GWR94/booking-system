@@ -14,10 +14,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DatePicker } from '@mui/x-date-pickers';
 import { GolfCourse, KeyboardArrowUp } from '@mui/icons-material';
 import dayjs, { Dayjs } from 'dayjs';
-import { Bays, SessionTimes } from '../interfaces/SlotContext.i';
 import { useSession } from '@hooks';
 import { useState } from 'react';
 import CollapsedSessionPicker from './CollapsedSessionPicker';
+import { Bays, SessionTimes } from './types';
 
 const SessionPicker = () => {
 	const theme = useTheme();

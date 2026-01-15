@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBasket, saveBasket } from '../api/basket';
-import { GroupedSlot } from '../components/interfaces/SlotContext.i';
+import { getBasket, saveBasket } from '@api';
 import { useSnackbar } from '@context';
 import dayjs from 'dayjs';
-import { HOURLY_RATE } from '../components/checkout/CheckoutItem';
 import { useEffect } from 'react';
+import { GroupedSlot } from '@components/booking';
+import { HOURLY_RATE } from '@components/checkout';
 
 export function useBasket() {
 	const queryClient = useQueryClient();

@@ -1,10 +1,5 @@
 import { useMotionValueEvent, useScroll, motion } from 'framer-motion';
-import {
-	Home,
-	Info,
-	EventAvailable,
-	CardMembership,
-} from '@mui/icons-material';
+import { Home, Info, EventAvailable, Close, Menu } from '@mui/icons-material';
 import {
 	AppBar,
 	Container,
@@ -13,17 +8,17 @@ import {
 	useTheme,
 	alpha,
 	useMediaQuery,
+	IconButton,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-	BasketButton,
+	Basket,
 	DesktopNavigation,
 	DesktopAccountButton,
 	MobileNavigationMenu,
-	MobileMenuButton,
 } from '@components/navigation';
-import Logo from './Logo';
+import { Logo } from '@common';
 
 interface NavBarProps {
 	threshold?: number;
@@ -46,7 +41,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	const location = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [menuContent, setMenuContent] = useState<'nav' | 'basket'>('nav');
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
 	const { scrollY } = useScroll();
 	const [hidden, setHidden] = useState(false);
@@ -89,7 +84,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 					top: 0,
 					left: 0,
 					right: 0,
-					zIndex: 1000,
+					zIndex: 10,
 				}}
 			>
 				<AppBar
@@ -113,32 +108,44 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 								width: '100%',
 							}}
 						>
-							<MobileMenuButton
-								setMenuContent={setMenuContent}
-								isMenuOpen={isMenuOpen}
-								setIsMenuOpen={setIsMenuOpen}
-							/>
-
-							<DesktopNavigation />
-
+							<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+								<IconButton
+									size="large"
+									onClick={() => {
+										setMenuContent('nav');
+										setIsMenuOpen(!isMenuOpen);
+									}}
+									color="inherit"
+									edge="start"
+									sx={{
+										borderRadius: 1.5,
+										mr: 1,
+										transition: 'all 0.2s ease',
+										'&:hover': {
+											backgroundColor: alpha(theme.palette.common.white, 0.1),
+										},
+									}}
+								>
+									{isMenuOpen ? <Close /> : <Menu />}
+								</IconButton>
+							</Box>
+							<DesktopNavigation navItems={navItems} />
 							<Logo
 								sx={{
-									height: '65px',
+									height: '50px',
 									position: 'absolute',
 									left: '50%',
 									transform: 'translateX(-50%)',
 								}}
 							/>
-
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-								<BasketButton
+								<Basket
 									isMobile={isMobile}
 									onMobileBasketClick={setMobileNavBarToBasket}
 								/>
 								<DesktopAccountButton isMobile={isMobile} />
 							</Box>
 						</Toolbar>
-						{/* Mobile Menu */}
 						<MobileNavigationMenu
 							menuContent={menuContent}
 							isMenuOpen={isMenuOpen}

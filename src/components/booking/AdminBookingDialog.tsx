@@ -8,9 +8,8 @@ import {
 	Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { GroupedSlot } from '../interfaces/SlotContext.i';
-import axios from '../../utils/axiosConfig';
-import { Booking } from '../interfaces/Booking.i';
+import { createBooking } from '@api';
+import { Booking, GroupedSlot } from './types';
 import dayjs from 'dayjs';
 
 type AdminBookingDialogProps = {
@@ -37,11 +36,7 @@ const AdminBookingDialog = ({
 	const handleBookSlot = async (slot: GroupedSlot) => {
 		setIsLoading(true);
 		try {
-			const {
-				data: { booking },
-			} = await axios.post(`/api/booking`, {
-				slotIds: slot.slotIds,
-			});
+			const { booking } = await createBooking(slot.slotIds);
 			setBooking(booking);
 			setStep('confirm');
 		} catch (error) {

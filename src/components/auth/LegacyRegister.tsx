@@ -7,11 +7,11 @@ import {
 	Typography,
 	Link,
 } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registrationSchema } from '../../validation/schema';
-import { FormInput, FormInputType } from '../interfaces/auth.i';
-import { useAuth } from '../../hooks/useAuth';
+import { FormInput, FormInputType } from './types';
+import { useAuth } from '@hooks';
 
 const LegacyRegister = () => {
 	const { register, isLoading } = useAuth();

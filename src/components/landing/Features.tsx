@@ -1,5 +1,4 @@
 import {
-	alpha,
 	Avatar,
 	Box,
 	Container,
@@ -40,14 +39,14 @@ const simulatorFeatures = [
 	},
 ];
 
-const Features = () => {
+const Features = ({ background }: { background?: string }) => {
 	const theme = useTheme();
 
 	return (
 		<Box
 			sx={{
 				py: 10,
-				backgroundColor: alpha(theme.palette.primary.light, 0.3),
+				background,
 			}}
 		>
 			<Container maxWidth="lg" sx={{ mb: 4 }}>
@@ -78,7 +77,7 @@ const Features = () => {
 				<Grid container spacing={4} sx={{ mt: 4 }}>
 					{simulatorFeatures.map((feature, index) => (
 						<Grid size={{ xs: 12, md: 3 }} key={index}>
-							<AnimateIn delay={index * 0.1} type="zoom-in" repeat>
+							<AnimateIn delay={index * 0.1} type="zoom-in">
 								<Box
 									textAlign="center"
 									sx={{

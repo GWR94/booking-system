@@ -1,36 +1,49 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ReactGA from 'react-ga4';
+import { useCookie } from '@context';
 
 const GoogleAnalytics = () => {
 	const location = useLocation();
+	const { preferences } = useCookie();
+	const [initialized, setInitialized] = useState(false);
 
 	useEffect(() => {
 		const gaId = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
-		if (gaId && !ReactGA.isInitialized) {
-			const savedConsent = localStorage.getItem('cookieConsent');
-			const consentState = savedConsent === 'accepted' ? 'granted' : 'denied';
 
-			ReactGA.gtag('consent', 'default', {
+		// Map our internal state to GA consent strings
+		const consentState = preferences.analytics ? 'granted' : 'denied';
+
+		if (window.gtag) {
+			window.gtag('consent', 'update', {
 				ad_storage: consentState,
 				ad_user_data: consentState,
 				ad_personalization: consentState,
 				analytics_storage: consentState,
 			});
-
-			ReactGA.initialize(gaId);
 		}
-	}, []);
+
+		// Only initialize if we have explicit analytics consent and an ID
+		if (
+			gaId &&
+			preferences.analytics &&
+			!initialized &&
+			!ReactGA.isInitialized
+		) {
+			ReactGA.initialize(gaId);
+			setInitialized(true);
+		}
+	}, [preferences.analytics, initialized]);
 
 	useEffect(() => {
-		const gaId = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
-		if (gaId) {
+		// Only track page views if analytics allowed
+		if (initialized && preferences.analytics) {
 			ReactGA.send({
 				hitType: 'pageview',
 				page: location.pathname + location.search,
 			});
 		}
-	}, [location]);
+	}, [location, initialized, preferences.analytics]);
 
 	return null;
 };

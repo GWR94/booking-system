@@ -14,13 +14,13 @@ import {
 	Divider,
 } from '@mui/material';
 import { FormatQuote, Verified } from '@mui/icons-material';
-import AnimateIn from '../common/AnimateIn';
+import AnimateIn from '@common/AnimateIn';
 
 const testimonials = [
 	{
 		name: 'James Wilson',
 		position: 'Amateur Golfer',
-		handicap: '9',
+		handicap: '+2',
 		quote:
 			"The best simulator experience I've found in Kent. TrackMan technology has helped me identify and fix flaws in my swing that I never knew existed.",
 		avatar: 'https://randomuser.me/api/portraits/men/85.jpg',
@@ -40,7 +40,7 @@ const testimonials = [
 	{
 		name: 'Robert Johnson',
 		position: 'Golf Enthusiast',
-		handicap: '16',
+		handicap: '36',
 		quote:
 			'As a beginner, I was intimidated at first, but the staff are incredibly supportive. Playing virtual courses has helped me prepare for real games.',
 		avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
@@ -57,22 +57,9 @@ const Testimonials = () => {
 			id="testimonials-section"
 			sx={{
 				py: { xs: 8, md: 12 },
-				background: `linear-gradient(to bottom, ${theme.palette.background.paper} 0%, ${theme.palette.background.default} 100%)`,
 				position: 'relative',
 				overflow: 'hidden',
-				'&::before': {
-					content: '""',
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					right: 0,
-					height: '100%',
-					background: `radial-gradient(circle at 50% 50%, ${alpha(
-						theme.palette.primary.main,
-						0.2,
-					)} 0%, transparent 70%)`,
-					zIndex: 1,
-				},
+				background: `linear-gradient(to bottom, ${theme.palette.background.default} 0%, ${theme.palette.grey[200]} 100%)`,
 			}}
 		>
 			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>

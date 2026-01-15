@@ -1,13 +1,6 @@
-import {
-	Box,
-	Grid2 as Grid,
-	Typography,
-	Button,
-	useTheme,
-	Container,
-} from '@mui/material';
+import { Box, Typography, Button, useTheme, Container } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
-import AnimateIn from '../common/AnimateIn';
+import { AnimateIn } from '@common';
 
 const Intro = () => {
 	const theme = useTheme();

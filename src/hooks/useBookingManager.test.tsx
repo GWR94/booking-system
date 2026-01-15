@@ -1,10 +1,10 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useBookingManager } from './useBookingManager';
-import { createWrapper } from '../utils/test-utils';
-import { getStoredBooking, saveStoredBooking } from '../api/booking';
+import createWrapper from '@utils/test-utils';
+import { getStoredBooking, saveStoredBooking } from '@api';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
-vi.mock('../api/booking', () => ({
+vi.mock('@api/booking', () => ({
 	getStoredBooking: vi.fn(),
 	saveStoredBooking: vi.fn(),
 }));

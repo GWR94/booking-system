@@ -9,7 +9,6 @@ import {
 	Button,
 	useTheme,
 } from '@mui/material';
-
 import { Link as RouterLink } from 'react-router-dom';
 
 const featuredCourses = [

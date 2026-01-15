@@ -1,12 +1,12 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useBasket } from './useBasket';
-import { createWrapper } from '../utils/test-utils';
-import { getBasket, saveBasket } from '../api/basket';
+import createWrapper from '@utils/test-utils';
+import { getBasket, saveBasket } from '@api';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 
 // Mock API
-vi.mock('../api/basket', () => ({
+vi.mock('@api/basket', () => ({
 	getBasket: vi.fn(),
 	saveBasket: vi.fn(),
 }));

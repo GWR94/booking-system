@@ -1,6 +1,5 @@
 import { CssBaseline, Divider, Typography } from '@mui/material';
-import OAuthButtons from '../components/auth/OAuthButtons';
-import LegacyRegister from '../components/auth/LegacyRegister';
+import { OAuthButtons, LegacyRegister } from '@components/auth';
 import { SignInContainer, Card } from '../styles/themes';
 
 const RegisterUser = () => {

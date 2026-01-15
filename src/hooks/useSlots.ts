@@ -1,10 +1,8 @@
-// useSlots.ts
 import { useQuery } from '@tanstack/react-query';
-import { fetchSlots } from '../api/basket';
-import { getGroupedTimeSlots } from '../utils/slots';
-import { useSession } from './useSession';
-import { useBasket } from './useBasket';
-import { TimeSlot } from '../components/interfaces/SlotContext.i';
+import { fetchSlots } from '@api';
+import { getGroupedTimeSlots } from '@utils';
+import { useSession, useBasket } from '@hooks';
+import { TimeSlot } from '@components/booking';
 
 export function useSlots() {
 	const { selectedDate, selectedSession, selectedBay } = useSession();
@@ -23,7 +21,6 @@ export function useSlots() {
 		staleTime: 0,
 	});
 
-	// Calculate grouped slots
 	const groupedTimeSlots = getGroupedTimeSlots(
 		slots as TimeSlot[],
 		selectedSession,

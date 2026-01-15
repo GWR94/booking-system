@@ -1,12 +1,15 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import CallToAction from '@common/CallToAction';
-import Intro from '@components/about/Intro';
-import OurStory from '@components/about/OurStory';
-import WhatWeOffer from '@components/about/WhatWeOffer';
-import Features from '@components/landing/Features';
-import Team from '@components/about/Team';
-import MiniFeatures from '@components/about/MiniFeatures';
+import { CallToAction } from '@common';
+import {
+	Intro,
+	OurStory,
+	WhatWeOffer,
+	Features,
+	Team,
+	MiniFeatures,
+	BookingPreview,
+} from '@components/about';
 import logo from '/GLF-logo.png';
 
 const About: React.FC = () => {
@@ -48,6 +51,7 @@ const About: React.FC = () => {
 			<Team />
 			<Features />
 			<WhatWeOffer />
+			<BookingPreview />
 			<CallToAction />
 		</Box>
 	);

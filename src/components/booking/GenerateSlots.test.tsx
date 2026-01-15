@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
-import GenerateSlots from './GenerateSlots';
+import { GenerateSlots } from '@components/booking';
 import dayjs from 'dayjs';
+import { useSlots } from '@hooks';
 
-vi.mock('../../hooks/useSlots', () => ({
+vi.mock('@hooks', () => ({
 	useSlots: vi.fn(),
 }));
 
@@ -11,8 +12,6 @@ vi.mock('../../hooks/useSlots', () => ({
 vi.mock('./Slot', () => ({
 	default: ({ slotKey }: any) => <div data-testid="mock-slot">{slotKey}</div>,
 }));
-
-import { useSlots } from '../../hooks/useSlots';
 
 describe('GenerateSlots', () => {
 	it('renders loading spinner', () => {

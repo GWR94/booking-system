@@ -11,38 +11,42 @@ import {
 } from '@mui/material';
 import { CheckCircleOutline } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import AnimateIn from '../common/AnimateIn';
+import AnimateIn from '@common/AnimateIn';
 
 const membershipTiers = [
 	{
-		name: 'Bronze',
+		name: 'Par',
 		price: '£199.99/month',
 		perks: [
 			'5 hours of simulator access per month',
 			'Access to weekday bookings only',
 			'10% discount on additional bookings',
+			'10% discount on additional bookings',
 		],
-		color: 'bronze',
+		id: 'PAR',
+		color: '#5a5a5aff',
 	},
 	{
-		name: 'Silver',
+		name: 'Birdie',
 		price: '£299.99/month',
 		perks: [
 			'10 hours of simulator access per month',
 			'Access to weekday and weekend bookings',
 			'15% discount on additional bookings',
 		],
-		color: 'silver',
+		id: 'BIRDIE',
+		color: '#D22B2B',
 	},
 	{
-		name: 'Gold',
-		price: '£499.99 / month',
+		name: 'Hole-In-One',
+		price: '£399.99 / month',
 		perks: [
 			'15 hours of simulator access per month',
 			'Access to all booking times',
 			'20% discount on additional bookings',
 		],
-		color: 'gold',
+		id: 'HOLEINONE',
+		color: '#FFD700',
 	},
 ];
 
@@ -56,10 +60,10 @@ const MembershipPreview = () => {
 				<Box sx={{ textAlign: 'center', mb: 8 }}>
 					<AnimateIn type="fade-up">
 						<Typography
-							variant="h3"
+							variant="title"
 							component="h2"
 							gutterBottom
-							sx={{ fontWeight: 700 }}
+							sx={{ fontWeight: 700, mb: 4 }}
 						>
 							Flexible Membership Plans
 						</Typography>
@@ -77,9 +81,13 @@ const MembershipPreview = () => {
 				<Grid container spacing={4} justifyContent="center">
 					{membershipTiers.map((tier, index) => (
 						<Grid size={{ xs: 12, md: 4 }} key={index}>
-							<AnimateIn type="fade-up" delay={index * 0.1}>
+							<AnimateIn
+								type="fade-up"
+								delay={index * 0.1}
+								style={{ height: '100%' }}
+							>
 								<Card
-									elevation={tier.color === 'gold' ? 8 : 2}
+									elevation={tier.id === 'HOLEINONE' ? 8 : 2}
 									sx={{
 										height: '100%',
 										display: 'flex',
@@ -87,20 +95,14 @@ const MembershipPreview = () => {
 										borderRadius: 4,
 										position: 'relative',
 										overflow: 'visible',
-										border: `2px solid ${
-											tier.color === 'gold'
-												? '#FFD700'
-												: tier.color === 'silver'
-												? '#C0C0C0'
-												: 'transparent'
-										}`,
+										border: `2px solid ${tier.color}`,
 										transition: 'transform 0.3s ease',
 										'&:hover': {
 											transform: 'translateY(-8px)',
 										},
 									}}
 								>
-									{tier.color === 'gold' && (
+									{tier.id === 'HOLEINONE' && (
 										<Box
 											sx={{
 												position: 'absolute',
@@ -127,12 +129,7 @@ const MembershipPreview = () => {
 											gutterBottom
 											sx={{
 												fontWeight: 700,
-												color:
-													tier.color === 'gold'
-														? '#FFD700'
-														: tier.color === 'silver'
-														? '#C0C0C0'
-														: '#CD7F32',
+												color: tier.color,
 											}}
 										>
 											{tier.name}
@@ -171,7 +168,9 @@ const MembershipPreview = () => {
 									</CardContent>
 									<CardActions sx={{ p: 4, pt: 0 }}>
 										<Button
-											variant={tier.color === 'gold' ? 'contained' : 'outlined'}
+											variant={
+												tier.id === 'HOLEINONE' ? 'contained' : 'outlined'
+											}
 											color="primary"
 											fullWidth
 											size="large"

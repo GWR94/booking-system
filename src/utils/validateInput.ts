@@ -1,4 +1,4 @@
-import { FormInput, LoginForm } from '../components/interfaces/auth.i';
+import { FormInput, LoginForm } from '@components/auth';
 import { loginSchema } from '../validation/schema';
 type FormInputType = 'email' | 'password';
 

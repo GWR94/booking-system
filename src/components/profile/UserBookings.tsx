@@ -21,13 +21,12 @@ import {
 	Delete as DeleteIcon,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
-import { StatusType } from '../interfaces/Booking.i';
+import { StatusType } from '@components/booking';
 import dayjs from 'dayjs';
-import axios from '../../utils/axiosConfig';
-import { useAuth } from '../../hooks/useAuth';
-
+import { deleteBooking } from '@api';
+import { useAuth } from '@hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from '../../context';
+import { useSnackbar } from '@context';
 
 const UserBookings = () => {
 	const { user } = useAuth();
@@ -49,7 +48,7 @@ const UserBookings = () => {
 
 	const handleDeleteBooking = async (bookingId: number) => {
 		try {
-			await axios.delete(`/api/bookings/${bookingId}`);
+			await deleteBooking(bookingId);
 			queryClient.invalidateQueries({ queryKey: ['auth'] });
 			showSnackbar('Booking deleted successfully', 'success');
 		} catch (error) {

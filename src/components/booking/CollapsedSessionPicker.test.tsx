@@ -1,7 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
-import CollapsedSessionPicker from './CollapsedSessionPicker';
+import { CollapsedSessionPicker } from '@components/booking';
 import dayjs from 'dayjs';
+import { useSession } from '@hooks';
 
 vi.mock('@hooks', () => ({
 	useSession: vi.fn(),
@@ -27,8 +28,6 @@ vi.mock('@mui/material', async (importOriginal) => {
 		}),
 	};
 });
-
-import { useSession } from '@hooks';
 
 describe('CollapsedSessionPicker', () => {
 	it('renders session details correctly', () => {
@@ -71,7 +70,6 @@ describe('CollapsedSessionPicker', () => {
 		render(<CollapsedSessionPicker setIsExpanded={mockSetIsExpanded} />);
 
 		const container = screen.getByText(/Any Bay/).closest('div')?.parentElement; // The Clickable Box
-		// Or just click text
 		fireEvent.click(screen.getByText(/Any Bay/));
 
 		expect(mockSetIsExpanded).toHaveBeenCalledWith(true);

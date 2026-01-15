@@ -1,11 +1,11 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useAuth } from './useAuth';
-import { createWrapper } from '../utils/test-utils';
-import { verifyUser, loginUser, logoutUser, registerUser } from '../api/auth';
+import createWrapper from '@utils/test-utils';
+import { verifyUser, loginUser, logoutUser, registerUser } from '@api';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // Mock API
-vi.mock('../api/auth', () => ({
+vi.mock('@api', () => ({
 	verifyUser: vi.fn(),
 	loginUser: vi.fn(),
 	logoutUser: vi.fn(),
@@ -43,8 +43,11 @@ describe('useAuth', () => {
 		});
 
 		// Assert
-		await waitFor(() => expect(result.current.isLoading).toBe(false));
-		expect(result.current.user).toEqual(mockUser);
+		await waitFor(() => {
+			expect(verifyUser).toHaveBeenCalled();
+			if (result.current.isLoading) throw new Error('Still loading');
+			expect(result.current.user).toEqual(mockUser);
+		});
 		expect(result.current.isAuthenticated).toBe(true);
 		expect(result.current.isAdmin).toBe(false);
 	});

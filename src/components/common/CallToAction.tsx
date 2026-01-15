@@ -1,4 +1,4 @@
-import AnimateIn from './AnimateIn';
+import { AnimateIn } from '@common';
 import {
 	Container,
 	Typography,
@@ -11,7 +11,6 @@ import {
 	Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
 import { SportsGolf, EventAvailable, PhoneInTalk } from '@mui/icons-material';
 
 const CallToAction = () => {
@@ -72,11 +71,17 @@ const CallToAction = () => {
 								</Box>
 							</Stack>
 
-							<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+							<Box
+								sx={{
+									display: 'flex',
+									alignItems: 'center',
+									flexDirection: { xs: 'column', sm: 'row' },
+									gap: 4,
+								}}
+							>
 								<Button
 									variant="contained"
 									color="secondary"
-									size="large"
 									onClick={() => navigate('/book')}
 									sx={{
 										px: 4,
@@ -92,8 +97,7 @@ const CallToAction = () => {
 									sx={{
 										display: 'flex',
 										alignItems: 'center',
-										px: { xs: 0, sm: 2 },
-										py: { xs: 2, sm: 0 },
+										justifyContent: 'center',
 									}}
 								>
 									<PhoneInTalk
@@ -104,11 +108,11 @@ const CallToAction = () => {
 											Or call us directly
 										</Typography>
 										<Typography variant="body2" sx={{ fontWeight: 500 }}>
-											+44 79874 45123
+											+44 7986 445123
 										</Typography>
 									</Box>
 								</Box>
-							</Stack>
+							</Box>
 						</AnimateIn>
 					</Grid>
 

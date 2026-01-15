@@ -13,15 +13,13 @@ import {
 	Facebook,
 	Twitter,
 	Instagram,
-	YouTube,
 	X,
-	GolfCourse,
 	Email,
 	Phone,
 	LocationOn,
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
-import Logo from './Logo';
+import { Logo } from '@common';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
@@ -38,7 +36,6 @@ const Footer: React.FC = () => {
 		>
 			<Container>
 				<Grid container spacing={2}>
-					{/* Logo and Description */}
 					<Grid
 						size={{ xs: 12, md: 4 }}
 						sx={{
@@ -117,8 +114,6 @@ const Footer: React.FC = () => {
 							</IconButton>
 						</Box>
 					</Grid>
-
-					{/* Quick Links */}
 					<Grid size={{ xs: 6, md: 2 }}>
 						<Typography
 							variant="h6"
@@ -153,21 +148,19 @@ const Footer: React.FC = () => {
 								underline="hover"
 								sx={{ mb: 1 }}
 							>
-								Book Now
+								Bookings
 							</Link>
 							<Link
 								component={RouterLink}
-								to="/contact"
+								to="/membership"
 								color="inherit"
 								underline="hover"
 								sx={{ mb: 1 }}
 							>
-								Contact
+								Membership
 							</Link>
 						</Box>
 					</Grid>
-
-					{/* Support */}
 					<Grid size={{ xs: 6, md: 2 }}>
 						<Typography
 							variant="h6"
@@ -176,13 +169,12 @@ const Footer: React.FC = () => {
 						>
 							Support
 						</Typography>
-						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 							<Link
 								component={RouterLink}
 								to="/terms"
 								color="inherit"
 								underline="hover"
-								sx={{ mb: 1 }}
 							>
 								Terms & Conditions
 							</Link>
@@ -191,7 +183,6 @@ const Footer: React.FC = () => {
 								to="/privacy"
 								color="inherit"
 								underline="hover"
-								sx={{ mb: 1 }}
 							>
 								Privacy Policy
 							</Link>
@@ -200,14 +191,19 @@ const Footer: React.FC = () => {
 								to="/help"
 								color="inherit"
 								underline="hover"
-								sx={{ mb: 1 }}
 							>
 								Help Center
 							</Link>
+							<Link
+								component={RouterLink}
+								to="/cookies"
+								color="inherit"
+								underline="hover"
+							>
+								Cookies Policy
+							</Link>
 						</Box>
 					</Grid>
-
-					{/* Contact */}
 					<Grid size={{ xs: 12, md: 3 }}>
 						<Typography
 							variant="h6"
@@ -224,14 +220,14 @@ const Footer: React.FC = () => {
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
 							<Phone sx={{ mr: 1, color: theme.palette.error.main }} />
-							<Typography variant="body2">+44 79864 45123</Typography>
+							<Typography variant="body2">+44 7986 445123</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<Email sx={{ mr: 1, color: theme.palette.error.dark }} />
 							<Typography variant="body2">
 								<Box
 									component="a"
-									href="mailto:golf@jamesgower.dev"
+									href="mailto:theshortgrass@jamesgower.dev"
 									sx={{
 										color: '#fff',
 										textDecoration: 'none',
@@ -240,7 +236,7 @@ const Footer: React.FC = () => {
 										},
 									}}
 								>
-									golf@jamesgower.dev
+									theshortgrass@jamesgower.dev
 								</Box>
 							</Typography>
 						</Box>

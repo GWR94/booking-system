@@ -12,8 +12,8 @@ import {
 	EmojiEvents,
 } from '@mui/icons-material';
 import React from 'react';
-import AbstractBackground from '../../assets/svg/AbstractBackground';
-import AnimateIn from '../common/AnimateIn';
+import AbstractBackground from '@assets/svg/AbstractBackground';
+import AnimateIn from '@common/AnimateIn';
 
 const statsData = [
 	{

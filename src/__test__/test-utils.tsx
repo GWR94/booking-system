@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarProvider } from '../context/SnackbarContext';
-import { ThemeProvider } from '../context/ThemeContext';
+import { SnackbarProvider } from '@context/SnackbarContext';
+import { ThemeProvider } from '@context/ThemeContext';
 
 const createTestQueryClient = () =>
 	new QueryClient({

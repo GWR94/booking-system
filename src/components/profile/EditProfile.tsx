@@ -1,29 +1,31 @@
-import FloatingButton from '@components/common/FloatingButton';
 import {
 	Box,
 	TextField,
 	Typography,
-	IconButton,
 	Button,
 	useMediaQuery,
 	useTheme,
+	DialogTitle,
 } from '@mui/material';
+import { unlinkProvider, updateProfile } from '@api';
 import { useAuth } from '@hooks';
 import { useState } from 'react';
+import { FacebookIcon, GoogleIcon, XIcon } from '@assets/icons/CustomIcons';
 import DeleteAccountDialog from './DeleteAccountDialog';
-import { FacebookIcon, GoogleIcon } from '@assets/icons/CustomIcons';
-
+import SubscriptionManagement from './SubscriptionManagement';
+import DisconnectAccountDialog from './DisconnectAccountDialog';
+import { useSnackbar } from '@context';
 type EditProfileProps = {
 	handleEditToggle: () => void;
 };
 
 const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 	const { user } = useAuth();
+	const { showSnackbar } = useSnackbar();
 	const theme = useTheme();
-	const [changePassword, setChangePassword] = useState(false);
-	const fullscreen = useMediaQuery(theme.breakpoints.down('sm'));
-	const socialLogin = !!user?.appleId || !!user?.googleId || !!user?.facebookId;
+	const fullscreen = useMediaQuery(theme.breakpoints.down('lg'));
 
+	const [changePassword, setChangePassword] = useState(false);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [userState, setUserState] = useState({
 		name: user?.name ?? '',
@@ -32,8 +34,23 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 		newPassword: '',
 		confirmPassword: '',
 	});
+	const [disconnectProvider, setDisconnectProvider] = useState<string | null>(
+		null,
+	);
 
-	const handleSave = () => {};
+	const handleDisconnectClick = (provider: string) => {
+		setDisconnectProvider(provider);
+	};
+
+	const handleSave = async () => {
+		try {
+			await updateProfile(userState);
+			showSnackbar('Profile updated successfully', 'success');
+		} catch (error) {
+			showSnackbar('Failed to update profile', 'error');
+			console.error('Failed to update profile', error);
+		}
+	};
 
 	if (!user) return null;
 
@@ -136,42 +153,126 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 						)}
 					</>
 				)}
-				{socialLogin && (
-					<Box>
-						<Typography variant="body1" sx={{ fontWeight: 500 }}>
-							Social Connections
-						</Typography>
+				<Box sx={{ mb: 2 }}>
+					<SubscriptionManagement user={user} />
+				</Box>
+				<Box sx={{ mb: 3 }}>
+					<Typography variant="body1" sx={{ fontWeight: 500, mb: 2 }}>
+						Social Connections
+					</Typography>
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+						{/* Facebook */}
 						<Box
 							sx={{
 								display: 'flex',
 								justifyContent: 'space-between',
 								alignItems: 'center',
-								mb: 2,
+								p: 1.5,
+								border: '1px solid #e0e0e0',
+								borderRadius: 1,
 							}}
 						>
-							<Box
-								display="flex"
-								alignItems="center"
-								width="100%"
-								justifyContent="space-evenly"
-							>
-								{user.facebookId && (
-									<FloatingButton>
-										<Typography sx={{ pr: 2 }}>Disconnect</Typography>
-										<FacebookIcon />
-									</FloatingButton>
-								)}
-								{user.googleId && (
-									<FloatingButton>
-										<Typography sx={{ pr: 2 }}>Disconnect</Typography>
-										<GoogleIcon />
-									</FloatingButton>
-								)}
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+								<FacebookIcon />
+								<Typography>Facebook</Typography>
 							</Box>
+							{user.facebookId ? (
+								<Button
+									variant="outlined"
+									color="error"
+									size="small"
+									onClick={() => handleDisconnectClick('facebook')}
+								>
+									Disconnect
+								</Button>
+							) : (
+								<Button
+									variant="outlined"
+									size="small"
+									href={`${
+										import.meta.env.VITE_BACKEND_API
+									}/api/user/login/facebook`}
+								>
+									Connect
+								</Button>
+							)}
 						</Box>
-						<IconButton />
+
+						{/* Google */}
+						<Box
+							sx={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								p: 1.5,
+								border: '1px solid #e0e0e0',
+								borderRadius: 1,
+							}}
+						>
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+								<GoogleIcon />
+								<Typography>Google</Typography>
+							</Box>
+							{user.googleId ? (
+								<Button
+									variant="outlined"
+									color="error"
+									size="small"
+									onClick={() => handleDisconnectClick('google')}
+								>
+									Disconnect
+								</Button>
+							) : (
+								<Button
+									variant="outlined"
+									size="small"
+									href={`${
+										import.meta.env.VITE_BACKEND_API
+									}/api/user/login/google`}
+								>
+									Connect
+								</Button>
+							)}
+						</Box>
+
+						{/* Twitter */}
+						<Box
+							sx={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								p: 1.5,
+								border: '1px solid #e0e0e0',
+								borderRadius: 1,
+							}}
+						>
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+								<XIcon />
+								<Typography>X</Typography>
+							</Box>
+							{user.twitterId ? (
+								<Button
+									variant="outlined"
+									color="error"
+									size="small"
+									onClick={() => handleDisconnectClick('twitter')}
+								>
+									Disconnect
+								</Button>
+							) : (
+								<Button
+									variant="outlined"
+									size="small"
+									href={`${
+										import.meta.env.VITE_BACKEND_API
+									}/api/user/login/twitter`}
+								>
+									Connect
+								</Button>
+							)}
+						</Box>
 					</Box>
-				)}
+				</Box>
 				<Box
 					sx={{
 						display: 'flex',
@@ -212,6 +313,11 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 				dialogOpen={dialogOpen}
 				onClose={() => setDialogOpen(false)}
 				fullscreen={fullscreen}
+			/>
+			<DisconnectAccountDialog
+				open={!!disconnectProvider}
+				provider={disconnectProvider}
+				onClose={() => setDisconnectProvider(null)}
 			/>
 		</>
 	);

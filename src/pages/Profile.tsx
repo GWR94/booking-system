@@ -1,6 +1,5 @@
 import { Container } from '@mui/material';
-import UserBookings from '../components/profile/UserBookings';
-import UserProfile from '../components/profile/UserProfile';
+import { UserBookings, UserProfile } from '@components/profile';
 
 const ProfilePage = () => {
 	return (

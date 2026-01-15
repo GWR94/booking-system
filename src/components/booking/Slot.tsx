@@ -9,12 +9,11 @@ import {
 	Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { GroupedTimeSlots } from '../interfaces/SlotContext.i';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useBasket } from '../../hooks/useBasket';
-import { useAuth } from '../../hooks/useAuth';
+import { useBasket, useAuth } from '@hooks';
 import AdminBookingDialog from './AdminBookingDialog';
+import { GroupedTimeSlots } from './types';
 
 type SlotProps = {
 	slotKey: string;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	Box,
 	Container,
@@ -15,84 +15,54 @@ import {
 	Accordion,
 	AccordionSummary,
 	AccordionDetails,
-	Alert,
 } from '@mui/material';
 import { ExpandMore, Cookie } from '@mui/icons-material';
-
-const saveCookiePreferences = (preferences: Record<string, boolean>) => {
-	//FIXME
-	return true;
-};
-
+import { useCookie } from '@context';
+import { useSnackbar } from '@context';
 const CookiesPolicy: React.FC = () => {
 	const theme = useTheme();
+	const { preferences, savePreferences, acceptAll, rejectAll } = useCookie();
+	const { showSnackbar } = useSnackbar();
+
 	const currentDate = new Date().toLocaleDateString('en-GB', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
 	});
 
-	// State for cookie preferences
-	const [cookiePreferences, setCookiePreferences] = useState({
-		essential: true, // Always true, cannot be disabled
-		functional: false,
-		analytics: false,
-		marketing: false,
-	});
+	// Local state for form editing before save
+	const [localPreferences, setLocalPreferences] = useState(preferences);
 
-	const [preferencesUpdated, setPreferencesUpdated] = useState(false);
+	useEffect(() => {
+		setLocalPreferences(preferences);
+	}, [preferences]);
 
 	const handlePreferenceChange = (
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
-		setCookiePreferences({
-			...cookiePreferences,
+		setLocalPreferences({
+			...localPreferences,
 			[event.target.name]: event.target.checked,
 		});
-		setPreferencesUpdated(false);
 	};
 
 	const handleSavePreferences = () => {
-		saveCookiePreferences(cookiePreferences);
-		setPreferencesUpdated(true);
+		savePreferences(localPreferences);
+		showSnackbar('Preferences saved successfully', 'success');
 	};
 
 	const handleAcceptAll = () => {
-		const allEnabled = {
-			essential: true,
-			functional: true,
-			analytics: true,
-			marketing: true,
-		};
-		setCookiePreferences(allEnabled);
-		saveCookiePreferences(allEnabled);
-		setPreferencesUpdated(true);
+		acceptAll();
+		showSnackbar('Preferences saved successfully', 'success');
 	};
 
 	const handleRejectNonEssential = () => {
-		const essentialOnly = {
-			essential: true,
-			functional: false,
-			analytics: false,
-			marketing: false,
-		};
-		setCookiePreferences(essentialOnly);
-		saveCookiePreferences(essentialOnly);
-		setPreferencesUpdated(true);
+		rejectAll();
+		showSnackbar('Preferences saved successfully', 'success');
 	};
 
 	return (
 		<Container maxWidth="lg" sx={{ py: 4 }}>
-			{preferencesUpdated && (
-				<Alert
-					severity="success"
-					sx={{ mb: 3 }}
-					onClose={() => setPreferencesUpdated(false)}
-				>
-					Your cookie preferences have been saved successfully.
-				</Alert>
-			)}
-
 			<Paper
 				elevation={0}
 				sx={{
@@ -333,7 +303,7 @@ const CookiesPolicy: React.FC = () => {
 					>
 						3. Your Cookie Preferences
 					</Typography>
-					<Typography variant="body1">
+					<Typography variant="body1" sx={{ mb: 2 }}>
 						You can set your cookie preferences below. Note that essential
 						cookies cannot be disabled as they are necessary for the website to
 						function properly.
@@ -356,7 +326,7 @@ const CookiesPolicy: React.FC = () => {
 							<FormControlLabel
 								control={
 									<Switch
-										checked={cookiePreferences.essential}
+										checked={localPreferences.essential}
 										name="essential"
 										color="primary"
 										disabled
@@ -378,7 +348,7 @@ const CookiesPolicy: React.FC = () => {
 							<FormControlLabel
 								control={
 									<Switch
-										checked={cookiePreferences.functional}
+										checked={localPreferences.functional}
 										onChange={handlePreferenceChange}
 										name="functional"
 										color="primary"
@@ -400,7 +370,7 @@ const CookiesPolicy: React.FC = () => {
 							<FormControlLabel
 								control={
 									<Switch
-										checked={cookiePreferences.analytics}
+										checked={localPreferences.analytics}
 										onChange={handlePreferenceChange}
 										name="analytics"
 										color="primary"
@@ -422,7 +392,7 @@ const CookiesPolicy: React.FC = () => {
 							<FormControlLabel
 								control={
 									<Switch
-										checked={cookiePreferences.marketing}
+										checked={localPreferences.marketing}
 										onChange={handlePreferenceChange}
 										name="marketing"
 										color="primary"
