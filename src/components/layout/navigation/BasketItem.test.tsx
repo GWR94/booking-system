@@ -14,8 +14,8 @@ describe('BasketItem', () => {
 	const mockItem = {
 		id: '1',
 		bayId: 1,
-		startTime: dayjs().add(1, 'day').hour(10).minute(0).toISOString(),
-		endTime: dayjs().add(1, 'day').hour(11).minute(0).toISOString(),
+		startTime: '2026-01-25T14:00:00', // Sunday 2 PM
+		endTime: '2026-01-25T15:00:00',
 		slotIds: ['1'], // 1 slot
 	};
 
@@ -38,7 +38,7 @@ describe('BasketItem', () => {
 		);
 
 		expect(screen.getByText('1')).toBeInTheDocument(); // Bay ID
-		expect(screen.getByText(/10:00 AM - 11:00 AM/i)).toBeInTheDocument();
+		expect(screen.getByText(/2:00 PM - 3:00 PM/i)).toBeInTheDocument();
 		expect(screen.getByText(/£45.00/i)).toBeInTheDocument();
 	});
 

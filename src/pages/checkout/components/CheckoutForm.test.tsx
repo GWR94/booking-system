@@ -9,7 +9,11 @@ import createWrapper from '@utils/test-utils';
 import { ThemeProvider, createTheme } from '@mui/material';
 
 vi.mock('@hooks', () => ({
-	useAuth: vi.fn(),
+	useAuth: vi.fn(() => ({
+		user: null,
+		isAdmin: false,
+		isAuthenticated: false,
+	})),
 	useBasket: vi.fn(),
 }));
 

@@ -21,6 +21,10 @@ vi.mock('@hooks', () => ({
 	useBasket: vi.fn(),
 	useBookingManager: vi.fn(),
 	useSession: vi.fn(),
+	useAuth: vi.fn(() => ({
+		user: null,
+		isAdmin: false,
+	})),
 }));
 
 describe('CompletePage Polling Logic', () => {
