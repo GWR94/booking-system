@@ -1,4 +1,3 @@
-import { HOURLY_RATE } from '../../../pages/checkout/components';
 import { Delete } from '@mui/icons-material';
 import {
 	Box,
@@ -9,8 +8,9 @@ import {
 	useTheme,
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { useBasket } from '@hooks';
-import { GroupedSlot } from '../../../pages/booking/components';
+import { useBasket, useAuth } from '@hooks';
+import { GroupedSlot } from '@pages/booking/components';
+import { calculateSlotPrice } from '@utils';
 
 type Props = {
 	item: GroupedSlot;
@@ -20,6 +20,12 @@ type Props = {
 const BasketItem = ({ item, isMobile }: Props) => {
 	const theme = useTheme();
 	const { removeFromBasket } = useBasket();
+	const { user } = useAuth();
+	const { discountedPrice } = calculateSlotPrice(
+		item.startTime,
+		user?.membershipTier,
+		user?.membershipStatus === 'ACTIVE',
+	);
 	return (
 		<Box
 			sx={{
@@ -78,7 +84,7 @@ const BasketItem = ({ item, isMobile }: Props) => {
 							mt: 0.5,
 						}}
 					>
-						£{((item.slotIds.length * HOURLY_RATE) / 100).toFixed(2)}
+						£{(item.slotIds.length * discountedPrice).toFixed(2)}
 					</Typography>
 				</Box>
 			</Box>

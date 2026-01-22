@@ -70,6 +70,7 @@ describe('CheckoutForm', () => {
 				name: 'Test User',
 				email: 'test@example.com',
 				membershipTier: 'NONE',
+				membershipUsage: null,
 			},
 			isAuthenticated: true,
 		});
@@ -206,6 +207,11 @@ describe('CheckoutForm', () => {
 				name: 'Gold User',
 				email: 'gold@example.com',
 				membershipTier: 'HOLEINONE',
+				membershipUsage: {
+					usedHours: 0,
+					totalHours: 15,
+					remainingHours: 15,
+				},
 				bookings: [],
 				currentPeriodStart: new Date(),
 				currentPeriodEnd: new Date(),

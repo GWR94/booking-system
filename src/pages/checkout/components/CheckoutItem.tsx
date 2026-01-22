@@ -9,7 +9,8 @@ import {
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from 'dayjs';
 import React from 'react';
-import { useBasket } from '@hooks';
+import { useBasket, useAuth } from '@hooks';
+import { calculateSlotPrice } from '@utils';
 import { GroupedSlot } from '../../booking/components';
 
 type CheckoutItemProps = {
@@ -17,12 +18,15 @@ type CheckoutItemProps = {
 	isCompleted?: boolean;
 };
 
-export const HOURLY_RATE = 4500;
-
 const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 	const { removeFromBasket } = useBasket();
+	const { user } = useAuth();
+	const { discountedPrice } = calculateSlotPrice(
+		user?.membershipTier,
+		user?.membershipStatus === 'ACTIVE',
+	);
 	const SESSION_LENGTH = slot.slotIds.length;
-	const totalPrice = ((HOURLY_RATE / 100) * SESSION_LENGTH).toFixed(2);
+	const totalPrice = (discountedPrice * SESSION_LENGTH).toFixed(2);
 
 	const durationInMinutes = dayjs(slot.endTime).diff(
 		dayjs(slot.startTime),

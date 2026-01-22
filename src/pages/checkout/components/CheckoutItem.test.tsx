@@ -1,11 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CheckoutItem from './CheckoutItem';
-import { useBasket } from '@hooks';
+import { useBasket, useAuth } from '@hooks';
 import { ThemeProvider, createTheme } from '@mui/material';
 
 vi.mock('@hooks', () => ({
 	useBasket: vi.fn(),
+	useAuth: vi.fn(),
 }));
 
 const theme = createTheme();
@@ -26,6 +27,10 @@ describe('CheckoutItem', () => {
 		vi.clearAllMocks();
 		(useBasket as any).mockReturnValue({
 			removeFromBasket: mockRemoveFromBasket,
+		});
+		(useAuth as any).mockReturnValue({
+			user: null,
+			isAdmin: false,
 		});
 	});
 

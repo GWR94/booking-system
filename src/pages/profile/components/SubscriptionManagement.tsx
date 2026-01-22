@@ -159,15 +159,81 @@ const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({
 						</Typography>
 					</Box>
 				</Grid>
+
+				{user.membershipUsage && (
+					<Grid size={{ xs: 12 }}>
+						<Box sx={{ mt: 2 }}>
+							<Stack
+								direction="row"
+								justifyContent="space-between"
+								alignItems="center"
+								sx={{ mb: 1 }}
+							>
+								<Typography
+									variant="caption"
+									color="text.secondary"
+									sx={{
+										textTransform: 'uppercase',
+										fontWeight: 600,
+										letterSpacing: 0.5,
+									}}
+								>
+									Monthly Included Hours
+								</Typography>
+								<Typography variant="caption" fontWeight="bold" color="primary">
+									{user.membershipUsage.usedHours} /{' '}
+									{user.membershipUsage.totalHours} Hours Used
+								</Typography>
+							</Stack>
+							<Box
+								sx={{
+									width: '100%',
+									height: 10,
+									bgcolor: alpha(theme.palette.primary.main, 0.1),
+									borderRadius: 5,
+									overflow: 'hidden',
+									position: 'relative',
+								}}
+							>
+								<Box
+									sx={{
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										height: '100%',
+										width: `${Math.min(
+											100,
+											(user.membershipUsage.usedHours /
+												user.membershipUsage.totalHours) *
+												100,
+										)}%`,
+										bgcolor: 'primary.main',
+										transition: 'width 0.5s ease-out',
+									}}
+								/>
+							</Box>
+							<Typography
+								variant="caption"
+								color="text.secondary"
+								sx={{ mt: 1, display: 'block' }}
+							>
+								{user.membershipUsage.remainingHours === 0
+									? 'All included hours used for this period.'
+									: `You have ${user.membershipUsage.remainingHours} hour(s) remaining for this period.`}
+							</Typography>
+						</Box>
+					</Grid>
+				)}
+
 				<Grid
 					size={{ xs: 12, md: 6 }}
 					sx={{
 						display: 'flex',
 						alignItems: 'center',
-						justifyContent: { xs: 'flex-start', md: 'flex-end' },
+						justifyContent: { xs: 'flex-start', md: 'flex-start' },
 					}}
 				>
-					<Stack spacing={2} width={{ xs: '100%', md: 'auto' }}>
+					<Stack spacing={2} width={{ xs: '100%', md: 'auto' }} sx={{ mt: 2 }}>
 						{error && <Alert severity="error">{error}</Alert>}
 						<Button
 							variant="contained"

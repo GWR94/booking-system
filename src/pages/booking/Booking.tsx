@@ -1,14 +1,26 @@
-import { Box, Container, Typography } from '@mui/material';
+import {
+	Box,
+	Container,
+	Typography,
+	Chip,
+	alpha,
+	useTheme,
+} from '@mui/material';
 import {
 	GenerateSlots,
 	SessionPicker,
 	NextPreviousButtons,
 } from './components';
 import { LoadingSpinner } from '@ui';
-import { useSlots } from '@hooks';
+import { useSlots, useAuth } from '@hooks';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const Booking = () => {
 	const { isLoading } = useSlots();
+	const { user } = useAuth();
+	const theme = useTheme();
+
+	const membershipUsage = user?.membershipUsage;
 
 	/**
 	 * FIXME - when there is slots in the basket and the user logs in,
@@ -46,6 +58,35 @@ const Booking = () => {
 						Choose your preferred time and bay to get started
 					</Typography>
 				</Box>
+
+				{membershipUsage && (
+					<Box
+						sx={{
+							mb: 4,
+							display: 'flex',
+							justifyContent: 'center',
+						}}
+					>
+						<Chip
+							icon={<InfoOutlinedIcon />}
+							label={`Member Benefit: ${membershipUsage.remainingHours} hour(s) remaining for this period`}
+							variant="outlined"
+							color="primary"
+							sx={{
+								px: 2,
+								py: 3,
+								borderRadius: 3,
+								borderColor: alpha(theme.palette.primary.main, 0.3),
+								bgcolor: alpha(theme.palette.primary.main, 0.05),
+								fontWeight: 'bold',
+								fontSize: '1rem',
+								'& .MuiChip-icon': {
+									color: theme.palette.primary.main,
+								},
+							}}
+						/>
+					</Box>
+				)}
 
 				<SessionPicker />
 

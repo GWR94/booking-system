@@ -73,7 +73,7 @@ const AuthModal = () => {
 				dividers={false}
 				sx={{
 					px: { xs: 2, sm: 4 },
-					pt: 2,
+					pt: 3,
 					pb: 4,
 					display: 'flex',
 					flexDirection: 'column',

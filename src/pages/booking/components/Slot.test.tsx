@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Slot from './Slot';
 import dayjs from 'dayjs';
 import createWrapper from '@utils/test-utils';
+import { useAuth, useBasket } from '@hooks';
 
 // Mock Router
 const mockNavigate = vi.fn();
@@ -14,9 +15,22 @@ vi.mock('react-router-dom', async () => {
 	};
 });
 
+vi.mock('@hooks', () => ({
+	useAuth: vi.fn(),
+	useBasket: vi.fn(),
+}));
+
 describe('Slot Component', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		(useAuth as any).mockReturnValue({
+			user: null,
+			isAdmin: false,
+		});
+		(useBasket as any).mockReturnValue({
+			addToBasket: vi.fn(),
+			basket: [],
+		});
 	});
 
 	const mockTimeSlots = {

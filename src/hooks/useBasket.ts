@@ -3,8 +3,9 @@ import { getBasket, saveBasket } from '@api';
 import { useSnackbar } from '@context';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
+import { useAuth } from './useAuth';
 import { GroupedSlot } from '../pages/booking/components';
-import { HOURLY_RATE } from '../pages/checkout/components';
+import { calculateSlotPrice } from '@utils';
 
 export function useBasket() {
 	const queryClient = useQueryClient();
@@ -72,9 +73,40 @@ export function useBasket() {
 		},
 	});
 
-	const basketPrice = basket
-		.reduce((acc, slot) => acc + slot.slotIds.length * (HOURLY_RATE / 100), 0)
-		.toFixed(2);
+	const { user } = useAuth();
+	const { discountedPrice } = calculateSlotPrice(
+		user?.membershipTier,
+		user?.membershipStatus === 'ACTIVE',
+	);
+
+	const basketPrice = (() => {
+		if (basket.length === 0) return '0.00';
+
+		const membershipUsage = user?.membershipUsage;
+		let remainingIncluded = membershipUsage?.remainingHours ?? 0;
+
+		let total = 0;
+		// Sort basket? Not strictly needed if we just want total
+		basket.forEach((slot) => {
+			const slotDate = dayjs(slot.startTime);
+			const isWeekend = slotDate.day() === 0 || slotDate.day() === 6;
+			const isEligible =
+				user?.membershipStatus === 'ACTIVE' &&
+				(user.membershipTier !== 'PAR' || !isWeekend);
+
+			const slotHours = slot.slotIds.length;
+			if (isEligible && remainingIncluded > 0) {
+				const freeHours = Math.min(remainingIncluded, slotHours);
+				const paidHours = Math.max(0, slotHours - freeHours);
+				total += paidHours * discountedPrice;
+				remainingIncluded -= freeHours;
+			} else {
+				total += slotHours * discountedPrice;
+			}
+		});
+
+		return total.toFixed(2);
+	})();
 
 	return {
 		basket,

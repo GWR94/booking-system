@@ -44,56 +44,26 @@ const CheckoutForm = ({
 	const [message, setMessage] = useState('');
 	const [isLoading, setLoading] = useState(false);
 
-	const TIER_LIMITS: { [key: string]: number } = {
-		PAR: 5,
-		BIRDIE: 10,
-		HOLEINONE: 15,
-	};
-
-	const membershipTier = user?.membershipTier;
-	const includedHours = membershipTier ? TIER_LIMITS[membershipTier] : 0;
-
-	const currentPeriodStart = user?.currentPeriodStart
-		? dayjs(user.currentPeriodStart)
-		: null;
-	const currentPeriodEnd = user?.currentPeriodEnd
-		? dayjs(user.currentPeriodEnd)
-		: null;
-
-	// Calculate used hours from past bookings in this period
-	const usedHours = React.useMemo(() => {
-		if (!user?.bookings || !currentPeriodStart || !currentPeriodEnd) return 0;
-
-		return user.bookings.reduce((total: number, booking: Booking) => {
-			// Only count confirmed bookings in the current period
-			if (
-				booking.status === 'confirmed' &&
-				dayjs(booking.bookingTime).isAfter(currentPeriodStart) &&
-				dayjs(booking.bookingTime).isBefore(currentPeriodEnd)
-			) {
-				return total + booking.slots.length;
-			}
-			return total;
-		}, 0);
-	}, [user, currentPeriodStart, currentPeriodEnd]);
+	// Use membership usage from user object (backend source of truth)
+	const membershipUsage = user?.membershipUsage;
+	const remainingIncluded = membershipUsage?.remainingHours ?? 0;
+	const includedHours = membershipUsage?.totalHours ?? 0;
+	const usedHours = membershipUsage?.usedHours ?? 0;
 
 	// Calculate hours currently in basket that are eligible for "Free" usage
 	const basketEligibleHours = React.useMemo(() => {
-		if (!membershipTier) return 0;
+		if (!user?.membershipTier) return 0;
 		return basket.reduce((count, slot) => {
-			// Check eligibility rules (e.g. Par has weekend restriction)
 			const slotDate = dayjs(slot.startTime);
 			const isWeekend = slotDate.day() === 0 || slotDate.day() === 6;
 			// Par cannot use included hours on weekends
-			if (membershipTier === 'PAR' && isWeekend) {
-				return count; // Not eligible
+			if (user.membershipTier === 'PAR' && isWeekend) {
+				return count;
 			}
-			// Birdie/Eagle: All slots eligible
 			return count + slot.slotIds.length;
 		}, 0);
-	}, [basket, membershipTier]);
+	}, [basket, user?.membershipTier]);
 
-	const remainingIncluded = Math.max(0, includedHours - usedHours);
 	// Actual hours deducted from allowance for this basket
 	const hoursToDeduct = Math.min(remainingIncluded, basketEligibleHours);
 	const remainingAfter = Math.max(0, remainingIncluded - hoursToDeduct);
@@ -328,7 +298,7 @@ const CheckoutForm = ({
 							<CircularProgress sx={{ color: 'white' }} size={20} />
 						</Box>
 					) : (
-						`Pay £${parseInt(basketPrice).toFixed(2)} with Stripe`
+						`Pay £${parseFloat(basketPrice).toFixed(2)} with Stripe`
 					)}
 				</Button>
 				{message && (

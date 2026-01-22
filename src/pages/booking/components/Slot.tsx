@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useBasket, useAuth } from '@hooks';
+import { calculateSlotPrice } from '@utils';
 import AdminBookingDialog from './AdminBookingDialog';
 import { GroupedTimeSlots } from './types';
 
@@ -22,7 +23,7 @@ type SlotProps = {
 
 const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 	const { addToBasket, basket } = useBasket();
-	const { isAdmin } = useAuth();
+	const { isAdmin, user } = useAuth();
 	const navigate = useNavigate();
 
 	// Get hourly slots for this time slot
@@ -116,6 +117,40 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 						>
 							{dayjs(slot.startTime).format('dddd Do MMMM')}
 						</Typography>
+
+						{(() => {
+							const { originalPrice, discountedPrice, hasDiscount } =
+								calculateSlotPrice(
+									slot.startTime,
+									user?.membershipTier,
+									user?.membershipStatus === 'ACTIVE',
+								);
+							return (
+								<Box
+									sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}
+								>
+									{hasDiscount && (
+										<Typography
+											variant="body2"
+											sx={{
+												textDecoration: 'line-through',
+												color: 'text.secondary',
+												fontWeight: 500,
+											}}
+										>
+											£{originalPrice.toFixed(2)}
+										</Typography>
+									)}
+									<Typography
+										variant="h6"
+										color="primary"
+										sx={{ fontWeight: 700 }}
+									>
+										£{discountedPrice.toFixed(2)}
+									</Typography>
+								</Box>
+							);
+						})()}
 
 						<Chip
 							label={slotPassed ? 'Unavailable' : availabilityText}

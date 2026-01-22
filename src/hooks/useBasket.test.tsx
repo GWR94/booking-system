@@ -1,7 +1,7 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { useBasket } from './useBasket';
 import createWrapper from '@utils/test-utils';
 import { getBasket, saveBasket } from '@api';
+import { useAuth, useBasket } from '@hooks';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import dayjs from 'dayjs';
 
@@ -11,9 +11,21 @@ vi.mock('@api/basket', () => ({
 	saveBasket: vi.fn(),
 }));
 
+vi.mock('@hooks', async () => {
+	const actual = await vi.importActual<typeof import('@hooks')>('@hooks');
+	return {
+		...actual,
+		useAuth: vi.fn(),
+	};
+});
+
 describe('useBasket', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		(useAuth as any).mockReturnValue({
+			user: null,
+			isAuthenticated: false,
+		});
 	});
 
 	it('should initialize with empty basket', async () => {

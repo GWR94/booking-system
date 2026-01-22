@@ -13,6 +13,11 @@ export interface User {
 	membershipStatus?: 'ACTIVE' | 'CANCELLED';
 	currentPeriodStart?: string;
 	currentPeriodEnd?: string;
+	membershipUsage?: {
+		usedHours: number;
+		totalHours: number;
+		remainingHours: number;
+	} | null;
 	cancelAtPeriodEnd?: boolean;
 	passwordHash?: string | boolean;
 	bookings?: any[];
