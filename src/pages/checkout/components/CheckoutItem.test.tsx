@@ -6,7 +6,10 @@ import { ThemeProvider, createTheme } from '@mui/material';
 
 vi.mock('@hooks', () => ({
 	useBasket: vi.fn(),
-	useAuth: vi.fn(),
+	useAuth: vi.fn(() => ({
+		user: null,
+		isAdmin: false,
+	})),
 }));
 
 const theme = createTheme();

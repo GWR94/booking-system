@@ -6,6 +6,10 @@ const mockUseSlots = vi.fn();
 
 vi.mock('@hooks', () => ({
 	useSlots: () => mockUseSlots(),
+	useAuth: vi.fn(() => ({
+		user: null,
+		isAdmin: false,
+	})),
 }));
 
 vi.mock('./components', () => ({

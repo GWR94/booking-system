@@ -16,7 +16,10 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('@hooks', () => ({
-	useAuth: vi.fn(),
+	useAuth: vi.fn(() => ({
+		user: null,
+		isAdmin: false,
+	})),
 	useBasket: vi.fn(),
 }));
 

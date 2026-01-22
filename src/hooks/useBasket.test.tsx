@@ -11,11 +11,14 @@ vi.mock('@api/basket', () => ({
 	saveBasket: vi.fn(),
 }));
 
-vi.mock('@hooks', async () => {
-	const actual = await vi.importActual<typeof import('@hooks')>('@hooks');
+vi.mock('@hooks', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@hooks')>();
 	return {
 		...actual,
-		useAuth: vi.fn(),
+		useAuth: vi.fn(() => ({
+			user: null,
+			isAuthenticated: false,
+		})),
 	};
 });
 

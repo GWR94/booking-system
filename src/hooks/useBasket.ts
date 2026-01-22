@@ -74,11 +74,6 @@ export function useBasket() {
 	});
 
 	const { user } = useAuth();
-	const { discountedPrice } = calculateSlotPrice(
-		user?.membershipTier,
-		user?.membershipStatus === 'ACTIVE',
-	);
-
 	const basketPrice = (() => {
 		if (basket.length === 0) return '0.00';
 
@@ -86,8 +81,13 @@ export function useBasket() {
 		let remainingIncluded = membershipUsage?.remainingHours ?? 0;
 
 		let total = 0;
-		// Sort basket? Not strictly needed if we just want total
 		basket.forEach((slot) => {
+			const { discountedPrice } = calculateSlotPrice(
+				slot.startTime,
+				user?.membershipTier,
+				user?.membershipStatus === 'ACTIVE',
+			);
+
 			const slotDate = dayjs(slot.startTime);
 			const isWeekend = slotDate.day() === 0 || slotDate.day() === 6;
 			const isEligible =

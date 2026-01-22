@@ -22,6 +22,7 @@ const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 	const { removeFromBasket } = useBasket();
 	const { user } = useAuth();
 	const { discountedPrice } = calculateSlotPrice(
+		slot.startTime,
 		user?.membershipTier,
 		user?.membershipStatus === 'ACTIVE',
 	);
