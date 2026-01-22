@@ -1,5 +1,9 @@
 import dayjs from 'dayjs';
-import { TimeSlot, GroupedTimeSlots, GroupedSlot } from '@components/booking';
+import {
+	TimeSlot,
+	GroupedTimeSlots,
+	GroupedSlot,
+} from '../pages/booking/components';
 
 export const getGroupedTimeSlots = (
 	slots: TimeSlot[],
@@ -50,17 +54,17 @@ export const getGroupedTimeSlots = (
 			if (isConsecutive) {
 				const startTime = dayjs(consecutiveSlots[0].startTime);
 				const endTime = dayjs(consecutiveSlots[sessionDuration - 1].endTime);
-				const key = `${startTime.format('HH:mm')}-${endTime.format('HH:mm')}`;
+				const timeRange = `${startTime.format('HH:mm')}-${endTime.format('HH:mm')}`;
 				const slotIds = consecutiveSlots.map((slot) => slot.id);
 
 				// Check if this slot is in the basket
 				const inBasket = slotIds.some((id) => basketSlotIds.includes(id));
 
-				if (!groupedSlots[key]) {
-					groupedSlots[key] = [];
+				if (!groupedSlots[timeRange]) {
+					groupedSlots[timeRange] = [];
 				}
 
-				groupedSlots[key].push({
+				groupedSlots[timeRange].push({
 					id: consecutiveSlots[0].id,
 					startTime,
 					endTime,

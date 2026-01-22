@@ -1,4 +1,4 @@
-import { GroupedSlot, TimeSlot } from '@components/booking';
+import { GroupedSlot, TimeSlot } from '../pages/booking/components';
 import { axios } from '@utils';
 import { Dayjs } from 'dayjs';
 

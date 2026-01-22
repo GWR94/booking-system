@@ -41,3 +41,18 @@ Object.defineProperty(window, 'matchMedia', {
 		dispatchEvent: vi.fn(),
 	})),
 });
+
+// Mock Stripe
+vi.mock('@stripe/react-stripe-js', () => ({
+	Elements: ({ children }: any) => children,
+	useStripe: () => ({
+		createPaymentMethod: vi.fn(),
+	}),
+	useElements: () => ({
+		getElement: vi.fn(),
+	}),
+}));
+
+vi.mock('@stripe/stripe-js', () => ({
+	loadStripe: vi.fn(() => Promise.resolve({})),
+}));

@@ -39,4 +39,25 @@ describe('useBookingManager', () => {
 
 		expect(saveStoredBooking).toHaveBeenCalledWith(null);
 	});
+
+	it('should set booking', async () => {
+		const newBooking = {
+			id: 2,
+			status: 'confirmed',
+			slots: [],
+		};
+		(getStoredBooking as any).mockReturnValue(null);
+		(saveStoredBooking as any).mockImplementation((data: any) => data);
+
+		const { result } = renderHook(() => useBookingManager(), {
+			wrapper: createWrapper(),
+		});
+		await waitFor(() => expect(result.current.booking).toBeNull());
+
+		await act(async () => {
+			await result.current.setBooking(newBooking as any);
+		});
+
+		expect(saveStoredBooking).toHaveBeenCalledWith(newBooking);
+	});
 });

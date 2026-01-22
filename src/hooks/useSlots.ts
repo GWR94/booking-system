@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchSlots } from '@api';
 import { getGroupedTimeSlots } from '@utils';
 import { useSession, useBasket } from '@hooks';
-import { TimeSlot } from '@components/booking';
+import { TimeSlot } from '../pages/booking/components';
 
 export function useSlots() {
 	const { selectedDate, selectedSession, selectedBay } = useSession();
@@ -16,7 +16,6 @@ export function useSlots() {
 		queryKey: ['slots', selectedDate],
 		queryFn: () => fetchSlots(selectedDate),
 		refetchOnMount: 'always',
-		refetchOnWindowFocus: false,
 		refetchInterval: 0,
 		staleTime: 0,
 	});

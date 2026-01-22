@@ -10,6 +10,8 @@
 
 # testing
 /coverage
+playwright
+lighthouse-report-*.html
 
 # production
 /build
@@ -22,7 +24,14 @@
 .env.development.local
 .env.test.local
 .env.production.local
+/test-results
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Test logs
+all_tests.log
+full_test_run.txt
+test_out.log
+test_results.json

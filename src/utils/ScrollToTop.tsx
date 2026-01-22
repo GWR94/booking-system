@@ -5,11 +5,11 @@ const ScrollToTop = () => {
 	const { pathname } = useLocation();
 
 	useEffect(() => {
-		// Scroll to the top of the page whenever the route changes
-		window.scrollTo({
-			top: 0,
-			// behavior: 'smooth', // smooth scrolling
+		// Decouple scroll from the render cycle to avoid forced reflows
+		const scrollRaf = requestAnimationFrame(() => {
+			window.scrollTo(0, 0);
 		});
+		return () => cancelAnimationFrame(scrollRaf);
 	}, [pathname]);
 
 	return null; // This component doesn't render anything

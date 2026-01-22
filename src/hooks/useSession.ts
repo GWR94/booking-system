@@ -8,9 +8,11 @@ type SessionState = {
 };
 
 const defaultSession: SessionState = {
-	selectedDate: dayjs().format('YYYY-MM-DD'),
+	selectedDate: dayjs().isAfter(dayjs().hour(21).startOf('hour'))
+		? dayjs().add(1, 'day').format('YYYY-MM-DD')
+		: dayjs().format('YYYY-MM-DD'),
 	selectedSession: 1,
-	selectedBay: 5,
+	selectedBay: 5, // all bays
 };
 
 export const useSession = () => {

@@ -3,8 +3,8 @@ import { getBasket, saveBasket } from '@api';
 import { useSnackbar } from '@context';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { GroupedSlot } from '@components/booking';
-import { HOURLY_RATE } from '@components/checkout';
+import { GroupedSlot } from '../pages/booking/components';
+import { HOURLY_RATE } from '../pages/checkout/components';
 
 export function useBasket() {
 	const queryClient = useQueryClient();

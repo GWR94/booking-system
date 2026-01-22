@@ -75,4 +75,134 @@ describe('useBasket', () => {
 		expect(result.current.basketPrice).toMatch(/^\d+\.\d{2}$/);
 		expect(result.current.basketPrice).not.toBe('0.00');
 	});
+
+	it('should remove item from basket', async () => {
+		const mockSlot = {
+			id: '1',
+			startTime: dayjs().add(1, 'day'),
+			endTime: dayjs().add(1, 'day').add(1, 'hour'),
+			slotIds: [100],
+			bayId: 1,
+		};
+		(getBasket as any).mockReturnValue([mockSlot]);
+		(saveBasket as any).mockReturnValue([]);
+
+		const { result } = renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.basket).toHaveLength(1));
+
+		await act(async () => {
+			await result.current.removeFromBasket(mockSlot as any);
+		});
+
+		expect(saveBasket).toHaveBeenCalledWith([]);
+	});
+
+	it('should clear entire basket', async () => {
+		const mockSlots = [
+			{
+				id: '1',
+				startTime: dayjs().add(1, 'day'),
+				slotIds: [100],
+			},
+			{
+				id: '2',
+				startTime: dayjs().add(2, 'days'),
+				slotIds: [101],
+			},
+		];
+		(getBasket as any).mockReturnValue(mockSlots);
+		(saveBasket as any).mockReturnValue([]);
+
+		const { result } = renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.basket).toHaveLength(2));
+
+		await act(async () => {
+			await result.current.clearBasket();
+		});
+
+		expect(saveBasket).toHaveBeenCalledWith([]);
+	});
+
+	it('should prevent adding duplicate slot to basket', async () => {
+		const mockSlot = {
+			id: '1',
+			startTime: dayjs().add(1, 'day'),
+			endTime: dayjs().add(1, 'day').add(1, 'hour'),
+			slotIds: [100],
+			bayId: 1,
+		};
+		(getBasket as any).mockReturnValue([mockSlot]);
+
+		const { result } = renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.basket).toHaveLength(1));
+
+		// Clear mock calls from initial load
+		vi.clearAllMocks();
+
+		await act(async () => {
+			await result.current.addToBasket(mockSlot as any);
+		});
+
+		// saveBasket should not be called with duplicate
+		expect(saveBasket).not.toHaveBeenCalled();
+	});
+
+	it('should prevent adding past slots to basket', async () => {
+		const pastSlot = {
+			id: '1',
+			startTime: dayjs().subtract(1, 'day'),
+			endTime: dayjs().subtract(1, 'day').add(1, 'hour'),
+			slotIds: [100],
+			bayId: 1,
+		};
+		(getBasket as any).mockReturnValue([]);
+
+		const { result } = renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.basket).toEqual([]));
+
+		await act(async () => {
+			await result.current.addToBasket(pastSlot as any);
+		});
+
+		// saveBasket should not be called with past slot
+		expect(saveBasket).not.toHaveBeenCalled();
+	});
+
+	it('should remove expired slots from basket on mount', async () => {
+		const pastSlot = {
+			id: '1',
+			startTime: dayjs().subtract(1, 'day'),
+			slotIds: [100],
+		};
+		const futureSlot = {
+			id: '2',
+			startTime: dayjs().add(1, 'day'),
+			slotIds: [101],
+		};
+
+		// Initially return both past and future slots
+		(getBasket as any).mockReturnValue([pastSlot, futureSlot]);
+		(saveBasket as any).mockImplementation((data: any) => data);
+
+		renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		// Wait for useEffect to run and clean up expired slots
+		await waitFor(() => {
+			expect(saveBasket).toHaveBeenCalledWith([futureSlot]);
+		});
+	});
 });

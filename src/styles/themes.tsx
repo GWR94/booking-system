@@ -123,9 +123,9 @@ const blueTealYellowTheme: ThemePalette = {
 			contrastText: '#ffffff',
 		},
 		secondary: {
-			main: '#2a9d8f',
-			light: '#54cebf',
-			dark: '#006e62',
+			main: '#1d7369', // Darker Teal for >4.5:1 contrast
+			light: '#4db6ab',
+			dark: '#004d40',
 			contrastText: '#ffffff',
 		},
 		accent: {
