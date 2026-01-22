@@ -98,4 +98,112 @@ describe('useAuth', () => {
 		// Assert
 		expect(logoutUser).toHaveBeenCalled();
 	});
+
+	it('should identify admin user correctly', async () => {
+		// Arrange
+		const adminUser = { id: 1, name: 'Admin User', role: 'admin' };
+		(verifyUser as any).mockResolvedValue(adminUser);
+
+		// Act
+		const { result } = renderHook(() => useAuth(), {
+			wrapper: createWrapper(),
+		});
+
+		// Assert
+		await waitFor(() => {
+			expect(result.current.isLoading).toBe(false);
+			expect(result.current.user).toEqual(adminUser);
+		});
+		expect(result.current.isAdmin).toBe(true);
+		expect(result.current.isAuthenticated).toBe(true);
+	});
+
+	it('should handle login error', async () => {
+		// Arrange
+		(verifyUser as any).mockResolvedValue(null);
+		const errorResponse = {
+			response: { data: { message: 'Invalid credentials' } },
+		};
+		(loginUser as any).mockRejectedValue(errorResponse);
+
+		const { result } = renderHook(() => useAuth(), {
+			wrapper: createWrapper(),
+		});
+		await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+		// Act & Assert
+		await act(async () => {
+			try {
+				await result.current.login({
+					email: 'wrong@test.com',
+					password: 'wrongpass',
+				} as any);
+			} catch (error) {
+				// Expected to throw
+			}
+		});
+
+		expect(loginUser).toHaveBeenCalledWith({
+			email: 'wrong@test.com',
+			password: 'wrongpass',
+		});
+	});
+
+	it('should register user successfully', async () => {
+		// Arrange
+		(verifyUser as any).mockResolvedValue(null);
+		(registerUser as any).mockResolvedValue({ id: 1, name: 'New User' });
+
+		const { result } = renderHook(() => useAuth(), {
+			wrapper: createWrapper(),
+		});
+		await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+		// Act
+		await act(async () => {
+			await result.current.register({
+				email: 'new@test.com',
+				password: 'password',
+				name: 'New User',
+			} as any);
+		});
+
+		// Assert
+		expect(registerUser).toHaveBeenCalledWith({
+			email: 'new@test.com',
+			password: 'password',
+			name: 'New User',
+		});
+	});
+
+	it('should handle register error', async () => {
+		// Arrange
+		(verifyUser as any).mockResolvedValue(null);
+		const errorResponse = {
+			response: { data: { message: 'Email already exists' } },
+		};
+		(registerUser as any).mockRejectedValue(errorResponse);
+
+		const { result } = renderHook(() => useAuth(), {
+			wrapper: createWrapper(),
+		});
+		await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+		// Act & Assert
+		await act(async () => {
+			try {
+				await result.current.register({
+					email: 'existing@test.com',
+					password: 'password',
+				} as any);
+			} catch (error) {
+				// Expected to throw
+			}
+		});
+
+		expect(registerUser).toHaveBeenCalledWith({
+			email: 'existing@test.com',
+			password: 'password',
+		});
+	});
 });

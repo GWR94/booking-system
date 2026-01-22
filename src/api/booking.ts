@@ -1,11 +1,11 @@
 import { axios } from '@utils';
-import { GuestUser } from '@components/checkout';
-import { Booking, GroupedSlot } from '@components/booking';
+import type { GuestUser } from '../pages/checkout/components';
+import type { Booking, GroupedSlot } from '../pages/booking/components';
 
 const BOOKING_STORAGE_KEY = 'booking-data';
 
 export const createBooking = async (slotIds: number[]) => {
-	const response = await axios.post('/api/booking', { slotIds });
+	const response = await axios.post('/api/bookings', { slotIds });
 	return response.data;
 };
 
@@ -46,9 +46,7 @@ export const confirmFreeBooking = async (
 	slotIds: number[],
 	guestInfo?: GuestUser | null,
 ) => {
-	const endpoint = guestInfo
-		? '/api/bookings/guest/create'
-		: '/api/bookings/create';
+	const endpoint = guestInfo ? '/api/bookings/guest' : '/api/bookings';
 	const response = await axios.post(endpoint, {
 		slotIds,
 		paymentId: 'FREE_MEMBERSHIP',

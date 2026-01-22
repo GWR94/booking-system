@@ -1,4 +1,5 @@
 import { Box, useTheme } from '@mui/material';
+import { useMemo } from 'react';
 
 interface AbstractBackgroundProps {
 	primaryColor?: string;
@@ -20,6 +21,18 @@ const AbstractBackground: React.FC<AbstractBackgroundProps> = ({
 	const secondary = secondaryColor || theme.palette.secondary.main;
 	const accent = accentColor || theme.palette.accent?.main || '#FFB74D';
 
+	// Fixed positions for dots to avoid Math.random() in render
+	const dots = useMemo(
+		() =>
+			[...Array(20)].map(() => ({
+				x: Math.random() * 100,
+				y: Math.random() * 100,
+				r: Math.random() * 4 + 1,
+				opacity: Math.random() * 0.5 + 0.1,
+			})),
+		[],
+	);
+
 	return (
 		<Box
 			sx={{
@@ -31,6 +44,7 @@ const AbstractBackground: React.FC<AbstractBackgroundProps> = ({
 				zIndex: 0,
 				opacity: opacity,
 				pointerEvents: 'none',
+				willChange: 'opacity', // Hint to browser
 			}}
 		>
 			<svg
@@ -76,9 +90,13 @@ const AbstractBackground: React.FC<AbstractBackgroundProps> = ({
 						<stop offset="100%" stopColor={secondary} stopOpacity="0.1" />
 					</linearGradient>
 
+					{/* Simplified filter for better performance */}
 					<filter id="glow">
-						<feGaussianBlur stdDeviation="8" result="blur" />
-						<feComposite in="SourceGraphic" in2="blur" operator="over" />
+						<feGaussianBlur stdDeviation="4" result="blur" />
+						<feMerge>
+							<feMergeNode in="blur" />
+							<feMergeNode in="SourceGraphic" />
+						</feMerge>
 					</filter>
 				</defs>
 
@@ -138,16 +156,16 @@ const AbstractBackground: React.FC<AbstractBackgroundProps> = ({
 					opacity="0.2"
 				/>
 
-				{/* Designer dots pattern */}
+				{/* Designer dots pattern - Now Stable */}
 				<g opacity="0.3">
-					{[...Array(20)].map((_, i) => (
+					{dots.map((dot, i) => (
 						<circle
 							key={i}
-							cx={`${Math.random() * 100}%`}
-							cy={`${Math.random() * 100}%`}
-							r={Math.random() * 4 + 1}
+							cx={`${dot.x}%`}
+							cy={`${dot.y}%`}
+							r={dot.r}
 							fill={i % 2 ? primary : secondary}
-							opacity={Math.random() * 0.5 + 0.1}
+							opacity={dot.opacity}
 						/>
 					))}
 				</g>

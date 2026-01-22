@@ -3,8 +3,22 @@
 		"baseUrl": ".",
 		"paths": {
 			"@components/*": ["./src/components/*"],
-			"@common/*": ["./src/components/common/*"],
-			"@common": ["./src/components/common"],
+			"@ui/*": ["./src/components/ui/*"],
+			"@ui": ["./src/components/ui"],
+			"@layout/*": ["./src/components/layout/*"],
+			"@layout": ["./src/components/layout"],
+			"@shared/*": ["./src/components/shared/*"],
+			"@shared": ["./src/components/shared"],
+			"@common/*": [
+				"./src/components/shared/*",
+				"./src/components/ui/*",
+				"./src/components/layout/*"
+			],
+			"@common": [
+				"./src/components/shared",
+				"./src/components/ui",
+				"./src/components/layout"
+			],
 			"@hooks": ["./src/hooks"],
 			"@hooks/*": ["./src/hooks/*"],
 			"@assets/*": ["./src/assets/*"],
@@ -14,7 +28,8 @@
 			"@context/*": ["./src/context/*"],
 			"@api": ["./src/api"],
 			"@pages": ["./src/pages"],
-			"@pages/*": ["./src/pages/*"]
+			"@pages/*": ["./src/pages/*"],
+			"@layouts": ["./src/layouts"]
 		},
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 		"types": ["vitest/globals", "@testing-library/jest-dom", "node"],

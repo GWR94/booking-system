@@ -30,39 +30,43 @@ const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const currentTheme =
 		themes.find((theme) => theme.id === themeId) || themes[0];
 
-	const theme = createTheme({
-		palette: {
-			mode: 'light',
-			...currentTheme.palette,
-		},
-		typography: {
-			fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-			h1: {
-				fontSize: '2.5rem',
-				fontWeight: 500,
-			},
-			title: {
-				fontSize: '2.5rem',
-				fontWeight: 700,
-				color: currentTheme.palette.primary?.main,
-				position: 'relative',
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				textAlign: 'center',
-				'&:after': {
-					content: '""',
-					position: 'absolute',
-					bottom: -10,
-					left: '50%',
-					transform: 'translateX(-50%)',
-					width: '40%',
-					height: 4,
-					backgroundColor: currentTheme.palette.secondary?.main,
+	const theme = React.useMemo(
+		() =>
+			createTheme({
+				palette: {
+					mode: 'light',
+					...currentTheme.palette,
 				},
-			},
-		},
-	});
+				typography: {
+					fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+					h1: {
+						fontSize: '2.5rem',
+						fontWeight: 500,
+					},
+					title: {
+						fontSize: '2.5rem',
+						fontWeight: 700,
+						color: currentTheme.palette.primary?.main,
+						position: 'relative',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+						textAlign: 'center',
+						'&:after': {
+							content: '""',
+							position: 'absolute',
+							bottom: -10,
+							left: '50%',
+							transform: 'translateX(-50%)',
+							width: '40%',
+							height: 4,
+							backgroundColor: currentTheme.palette.secondary?.main,
+						},
+					},
+				},
+			}),
+		[currentTheme],
+	);
 
 	return <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>;
 };

@@ -39,3 +39,11 @@ declare module '*.jpg' {
 	const content: string;
 	export default content;
 }
+// React augmentation for experimental attributes
+import 'react';
+
+declare module 'react' {
+	interface ImgHTMLAttributes<T> extends React.HTMLAttributes<T> {
+		fetchpriority?: 'high' | 'low' | 'auto';
+	}
+}

@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { RegistrationForm, LoginForm } from '@components/auth';
+import { RegistrationForm, LoginForm } from '../pages/auth/components/types';
 
 export const registrationSchema = Joi.object<RegistrationForm>({
 	email: Joi.string()

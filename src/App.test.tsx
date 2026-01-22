@@ -10,6 +10,7 @@ import {
 	afterEach,
 } from 'vitest';
 import App from './App';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Define Mock Types if needed for TypeScript intelligence, or rely on loose mocking
 type AuthMock = {
@@ -94,17 +95,27 @@ describe('App Integration', () => {
 			// (No specific arrangement needed beyond beforeEach mocks)
 
 			// Act
-			render(<App />);
+			render(
+				<HelmetProvider>
+					<App />
+				</HelmetProvider>,
+			);
 
 			// Assert
 			// Check for the main hero text presence
-			const heroText = await screen.findByText(/Tee Up Your Perfect Game/i);
+			const heroText = await screen.findByRole('heading', {
+				name: /The Short Grass/i,
+			});
 			expect(heroText).toBeInTheDocument();
 		});
 
 		it('should render the navigation bar', async () => {
 			// Arrange
-			render(<App />);
+			render(
+				<HelmetProvider>
+					<App />
+				</HelmetProvider>,
+			);
 
 			// Act
 			// Attempt to find a known nav element, e.g., 'Home' link or logo text if pertinent

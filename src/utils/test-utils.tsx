@@ -1,7 +1,9 @@
 import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackbarContext } from '@context';
+import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
+import { HelmetProvider } from 'react-helmet-async';
 
 const createWrapper = () => {
 	const queryClient = new QueryClient({
@@ -16,16 +18,18 @@ const createWrapper = () => {
 	const mockHideSnackbar = vi.fn();
 
 	return ({ children }: { children: ReactNode }) => (
-		<QueryClientProvider client={queryClient}>
-			<SnackbarContext.Provider
-				value={{
-					showSnackbar: mockShowSnackbar,
-					hideSnackbar: mockHideSnackbar,
-				}}
-			>
-				{children}
-			</SnackbarContext.Provider>
-		</QueryClientProvider>
+		<HelmetProvider>
+			<QueryClientProvider client={queryClient}>
+				<SnackbarContext.Provider
+					value={{
+						showSnackbar: mockShowSnackbar,
+						hideSnackbar: mockHideSnackbar,
+					}}
+				>
+					<MemoryRouter>{children}</MemoryRouter>
+				</SnackbarContext.Provider>
+			</QueryClientProvider>
+		</HelmetProvider>
 	);
 };
 
