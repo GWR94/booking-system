@@ -70,7 +70,7 @@ const StatCard = ({ title, value, icon, color, gradient }: any) => {
 				sx={{
 					background:
 						gradient ||
-						`linear-gradient(135deg, ${theme.palette[color].main} 0%, ${theme.palette[color].dark} 100%)`,
+						`linear-gradient(135deg, ${(theme.palette as any)[color].main} 0%, ${(theme.palette as any)[color].dark} 100%)`,
 					color: '#fff',
 					p: 1.5,
 					borderRadius: 2.5,
