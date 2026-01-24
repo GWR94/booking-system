@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarContext } from '@context';
+import { SnackbarContext } from '../context/SnackbarContext';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { HelmetProvider } from 'react-helmet-async';

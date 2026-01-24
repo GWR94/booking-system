@@ -20,8 +20,7 @@ import {
 	ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@hooks';
-import { NavBar, Footer, SEO } from '@layout';
-import { PROFILE_MENU_ITEMS } from '@layout';
+import { NavBar, Footer, SEO, PROFILE_MENU_ITEMS } from '@layout';
 
 const ProfileLayout = () => {
 	const theme = useTheme();
@@ -43,7 +42,7 @@ const ProfileLayout = () => {
 		const activeItem = PROFILE_MENU_ITEMS.find(
 			(item) => item.path === currentPath,
 		);
-		return activeItem ? activeItem.label : 'Profile';
+		return activeItem ? `${activeItem.label} - Profile` : 'Profile';
 	};
 
 	return (

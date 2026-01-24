@@ -14,7 +14,7 @@ export const isPeakTime = (date: Date | string | dayjs.Dayjs): boolean => {
 	return isWeekend || isPeakHour;
 };
 
-export const getDiscountPercentage = (tier?: string): number => {
+const getDiscountPercentage = (tier?: string): number => {
 	switch (tier?.toUpperCase()) {
 		case 'PAR':
 			return 10;

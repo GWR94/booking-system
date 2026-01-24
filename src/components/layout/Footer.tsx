@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { Logo } from '@ui';
+import { COMPANY_INFO } from '@constants/company';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
@@ -214,20 +215,18 @@ const Footer: React.FC = () => {
 						</Typography>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
 							<LocationOn sx={{ mr: 1, color: theme.palette.error.light }} />
-							<Typography variant="body2">
-								Royal Star Arcade, High St, Maidstone ME14 1JL
-							</Typography>
+							<Typography variant="body2">{COMPANY_INFO.address}</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
 							<Phone sx={{ mr: 1, color: theme.palette.error.main }} />
-							<Typography variant="body2">+44 7986 445123</Typography>
+							<Typography variant="body2">{COMPANY_INFO.phone}</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<Email sx={{ mr: 1, color: theme.palette.error.dark }} />
 							<Typography variant="body2">
 								<Box
 									component="a"
-									href="mailto:theshortgrass@jamesgower.dev"
+									href={`mailto:${COMPANY_INFO.email}`}
 									sx={{
 										color: '#fff',
 										textDecoration: 'none',
@@ -236,7 +235,7 @@ const Footer: React.FC = () => {
 										},
 									}}
 								>
-									theshortgrass@jamesgower.dev
+									{COMPANY_INFO.email}
 								</Box>
 							</Typography>
 						</Box>
@@ -256,7 +255,8 @@ const Footer: React.FC = () => {
 						variant="body2"
 						sx={{ color: theme.palette.grey[500], mb: { xs: 2, sm: 0 } }}
 					>
-						© {new Date().getFullYear()} The Short Grass. All rights reserved.
+						© {new Date().getFullYear()} {COMPANY_INFO.name}. All rights
+						reserved.
 					</Typography>
 				</Box>
 			</Container>

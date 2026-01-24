@@ -1,4 +1,4 @@
-import TestPaymentNotice from '../../checkout/components/TestPaymentNotice';
+import { TestPaymentNotice } from '@pages/checkout/components';
 import { useSnackbar } from '@context';
 import { useAuth } from '@hooks';
 import { LoadingButton } from '@mui/lab';

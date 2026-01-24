@@ -3,8 +3,8 @@ import { getBasket, saveBasket } from '@api';
 import { useSnackbar } from '@context';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
-import { useAuth } from './useAuth';
-import { GroupedSlot } from '../pages/booking/components';
+import { useAuth } from '@hooks';
+import { GroupedSlot } from '@pages/booking/components';
 import { calculateSlotPrice } from '@utils';
 
 export function useBasket() {

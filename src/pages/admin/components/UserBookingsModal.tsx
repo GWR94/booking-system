@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import UserBookingDetailsDialog from '../../profile/components/UserBookingDetailsDialog';
+import UserBookingDetailsDialog from '@pages/profile/components/UserBookingDetailsDialog';
 
 type UserBookingsModalProps = {
 	user: any;

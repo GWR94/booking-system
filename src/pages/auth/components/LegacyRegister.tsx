@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registrationSchema } from '../../../validation/schema';
+import { registrationSchema } from '@validation/schema';
 import { FormInput, FormInputType } from './types';
 import { useAuth } from '@hooks';
 

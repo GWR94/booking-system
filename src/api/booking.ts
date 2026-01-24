@@ -1,6 +1,6 @@
 import { axios } from '@utils';
-import type { GuestUser } from '../pages/checkout/components';
-import type { Booking, GroupedSlot } from '../pages/booking/components';
+import type { GuestUser } from '@pages/checkout/components';
+import type { Booking, GroupedSlot } from '@pages/booking/components';
 
 const BOOKING_STORAGE_KEY = 'booking-data';
 

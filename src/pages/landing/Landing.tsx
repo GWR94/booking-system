@@ -1,6 +1,6 @@
 import { Box, Skeleton, Container } from '@mui/material';
 import { Suspense, lazy } from 'react';
-import { SEO, StructuredData } from '@components/layout';
+import { SEO, StructuredData } from '@layout';
 
 import Hero from './components/hero/Hero';
 
@@ -66,9 +66,8 @@ const Landing = () => {
 								'Thursday',
 								'Friday',
 								'Saturday',
-								'Sunday',
 							],
-							opens: '06:00',
+							opens: '10:00',
 							closes: '22:00',
 						},
 					],

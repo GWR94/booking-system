@@ -28,7 +28,6 @@ const HeroContent = () => {
 					display: 'block',
 					mb: 2,
 					textShadow: '0px 2px 4px rgba(0,0,0,0.25)',
-					fontSize: { xs: '2.5rem', md: '3.5rem' },
 				}}
 			>
 				<AnimateIn type="fade-right">The Short Grass.</AnimateIn>

@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { SignInContainer } from '../styles/themes';
+import { SignInContainer } from '@styles/themes';
 
 const AuthLayout = () => {
 	return (

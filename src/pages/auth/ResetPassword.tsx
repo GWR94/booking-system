@@ -88,11 +88,7 @@ const ResetPassword = () => {
 	return (
 		<SignInContainer>
 			<Card variant="outlined">
-				<Typography
-					component="h1"
-					variant="h4"
-					sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-				>
+				<Typography component="h1" variant="h4" sx={{ width: '100%' }}>
 					Reset Password
 				</Typography>
 				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

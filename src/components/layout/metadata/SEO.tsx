@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { COMPANY_INFO } from '@constants/company';
 
 interface SEOProps {
 	title: string;
@@ -11,14 +12,16 @@ interface SEOProps {
 export const SEO = ({
 	title,
 	description,
-	name = 'The Short Grass',
+	name = COMPANY_INFO.name,
 	type = 'website',
 	keywords = [],
 }: SEOProps) => {
 	return (
 		<Helmet>
 			{/* Standard metadata tags */}
-			<title>{title} | The Short Grass</title>
+			<title>
+				{title} | {COMPANY_INFO.name}
+			</title>
 			<meta name="description" content={description} />
 			{keywords.length > 0 && (
 				<meta name="keywords" content={keywords.join(', ')} />

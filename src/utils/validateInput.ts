@@ -1,6 +1,6 @@
-import { FormInput } from '../pages/auth/components';
-import { LoginForm } from '../pages/auth/components/types';
-import { loginSchema } from '../validation/schema';
+import { FormInput } from '@pages/auth/components';
+import { LoginForm } from '@pages/auth/components/types';
+import { loginSchema } from '@validation/schema';
 type FormInputType = 'email' | 'password';
 
 const validateInputs = (

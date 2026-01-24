@@ -1,6 +1,6 @@
 import { axios } from '@utils';
-import type { Booking } from '../pages/booking/components';
-import type { User } from '../pages/auth/components/types';
+import type { Booking } from '@pages/booking/components';
+import type { User } from '@pages/auth/components/types';
 
 export const getAllUsers = async (): Promise<User[]> => {
 	const response = await axios.get('/api/admin/users');

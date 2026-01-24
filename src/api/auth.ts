@@ -2,7 +2,7 @@ import type {
 	LoginCredentials,
 	RegisterCredentials,
 	User,
-} from '../pages/auth/components';
+} from '@pages/auth/components';
 import { axios } from '@utils';
 
 export const verifyUser = async (): Promise<User> => {

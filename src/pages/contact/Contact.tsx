@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Container, Typography, Paper, useTheme } from '@mui/material';
 import { ContactForm } from '@shared';
+import { COMPANY_INFO } from '@constants/company';
 
 const Contact: React.FC = () => {
 	const theme = useTheme();
@@ -61,14 +62,14 @@ const Contact: React.FC = () => {
 							}}
 						>
 							<iframe
-								src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2496.7280278529666!2d0.5157631767260644!3d51.2718865295977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47df334ce5288035%3A0x308a415dedd49af5!2sHigh%20St%2C%20Maidstone%20ME14%201JL%2C%20UK!5e0!3m2!1sen!2sus!4v1712077333092!5m2!1sen!2sus"
+								src={COMPANY_INFO.googleMapsEmbedUrl}
 								width="100%"
 								height="100%"
 								style={{ border: 0 }}
 								allowFullScreen
 								loading="lazy"
 								referrerPolicy="no-referrer-when-downgrade"
-								title="The Short Grass Location"
+								title={`${COMPANY_INFO.name} Location`}
 							></iframe>
 						</Box>
 

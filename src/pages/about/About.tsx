@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { CallToAction } from '../../components/shared';
+import { CallToAction } from '@shared';
 import {
 	Intro,
 	OurStory,

@@ -21,7 +21,7 @@ import { GuestUser } from './types';
 import { useBasket, useAuth } from '@hooks';
 import { useNavigate } from 'react-router-dom';
 import { confirmFreeBooking } from '@api';
-import { Booking } from '../../booking/components';
+import { Booking } from '@pages/booking/components';
 
 interface CheckoutFormProps {
 	guest: GuestUser | null;
