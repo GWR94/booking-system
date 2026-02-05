@@ -6,9 +6,8 @@ import {
 	Button,
 	useTheme,
 	useMediaQuery,
-	InputAdornment,
-	Divider,
-	Chip,
+	Card,
+	CardContent,
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -19,14 +18,7 @@ import { checkEmailExists } from '@api';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useBasket } from '@hooks';
 import { LoadingButton } from '@mui/lab';
-import {
-	PersonOutline as PersonOutlineIcon,
-	EmailOutlined as EmailOutlinedIcon,
-	PhoneOutlined as PhoneOutlinedIcon,
-	LockOutlined as LockOutlinedIcon,
-	VerifiedUserOutlined as VerifiedUserOutlinedIcon,
-	InfoOutlined as InfoOutlinedIcon,
-} from '@mui/icons-material';
+import { LockOutlined as LockOutlinedIcon } from '@mui/icons-material';
 import { GuestUser } from './types';
 
 const initialGuest: GuestUser = {
@@ -105,227 +97,113 @@ const GuestInfo = ({ onSubmit }: GuestInfoProps) => {
 
 	return (
 		<Container maxWidth="md" sx={{ py: 4 }}>
-			{/* Header Section */}
-			<Box sx={{ mb: 6, textAlign: 'center' }}>
-				<Typography
-					variant="h3"
-					component="h1"
-					fontWeight="700"
-					color="text.primary"
-					gutterBottom
+			<Box
+				component="form"
+				onSubmit={handleSubmit}
+				maxWidth="md"
+				sx={{ mx: 'auto' }}
+			>
+				<Card
+					variant="outlined"
+					sx={{ mb: 4, borderRadius: 2, bgcolor: 'background.paper' }}
 				>
-					Guest Checkout
-				</Typography>
-				<Typography
-					variant="h6"
-					color="text.secondary"
-					sx={{ mb: 3, maxWidth: 600, mx: 'auto', fontWeight: 400 }}
-				>
-					Complete your booking quickly and securely. We'll send your
-					confirmation to the email address you provide.
-				</Typography>
-
-				{/* Trust Indicators */}
-				<Box
-					sx={{
-						display: 'flex',
-						justifyContent: 'center',
-						gap: 2,
-						flexWrap: 'wrap',
-					}}
-				>
-					<Chip
-						icon={<LockOutlinedIcon />}
-						label="Secure Checkout"
-						variant="outlined"
-						color="success"
-						sx={{ px: 1 }}
-					/>
-					<Chip
-						icon={<VerifiedUserOutlinedIcon />}
-						label="Privacy Protected"
-						variant="outlined"
-						color="primary"
-						sx={{ px: 1 }}
-					/>
-				</Box>
-			</Box>
-
-			<Box component="form" onSubmit={handleSubmit}>
-				{/* Contact Information Section */}
-				<Box sx={{ mb: 6 }}>
-					<Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-						<PersonOutlineIcon color="primary" sx={{ fontSize: 28, mr: 1.5 }} />
-						<Typography variant="h5" fontWeight="600" color="text.primary">
+					<CardContent sx={{ p: 4 }}>
+						<Typography
+							variant="h6"
+							gutterBottom
+							sx={{ mb: 3, fontWeight: 700 }}
+						>
 							Contact Information
 						</Typography>
-					</Box>
 
-					<Box
-						sx={{
-							display: 'grid',
-							gap: 3,
-							gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-						}}
-					>
-						<TextField
-							label="Full Name"
-							fullWidth
-							name="name"
-							value={guest.name}
-							required
-							onChange={handleChange}
-							error={!!errors.name}
-							helperText={errors.name || 'Enter your first and last name'}
-							placeholder="John Smith"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<PersonOutlineIcon
-												color="inherit"
-												sx={{
-													color: theme.palette.error.light,
-												}}
-											/>
-										</InputAdornment>
-									),
-								},
-								formHelperText: {
-									sx: {
-										fontSize: '0.75rem',
-										fontStyle: 'italic',
-										color: theme.palette.grey[500],
-									},
-								},
-							}}
-							sx={{ gridColumn: '1 / -1' }}
-						/>
-
-						<TextField
-							label="Email Address"
-							fullWidth
-							type="email"
-							name="email"
-							value={guest.email}
-							onChange={handleChange}
-							required
-							error={!!errors.email}
-							helperText={
-								errors.email || "We'll send your booking confirmation here"
-							}
-							placeholder="john.smith@example.com"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<EmailOutlinedIcon
-												color="inherit"
-												sx={{
-													color: theme.palette.error.light,
-												}}
-											/>
-										</InputAdornment>
-									),
-								},
-								formHelperText: {
-									sx: {
-										fontSize: '0.75rem',
-										fontStyle: 'italic',
-										color: theme.palette.grey[500],
-									},
-								},
-							}}
-						/>
-
-						<TextField
-							label="Phone Number (Optional)"
-							fullWidth
-							type="tel"
-							name="phone"
-							value={guest?.phone || ''}
-							onChange={handleChange}
-							error={!!errors.phone}
-							helperText={errors.phone || 'For booking updates and support'}
-							placeholder="+44 7700 900000"
-							slotProps={{
-								input: {
-									startAdornment: (
-										<InputAdornment position="start">
-											<PhoneOutlinedIcon
-												color="inherit"
-												sx={{
-													color: theme.palette.error.light,
-												}}
-											/>
-										</InputAdornment>
-									),
-								},
-								formHelperText: {
-									sx: {
-										fontSize: '0.75rem',
-										fontStyle: 'italic',
-										color: theme.palette.grey[500],
-									},
-								},
-							}}
-						/>
-					</Box>
-				</Box>
-
-				<Divider sx={{ mb: 6 }} />
-
-				{/* Security Verification */}
-				<Box sx={{ mb: 6, textAlign: 'center' }}>
-					<Box
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							mb: 2,
-						}}
-					>
-						<LockOutlinedIcon color="primary" sx={{ mr: 1 }} />
-						<Typography variant="h6" fontWeight="600">
-							Security Verification
-						</Typography>
-					</Box>
-
-					<Box
-						sx={{
-							display: 'flex',
-							justifyContent: 'center',
-							p: 2,
-						}}
-					>
-						<ReCAPTCHA
-							sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
-							onChange={(token) => setRecaptchaToken(token)}
-						/>
-					</Box>
-
-					<Box
-						sx={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							gap: 1,
-							mt: 2,
-						}}
-					>
-						<InfoOutlinedIcon
+						<Box
 							sx={{
-								fontSize: 18,
-								color: theme.palette.text.secondary,
+								display: 'grid',
+								gap: 3,
+								gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
 							}}
-						/>
-						<Typography variant="caption" color="text.secondary">
-							Your data is processed securely.
-						</Typography>
-					</Box>
-				</Box>
+						>
+							<TextField
+								label="Full Name"
+								fullWidth
+								name="name"
+								value={guest.name}
+								required
+								onChange={handleChange}
+								error={!!errors.name}
+								helperText={errors.name}
+								placeholder="John Smith"
+								sx={{ gridColumn: '1 / -1' }}
+							/>
 
-				{/* Action Buttons */}
+							<TextField
+								label="Email Address"
+								fullWidth
+								type="email"
+								name="email"
+								value={guest.email}
+								onChange={handleChange}
+								required
+								error={!!errors.email}
+								helperText={
+									errors.email || "We'll send your booking confirmation here"
+								}
+								placeholder="john.smith@example.com"
+							/>
+
+							<TextField
+								label="Phone Number (Optional)"
+								fullWidth
+								type="tel"
+								name="phone"
+								value={guest?.phone || ''}
+								onChange={handleChange}
+								error={!!errors.phone}
+								helperText={errors.phone}
+								placeholder="+44 7700 900000"
+							/>
+						</Box>
+					</CardContent>
+				</Card>
+
+				<Card
+					variant="outlined"
+					sx={{ mb: 4, borderRadius: 2, bgcolor: 'background.paper' }}
+				>
+					<CardContent sx={{ p: 4, textAlign: 'center' }}>
+						<Box
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								mb: 3,
+							}}
+						>
+							<LockOutlinedIcon color="primary" sx={{ mr: 1 }} />
+							<Typography variant="h6" fontWeight="700">
+								Security Verification
+							</Typography>
+						</Box>
+
+						<Box
+							sx={{
+								display: 'flex',
+								justifyContent: 'center',
+								mb: 2,
+							}}
+						>
+							<ReCAPTCHA
+								sitekey={import.meta.env.VITE_CAPTCHA_SITE_KEY}
+								onChange={(token) => setRecaptchaToken(token)}
+							/>
+						</Box>
+
+						<Typography variant="caption" color="text.secondary">
+							We use reCAPTCHA to protect your data.
+						</Typography>
+					</CardContent>
+				</Card>
+
 				<Box
 					sx={{
 						display: 'flex',
@@ -343,6 +221,7 @@ const GuestInfo = ({ onSubmit }: GuestInfoProps) => {
 							px: 4,
 							py: 1.5,
 							borderRadius: 2,
+							height: 56,
 						}}
 					>
 						Go Back
@@ -358,6 +237,9 @@ const GuestInfo = ({ onSubmit }: GuestInfoProps) => {
 							px: 6,
 							py: 1.5,
 							borderRadius: 2,
+							height: 56,
+							fontWeight: 700,
+							boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
 						}}
 					>
 						Continue to Payment

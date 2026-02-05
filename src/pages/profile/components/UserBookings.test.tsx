@@ -85,7 +85,6 @@ describe('UserBookings', () => {
 
 		expect(screen.getAllByText(/My Bookings/i)[0]).toBeInTheDocument();
 
-		// Check for past booking
 		expect(
 			screen.getAllByText((content, element) => {
 				return (
@@ -99,7 +98,6 @@ describe('UserBookings', () => {
 			}).length,
 		).toBeGreaterThan(0);
 
-		// Check for future booking
 		expect(
 			screen.getAllByText((content, element) => {
 				return (

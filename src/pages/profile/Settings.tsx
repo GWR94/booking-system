@@ -1,7 +1,8 @@
 import { SubscriptionManagement, DeleteAccountDialog } from './components';
-import { Box, Typography, Button, Paper, Divider } from '@mui/material';
+import { Box, Button, Paper, Divider, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from '@hooks';
+import { SectionHeader } from '@ui';
 
 const Settings = () => {
 	const { user } = useAuth();
@@ -11,9 +12,12 @@ const Settings = () => {
 
 	return (
 		<Box maxWidth="sm" margin="auto">
-			<Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-				Account Settings
-			</Typography>
+			<SectionHeader
+				subtitle="ACCOUNT"
+				title="Settings"
+				description="Manage your subscription and account preferences"
+				noAnimation
+			/>
 
 			<SubscriptionManagement user={user} />
 

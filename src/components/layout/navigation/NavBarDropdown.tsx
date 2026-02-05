@@ -141,11 +141,7 @@ const NavBarDropdown = ({
 							<Button
 								fullWidth
 								onClick={() => {
-									if (isAuthenticated) {
-										logout();
-									} else {
-										openAuthModal('login');
-									}
+									isAuthenticated ? logout() : openAuthModal('login');
 									setIsMenuOpen(false);
 								}}
 								startIcon={isAuthenticated ? <Logout /> : <Login />}

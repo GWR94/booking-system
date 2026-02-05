@@ -15,11 +15,12 @@ const OurStory = () => {
 	return (
 		<Box
 			sx={{
+				py: 8,
 				position: 'relative',
 				overflow: 'hidden',
 			}}
 		>
-			<Container>
+			<Container maxWidth="lg">
 				<Grid container spacing={{ xs: 6, md: 8 }} alignItems="center">
 					<Grid size={{ xs: 12, md: 7 }} order={{ xs: 2, md: 2 }}>
 						<AnimateIn type="fade-right">
@@ -28,7 +29,7 @@ const OurStory = () => {
 								component="h2"
 								sx={{
 									fontWeight: 700,
-									py: 3,
+									mb: 4,
 									background: `linear-gradient(45deg, ${theme.palette.secondary.main}, ${theme.palette.primary.dark})`,
 									backgroundClip: 'text',
 									textFillColor: 'transparent',
@@ -46,9 +47,11 @@ const OurStory = () => {
 								component="p"
 								sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 3 }}
 							>
-								Founded in 2018, The Short Grass was born from a simple idea: to
-								make the joy of golf accessible year-round, regardless of
-								weather or daylight.
+								The Short Grass didn't start in a boardroom; it started on the
+								range. Frustrated by the limitations of British weather and the
+								lack of accessible elite-level technology, we asked a simple
+								question: "Why can't we play the world's best courses on a
+								Tuesday night in February?"
 							</Typography>
 
 							<Typography
@@ -56,10 +59,10 @@ const OurStory = () => {
 								component="p"
 								sx={{ color: 'text.secondary', mb: 3 }}
 							>
-								Our founder, Michael Wright, a former PGA professional,
-								recognized the need for a premium indoor golf experience in
-								Maidstone that would combine cutting-edge technology with the
-								authentic feel of the game.
+								Our founder, Michael Wright, envisioned a space that stripped
+								away the stuffiness of traditional clubs while keeping the
+								respect for the game. He wanted to build a sanctuary where
+								technology enhances the experience, not complicates it.
 							</Typography>
 
 							<Typography
@@ -67,10 +70,11 @@ const OurStory = () => {
 								component="p"
 								sx={{ color: 'text.secondary', mb: 4 }}
 							>
-								What began as a small facility with just two simulator bays has
-								now expanded to our current location on High Street, featuring
-								four state-of-the-art TrackMan 4 simulator bays, a dedicated
-								coaching area, and a comfortable lounge space.
+								Today, The Short Grass is more than just a simulator venue. It's
+								a community of passionate golfers, from scratch players refining
+								their numbers to beginners finding their swing. With four
+								state-of-the-art TrackMan bays and a vibrant lounge, we're
+								defining the future of indoor golf in Maidstone.
 							</Typography>
 
 							<Box
@@ -121,7 +125,7 @@ const OurStory = () => {
 						<AnimateIn type="fade-left" delay={0.2}>
 							<Box sx={{ position: 'relative' }}>
 								<Paper
-									elevation={10}
+									elevation={3}
 									sx={{
 										position: 'relative',
 										borderRadius: 4,
@@ -132,6 +136,7 @@ const OurStory = () => {
 										transition: 'transform 0.3s ease-in-out',
 										'&:hover': {
 											transform: 'translateY(-5px)',
+											boxShadow: 6,
 										},
 									}}
 								>

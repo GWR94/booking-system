@@ -1,8 +1,13 @@
-import { Box, Button } from '@mui/material';
+import { Box, Button, SxProps, Theme } from '@mui/material';
 import { GoogleIcon, FacebookIcon, XIcon } from '@assets/icons/CustomIcons';
 
-const OAuthButtons = () => {
-	const backendUrl = import.meta.env.VITE_BACKEND_API!;
+interface ButtonsProps {
+	buttonSx?: SxProps<Theme>;
+	iconOnly?: boolean;
+}
+
+const OAuthButtons = ({ buttonSx, iconOnly = false }: ButtonsProps) => {
+	const backendUrl = import.meta.env.VITE_BACKEND_API;
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
@@ -11,24 +16,27 @@ const OAuthButtons = () => {
 				variant="outlined"
 				href={`${backendUrl}/api/user/login/google`}
 				startIcon={<GoogleIcon />}
+				sx={{ ...buttonSx }}
 			>
-				Continue with Google
+				{!iconOnly && 'Continue with Google'}
 			</Button>
 			<Button
 				fullWidth
 				variant="outlined"
 				href={`${backendUrl}/api/user/login/facebook`}
 				startIcon={<FacebookIcon />}
+				sx={{ ...buttonSx }}
 			>
-				Continue with Facebook
+				{!iconOnly && 'Continue with Facebook'}
 			</Button>
 			<Button
 				fullWidth
 				variant="outlined"
 				href={`${backendUrl}/api/user/login/twitter`}
 				startIcon={<XIcon />}
+				sx={{ ...buttonSx }}
 			>
-				Continue with X
+				{!iconOnly && 'Continue with X'}
 			</Button>
 		</Box>
 	);

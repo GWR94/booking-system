@@ -1,9 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, {
+	createContext,
+	useContext,
+	useState,
+	ReactNode,
+	useCallback,
+	useMemo,
+} from 'react';
 import { Snackbar, Alert, AlertProps } from '@mui/material';
 
 interface SnackbarContextType {
 	showSnackbar: (message: string, severity?: AlertProps['severity']) => void;
 	hideSnackbar: () => void;
+	setBottomOffset: (offset: number) => void;
 }
 
 export const SnackbarContext = createContext<SnackbarContextType | undefined>(
@@ -17,35 +25,46 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
 		message: string;
 		severity: AlertProps['severity'];
 		open: boolean;
+		key: number;
 	}>({
 		message: '',
 		severity: 'info',
 		open: false,
+		key: 0,
 	});
+	const [bottomOffset, setBottomOffset] = useState(0);
 
-	const showSnackbar = (
-		message: string,
-		severity: AlertProps['severity'] = 'info',
-	) => {
-		setSnackbar({ message, severity, open: true });
-	};
+	const showSnackbar = useCallback(
+		(message: string, severity: AlertProps['severity'] = 'info') => {
+			setSnackbar({ message, severity, open: true, key: Date.now() });
+		},
+		[],
+	);
 
-	const hideSnackbar = () =>
-		setSnackbar({ message: '', severity: 'info', open: false });
+	const hideSnackbar = useCallback(
+		() => setSnackbar((prev) => ({ ...prev, open: false })),
+		[],
+	);
 
-	const value: SnackbarContextType = {
-		showSnackbar,
-		hideSnackbar,
-	};
+	const value: SnackbarContextType = useMemo(
+		() => ({
+			showSnackbar,
+			hideSnackbar,
+			setBottomOffset,
+		}),
+		[showSnackbar, hideSnackbar, setBottomOffset],
+	);
 
 	return (
 		<SnackbarContext.Provider value={value}>
 			{children}
 			<Snackbar
+				key={snackbar.key}
 				open={snackbar.open}
 				autoHideDuration={3000}
 				onClose={hideSnackbar}
 				anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+				sx={{ mb: bottomOffset }}
 			>
 				<Alert
 					onClose={hideSnackbar}

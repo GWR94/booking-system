@@ -20,7 +20,7 @@ describe('OurStory', () => {
 		expect(screen.getByText(/Play\./i)).toBeInTheDocument();
 		expect(screen.getByText(/Practice\./i)).toBeInTheDocument();
 		expect(screen.getByText(/Perform\./i)).toBeInTheDocument();
-		expect(screen.getByText(/Founded in 2018/i)).toBeInTheDocument();
+		expect(screen.getByText(/Michael Wright/i)).toBeInTheDocument();
 		expect(screen.getByText(/Michael Wright/i)).toBeInTheDocument();
 	});
 

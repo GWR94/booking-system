@@ -22,27 +22,22 @@ vi.mock('@hooks', () => ({
 vi.mock('@mui/x-date-pickers', () => ({
 	DatePicker: ({ label, onChange }: any) => (
 		<div>
-			<label>{label}</label>
-			<input
-				data-testid="date-picker-input"
-				onChange={(e) => onChange(dayjs(e.target.value))}
-			/>
+			<label>
+				{label}
+				<input
+					data-testid="date-picker-input"
+					onChange={(e) => onChange(dayjs(e.target.value))}
+				/>
+			</label>
 		</div>
 	),
 }));
 
-// Mock framer-motion to avoid animation issues in test env
-vi.mock('framer-motion', () => ({
-	motion: {
-		div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-	},
-	AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
-
 describe('SessionPicker', () => {
-	it('renders title and controls', () => {
+	it('renders inputs correctly', () => {
 		render(<SessionPicker />);
-		expect(screen.getByText('Find Available Sessions')).toBeInTheDocument();
+		// We removed the header "Find Available Sessions" so we update the test
+		expect(screen.getByLabelText(/Select Date/i)).toBeInTheDocument();
 		expect(screen.getByLabelText(/Duration/i)).toBeInTheDocument();
 		expect(screen.getByLabelText(/Bay/i)).toBeInTheDocument();
 	});

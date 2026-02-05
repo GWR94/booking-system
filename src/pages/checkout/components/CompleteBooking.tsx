@@ -10,7 +10,10 @@ import {
 	Grid2 as Grid,
 	Container,
 	Stack,
+	Card,
+	CardContent,
 } from '@mui/material';
+import { AnimateIn } from '@ui';
 import {
 	CheckCircle as CheckCircleIcon,
 	Error as ErrorIcon,
@@ -23,6 +26,7 @@ import CheckoutItem from './CheckoutItem';
 import { useBasket, useBookingManager } from '@hooks';
 import { getBookingByPaymentIntent } from '@api';
 import dayjs from 'dayjs';
+import { groupSlotsByBay } from '@utils';
 import { useSnackbar } from '@context';
 import { GroupedSlot } from '../../booking/components';
 
@@ -87,11 +91,31 @@ const CompletePage = () => {
 		const fetchPaymentIntent = async () => {
 			if (!stripe) return;
 
-			const clientSecret = new URLSearchParams(window.location.search).get(
-				'payment_intent_client_secret',
-			);
+			const params = new URLSearchParams(window.location.search);
+			const clientSecret = params.get('payment_intent_client_secret');
+			const isSuccess = params.get('success') === 'true';
 
-			if (!clientSecret) return;
+			if (!clientSecret && !isSuccess) {
+				setLoading(false);
+				return;
+			}
+
+			// If we just finished a free flow, we should have the booking in manager already
+			if (isSuccess && booking) {
+				const grouped = groupSlotsByBay(booking.slots as any);
+				setItems(grouped);
+				setStatus('succeeded');
+				setItemsCost('0.00');
+				setPaymentMethod('Membership Included');
+				setLoading(false);
+				clearBasket(); // Ensure basket is cleared for free bookings too
+				return;
+			}
+
+			if (!clientSecret) {
+				setLoading(false);
+				return;
+			}
 
 			const { paymentIntent } =
 				await stripe.retrievePaymentIntent(clientSecret);
@@ -159,13 +183,7 @@ const CompletePage = () => {
 					const data = await getBookingByPaymentIntent(paymentIntent.id);
 					if (data.booking && data.groupedSlots) {
 						setBooking(data.booking);
-						const grouped = data.groupedSlots.map((slot: any) => ({
-							id: slot.slotIds[0],
-							startTime: dayjs(slot.startTimeISO),
-							endTime: dayjs(slot.endTimeISO),
-							bayId: slot.bayId,
-							slotIds: slot.slotIds,
-						}));
+						const grouped = groupSlotsByBay(data.booking.slots);
 						setItems(grouped);
 						setLoading(false);
 						clearBasket();
@@ -203,214 +221,277 @@ const CompletePage = () => {
 		</Box>
 	) : (
 		<Container>
-			<Box display="flex" flexDirection="column" alignItems="center" gap={3}>
-				<Box
-					sx={{
-						backgroundColor: STATUS_CONTENT_MAP[status].iconColor,
-						borderRadius: '50%',
-						p: 2,
-						display: 'flex',
-						justifyContent: 'center',
-					}}
-					maxWidth="sm"
-				>
-					{status === 'succeeded' ? (
-						<CheckCircleIcon sx={{ fontSize: 48, color: 'white' }} />
-					) : (
-						<ErrorIcon sx={{ fontSize: 48, color: 'white' }} />
-					)}
-				</Box>
+			<Box
+				display="flex"
+				flexDirection="column"
+				alignItems="center"
+				gap={4}
+				sx={{ py: 8 }}
+			>
+				<AnimateIn type="scale-up">
+					<Box
+						sx={{
+							backgroundColor: STATUS_CONTENT_MAP[status].iconColor,
+							borderRadius: '50%',
+							p: 3,
+							display: 'flex',
+							justifyContent: 'center',
+							boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+						}}
+						maxWidth="sm"
+					>
+						{status === 'succeeded' ? (
+							<CheckCircleIcon sx={{ fontSize: 64, color: 'white' }} />
+						) : (
+							<ErrorIcon sx={{ fontSize: 64, color: 'white' }} />
+						)}
+					</Box>
+				</AnimateIn>
 
-				<Typography variant="h4" gutterBottom>
-					{STATUS_CONTENT_MAP[status].text}
-				</Typography>
+				<AnimateIn type="fade-up" delay={0.1}>
+					<Typography
+						variant="h3"
+						fontWeight="800"
+						gutterBottom
+						textAlign="center"
+					>
+						{STATUS_CONTENT_MAP[status].text}
+					</Typography>
+					<Typography
+						variant="h6"
+						color="text.secondary"
+						textAlign="center"
+						fontWeight="normal"
+					>
+						{status === 'succeeded'
+							? 'Thank you for your booking. We look forward to seeing you.'
+							: 'Please check your payment details and try again.'}
+					</Typography>
+				</AnimateIn>
 
-				<Grid container spacing={3} sx={{ width: '100%' }}>
+				<Grid container spacing={4} sx={{ width: '100%', mt: 2 }}>
 					{/* Payment Details */}
 					{intentId && (
 						<Grid size={{ xs: 12, md: 6 }}>
-							<Box
-								sx={{
-									p: 3,
-									border: '1px solid #e0e0e0',
-									borderRadius: 2,
-									height: '100%',
-								}}
-							>
-								<Typography variant="h6" gutterBottom>
-									Payment Summary
-								</Typography>
-								<Stack spacing={2}>
-									<Stack direction="row" justifyContent="space-between">
-										<Typography color="text.secondary">
-											Payment Status
-										</Typography>
+							<AnimateIn type="fade-up" delay={0.2} style={{ height: '100%' }}>
+								<Card
+									elevation={0}
+									sx={{
+										height: '100%',
+										border: '1px solid',
+										borderColor: 'divider',
+										borderRadius: 3,
+									}}
+								>
+									<CardContent sx={{ p: 4 }}>
 										<Typography
-											sx={{
-												textTransform: 'capitalize',
-												fontWeight: 'medium',
-												color:
-													status === 'succeeded'
-														? 'success.main'
-														: 'text.primary',
-											}}
+											variant="h6"
+											gutterBottom
+											fontWeight="700"
+											sx={{ mb: 3 }}
 										>
-											{status}
+											Payment Summary
 										</Typography>
-									</Stack>
+										<Stack spacing={2}>
+											<Stack direction="row" justifyContent="space-between">
+												<Typography color="text.secondary">
+													Payment Status
+												</Typography>
+												<Typography
+													sx={{
+														textTransform: 'capitalize',
+														fontWeight: 'medium',
+														color:
+															status === 'succeeded'
+																? 'success.main'
+																: 'text.primary',
+													}}
+												>
+													{status}
+												</Typography>
+											</Stack>
 
-									<Stack direction="row" justifyContent="space-between">
-										<Typography color="text.secondary">
-											Payment Method
-										</Typography>
-										<Typography sx={{ fontWeight: 'medium' }}>
-											{paymentMethod}
-										</Typography>
-									</Stack>
+											<Stack direction="row" justifyContent="space-between">
+												<Typography color="text.secondary">
+													Payment Method
+												</Typography>
+												<Typography sx={{ fontWeight: 'medium' }}>
+													{paymentMethod}
+												</Typography>
+											</Stack>
 
-									<Stack direction="row" justifyContent="space-between">
-										<Typography color="text.secondary">
-											Transaction Date
-										</Typography>
-										<Typography sx={{ fontWeight: 'medium' }}>
-											{dayjs().format('DD MMM YYYY')}
-										</Typography>
-									</Stack>
+											<Stack direction="row" justifyContent="space-between">
+												<Typography color="text.secondary">
+													Transaction Date
+												</Typography>
+												<Typography sx={{ fontWeight: 'medium' }}>
+													{dayjs().format('DD MMM YYYY')}
+												</Typography>
+											</Stack>
 
-									<Divider />
+											<Divider />
 
-									<Stack direction="row" justifyContent="space-between">
-										<Typography color="text.secondary">Subtotal</Typography>
-										<Typography>£{subtotal.toFixed(2)}</Typography>
-									</Stack>
+											<Stack direction="row" justifyContent="space-between">
+												<Typography color="text.secondary">Subtotal</Typography>
+												<Typography>£{subtotal.toFixed(2)}</Typography>
+											</Stack>
 
-									<Stack direction="row" justifyContent="space-between">
-										<Typography color="text.secondary">VAT (20%)</Typography>
-										<Typography>£{vat.toFixed(2)}</Typography>
-									</Stack>
+											<Stack direction="row" justifyContent="space-between">
+												<Typography color="text.secondary">
+													VAT (20%)
+												</Typography>
+												<Typography>£{vat.toFixed(2)}</Typography>
+											</Stack>
 
-									<Divider />
+											<Divider />
 
-									<Stack direction="row" justifyContent="space-between">
-										<Typography variant="h6">Total</Typography>
-										<Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-											£{itemsCost}
-										</Typography>
-									</Stack>
+											<Stack direction="row" justifyContent="space-between">
+												<Typography variant="h6">Total</Typography>
+												<Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+													£{itemsCost}
+												</Typography>
+											</Stack>
 
-									<Box
-										sx={{
-											mt: 1,
-											p: 1,
-											bgcolor: 'action.hover',
-											borderRadius: 1,
-										}}
-									>
-										<Typography variant="caption" color="text.secondary">
-											Transaction ID: {intentId.slice(-12).toUpperCase()}
-										</Typography>
-									</Box>
-								</Stack>
-							</Box>
+											<Box
+												sx={{
+													mt: 1,
+													p: 1,
+													bgcolor: 'action.hover',
+													borderRadius: 1,
+												}}
+											>
+												<Typography variant="caption" color="text.secondary">
+													Transaction ID: {intentId.slice(-12).toUpperCase()}
+												</Typography>
+											</Box>
+										</Stack>
+									</CardContent>
+								</Card>
+							</AnimateIn>
 						</Grid>
 					)}
 
 					{/* Booking Information */}
 					{booking && (
 						<Grid size={{ xs: 12, md: 6 }}>
-							<Box
-								sx={{
-									p: 3,
-									border: '1px solid #e0e0e0',
-									borderRadius: 2,
-									height: '100%',
-									display: 'flex',
-									flexDirection: 'column',
-								}}
-							>
-								<Typography variant="h6" gutterBottom>
-									Booking Details
-								</Typography>
-								<Stack
-									spacing={2}
-									sx={{ flex: 1, justifyContent: 'space-between' }}
+							<AnimateIn type="fade-up" delay={0.3} style={{ height: '100%' }}>
+								<Card
+									elevation={0}
+									sx={{
+										height: '100%',
+										border: '1px solid',
+										borderColor: 'divider',
+										borderRadius: 3,
+									}}
 								>
-									<Box>
-										<Stack spacing={2}>
-											<Stack direction="row" justifyContent="space-between">
-												<Typography color="text.secondary">
-													Booking Reference
-												</Typography>
-												<Typography sx={{ fontWeight: 'medium' }}>
-													#{booking.id}
-												</Typography>
-											</Stack>
-
-											<Stack direction="row" justifyContent="space-between">
-												<Typography color="text.secondary">Status</Typography>
-												<Typography
-													sx={{
-														textTransform: 'capitalize',
-														fontWeight: 'medium',
-													}}
-												>
-													{booking.status}
-												</Typography>
-											</Stack>
-
-											<Stack direction="row" justifyContent="space-between">
-												<Typography color="text.secondary">Date</Typography>
-												<Typography sx={{ fontWeight: 'medium' }}>
-													{dayjs(booking.bookingTime).format('DD MMM YYYY')}
-												</Typography>
-											</Stack>
-
-											{booking.user && (
-												<>
-													<Divider />
-													<Stack direction="row" justifyContent="space-between">
-														<Typography color="text.secondary">Name</Typography>
-														<Typography sx={{ fontWeight: 'medium' }}>
-															{booking.user.name}
-														</Typography>
-													</Stack>
+									<CardContent
+										sx={{
+											p: 4,
+											height: '100%',
+											display: 'flex',
+											flexDirection: 'column',
+										}}
+									>
+										<Typography
+											variant="h6"
+											gutterBottom
+											fontWeight="700"
+											sx={{ mb: 3 }}
+										>
+											Booking Details
+										</Typography>
+										<Stack
+											spacing={2}
+											sx={{ flex: 1, justifyContent: 'space-between' }}
+										>
+											<Box>
+												<Stack spacing={2}>
 													<Stack direction="row" justifyContent="space-between">
 														<Typography color="text.secondary">
-															Email
+															Booking Reference
 														</Typography>
 														<Typography sx={{ fontWeight: 'medium' }}>
-															{booking.user.email}
+															#{booking.id}
 														</Typography>
 													</Stack>
-												</>
+
+													<Stack direction="row" justifyContent="space-between">
+														<Typography color="text.secondary">
+															Status
+														</Typography>
+														<Typography
+															sx={{
+																textTransform: 'capitalize',
+																fontWeight: 'medium',
+															}}
+														>
+															{booking.status}
+														</Typography>
+													</Stack>
+
+													<Stack direction="row" justifyContent="space-between">
+														<Typography color="text.secondary">Date</Typography>
+														<Typography sx={{ fontWeight: 'medium' }}>
+															{dayjs(booking.bookingTime).format('DD MMM YYYY')}
+														</Typography>
+													</Stack>
+
+													{booking.user && (
+														<>
+															<Divider />
+															<Stack
+																direction="row"
+																justifyContent="space-between"
+															>
+																<Typography color="text.secondary">
+																	Name
+																</Typography>
+																<Typography sx={{ fontWeight: 'medium' }}>
+																	{booking.user.name}
+																</Typography>
+															</Stack>
+															<Stack
+																direction="row"
+																justifyContent="space-between"
+															>
+																<Typography color="text.secondary">
+																	Email
+																</Typography>
+																<Typography sx={{ fontWeight: 'medium' }}>
+																	{booking.user.email}
+																</Typography>
+															</Stack>
+														</>
+													)}
+												</Stack>
+											</Box>
+
+											{booking.user && (
+												<Box
+													sx={{
+														p: 1.5,
+														bgcolor: 'action.hover',
+														borderRadius: 1,
+														display: 'flex',
+														gap: 1,
+														alignItems: 'start',
+													}}
+												>
+													<InfoIcon
+														fontSize="small"
+														color="action"
+														sx={{ mt: 0.2 }}
+													/>
+													<Typography variant="caption" color="text.secondary">
+														A confirmation email has been sent to{' '}
+														{booking.user.email}
+													</Typography>
+												</Box>
 											)}
 										</Stack>
-									</Box>
-
-									{booking.user && (
-										<Box
-											sx={{
-												p: 1.5,
-												bgcolor: 'action.hover',
-												borderRadius: 1,
-												display: 'flex',
-												gap: 1,
-												alignItems: 'start',
-											}}
-										>
-											<InfoIcon
-												fontSize="small"
-												color="action"
-												sx={{ mt: 0.2 }}
-											/>
-											<Typography variant="caption" color="text.secondary">
-												A confirmation email has been sent to{' '}
-												{booking.user.email}
-											</Typography>
-										</Box>
-									)}
-								</Stack>
-							</Box>
+									</CardContent>
+								</Card>
+							</AnimateIn>
 						</Grid>
 					)}
 				</Grid>

@@ -12,6 +12,7 @@ const mockCreateGuestPaymentIntent = vi.fn();
 vi.mock('@hooks', () => ({
 	useBasket: () => mockUseBasket(),
 	useAuth: () => mockUseAuth(),
+	useBookingManager: () => ({ booking: null }),
 }));
 
 vi.mock('@context', () => ({
@@ -42,10 +43,13 @@ vi.mock('./components', () => ({
 			</button>
 		</div>
 	),
+	CheckoutSkeleton: () => <div>Checkout Skeleton</div>,
 }));
 
 vi.mock('@ui', () => ({
 	LoadingSpinner: () => <div>Loading Spinner</div>,
+	SectionHeader: () => <div>Section Header</div>,
+	AnimateIn: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock('@stripe/react-stripe-js', () => ({
@@ -90,7 +94,7 @@ describe('Checkout Page', () => {
 		);
 
 		await waitFor(() => {
-			expect(screen.getByText('Loading Spinner')).toBeInTheDocument();
+			expect(screen.getByText('Checkout Skeleton')).toBeInTheDocument();
 		});
 	});
 

@@ -3,12 +3,6 @@ import { describe, it, expect, vi } from 'vitest';
 import Team from './Team';
 import { ThemeProvider } from '@context';
 
-vi.mock('@ui', () => ({
-	AnimateIn: ({ children }: { children: React.ReactNode }) => (
-		<div data-testid="animate-in">{children}</div>
-	),
-}));
-
 describe('Team', () => {
 	it('should render header and team section', () => {
 		render(
@@ -17,7 +11,7 @@ describe('Team', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/Meet Our Experts/i)).toBeInTheDocument();
+		expect(screen.getByText(/Meet Our Team/i)).toBeInTheDocument();
 		expect(screen.getByText(/PGA-certified expertise/i)).toBeInTheDocument();
 	});
 

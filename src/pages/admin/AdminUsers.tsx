@@ -23,7 +23,7 @@ import {
 	Visibility as ViewIcon,
 	Edit as EditIcon,
 } from '@mui/icons-material';
-import { LoadingSpinner } from '@ui';
+import { LoadingSpinner, AnimateIn, SectionHeader } from '@ui';
 import { useState } from 'react';
 import UserBookingsModal from './components/UserBookingsModal';
 import EditUserModal from './components/EditUserModal';
@@ -62,174 +62,190 @@ const Users = () => {
 	};
 
 	return (
-		<Box>
-			<Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
-				User Management
-			</Typography>
-
-			<Paper
-				elevation={0}
-				sx={{
-					borderRadius: 3,
-					border: '1px solid',
-					borderColor: 'divider',
-					overflow: 'hidden',
-				}}
-			>
-				<Box sx={{ p: 2 }}>
-					<TextField
-						fullWidth
-						variant="outlined"
-						placeholder="Search users by name, email, or ID..."
-						size="small"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						InputProps={{
-							startAdornment: (
-								<InputAdornment position="start">
-									<SearchIcon color="action" />
-								</InputAdornment>
-							),
+		<Box sx={{ py: 4 }}>
+			<Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 } }}>
+				<SectionHeader
+					title="User Management"
+					subtitle="Admin Portal"
+					description="Manage registered users and their memberships"
+					noAnimation
+				/>
+				<AnimateIn type="fade-up">
+					<Paper
+						elevation={0}
+						sx={{
+							borderRadius: 4,
+							border: 'none',
+							boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+							overflow: 'hidden',
 						}}
-					/>
-				</Box>
-				<TableContainer>
-					<Table sx={{ minWidth: 650 }} aria-label="users table" size="small">
-						<TableHead
-							sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}
-						>
-							<TableRow>
-								<TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
-								<TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-								<TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
-								<TableCell sx={{ fontWeight: 600 }}>Membership</TableCell>
-								<TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-								<TableCell align="right" sx={{ fontWeight: 600 }}>
-									Actions
-								</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{filteredUsers.map((user: any) => (
-								<TableRow
-									key={user.id}
-									hover
-									sx={{
-										'&:last-child td, &:last-child th': { border: 0 },
-										cursor: 'pointer',
-									}}
-									onClick={() => handleViewUser(user)}
+					>
+						<Box sx={{ p: 2 }}>
+							<TextField
+								fullWidth
+								variant="outlined"
+								placeholder="Search users by name, email, or ID..."
+								size="small"
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								slotProps={{
+									input: {
+										startAdornment: (
+											<InputAdornment position="start">
+												<SearchIcon color="action" />
+											</InputAdornment>
+										),
+									},
+								}}
+							/>
+						</Box>
+						<TableContainer>
+							<Table
+								sx={{ minWidth: 650 }}
+								aria-label="users table"
+								size="small"
+							>
+								<TableHead
+									sx={{ bgcolor: alpha(theme.palette.primary.main, 0.02) }}
 								>
-									<TableCell
-										component="th"
-										scope="row"
-										sx={{ fontWeight: 500 }}
-									>
-										{user.id}
-									</TableCell>
-									<TableCell>
-										<Typography variant="body2" fontWeight={600}>
-											{user.name}
-										</Typography>
-									</TableCell>
-									<TableCell sx={{ maxWidth: 200 }}>
-										<Tooltip title={user.email} placement="top">
-											<Typography
-												variant="body2"
-												noWrap
-												sx={{
-													cursor: 'help',
-												}}
+									<TableRow>
+										<TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
+										<TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+										<TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+										<TableCell sx={{ fontWeight: 600 }}>Membership</TableCell>
+										<TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+										<TableCell align="right" sx={{ fontWeight: 600 }}>
+											Actions
+										</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{filteredUsers.map((user: any) => (
+										<TableRow
+											key={user.id}
+											hover
+											sx={{
+												'&:last-child td, &:last-child th': { border: 0 },
+												cursor: 'pointer',
+											}}
+											onClick={() => handleViewUser(user)}
+										>
+											<TableCell
+												component="th"
+												scope="row"
+												sx={{ fontWeight: 500 }}
 											>
-												{user.email}
-											</Typography>
-										</Tooltip>
-									</TableCell>
-									<TableCell>
-										{user.membershipTier ? (
-											<Chip
-												label={user.membershipTier}
-												size="small"
-												color="primary"
-												variant={
-													user.membershipStatus === 'ACTIVE'
-														? 'filled'
-														: 'outlined'
-												}
-												sx={{ fontWeight: 600 }}
-											/>
-										) : (
-											<Typography variant="caption" color="text.secondary">
-												None
-											</Typography>
-										)}
-									</TableCell>
-									<TableCell>
-										{user.membershipStatus === 'ACTIVE' &&
-										user.cancelAtPeriodEnd ? (
-											<Chip
-												label="CANCELLING"
-												color="warning"
-												size="small"
-												sx={{ fontWeight: 600 }}
-											/>
-										) : (
-											<Chip
-												label={user.membershipStatus || 'INACTIVE'}
-												color={
-													user.membershipStatus === 'ACTIVE'
-														? 'success'
-														: user.membershipStatus === 'CANCELLED'
-															? 'error'
-															: 'default'
-												}
-												size="small"
-												sx={{ fontWeight: 600 }}
-											/>
-										)}
-									</TableCell>
-									<TableCell align="right">
-										<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-											<Tooltip title="View Bookings">
-												<IconButton
-													size="small"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleViewUser(user);
-													}}
+												{user.id}
+											</TableCell>
+											<TableCell>
+												<Typography variant="body2" fontWeight={600}>
+													{user.name}
+												</Typography>
+											</TableCell>
+											<TableCell sx={{ maxWidth: 200 }}>
+												<Tooltip title={user.email} placement="top">
+													<Typography
+														variant="body2"
+														noWrap
+														sx={{
+															cursor: 'help',
+															// textDecoration: 'underline',
+															// textDecorationStyle: 'dotted',
+														}}
+													>
+														{user.email}
+													</Typography>
+												</Tooltip>
+											</TableCell>
+											<TableCell>
+												{user.membershipTier ? (
+													<Chip
+														label={user.membershipTier}
+														size="small"
+														color="primary"
+														variant={
+															user.membershipStatus === 'ACTIVE'
+																? 'filled'
+																: 'outlined'
+														}
+														sx={{ fontWeight: 600 }}
+													/>
+												) : (
+													<Typography variant="caption" color="text.secondary">
+														None
+													</Typography>
+												)}
+											</TableCell>
+											<TableCell>
+												{user.membershipStatus === 'ACTIVE' &&
+												user.cancelAtPeriodEnd ? (
+													<Chip
+														label="CANCELLING"
+														color="warning"
+														size="small"
+														sx={{ fontWeight: 600 }}
+													/>
+												) : (
+													<Chip
+														label={user.membershipStatus || 'INACTIVE'}
+														color={
+															user.membershipStatus === 'ACTIVE'
+																? 'success'
+																: user.membershipStatus === 'CANCELLED'
+																	? 'error'
+																	: 'default'
+														}
+														size="small"
+														sx={{ fontWeight: 600 }}
+													/>
+												)}
+											</TableCell>
+											<TableCell align="right">
+												<Box
+													sx={{ display: 'flex', justifyContent: 'flex-end' }}
 												>
-													<ViewIcon fontSize="small" />
-												</IconButton>
-											</Tooltip>
-											<Tooltip title="Edit User">
-												<IconButton
-													size="small"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleEditUser(user);
-													}}
-													sx={{ ml: 1 }}
-												>
-													<EditIcon fontSize="small" />
-												</IconButton>
-											</Tooltip>
-										</Box>
-									</TableCell>
-								</TableRow>
-							))}
-							{filteredUsers.length === 0 && (
-								<TableRow>
-									<TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-										<Typography variant="body2" color="text.secondary">
-											No users found matching "{search}"
-										</Typography>
-									</TableCell>
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-				</TableContainer>
-			</Paper>
+													<Tooltip title="View Bookings">
+														<IconButton
+															size="small"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleViewUser(user);
+															}}
+														>
+															<ViewIcon fontSize="small" />
+														</IconButton>
+													</Tooltip>
+													<Tooltip title="Edit User">
+														<IconButton
+															size="small"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleEditUser(user);
+															}}
+															sx={{ ml: 1 }}
+														>
+															<EditIcon fontSize="small" />
+														</IconButton>
+													</Tooltip>
+												</Box>
+											</TableCell>
+										</TableRow>
+									))}
+									{filteredUsers.length === 0 && (
+										<TableRow>
+											<TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+												<Typography variant="body2" color="text.secondary">
+													No users found matching "{search}"
+												</Typography>
+											</TableCell>
+										</TableRow>
+									)}
+								</TableBody>
+							</Table>
+						</TableContainer>
+					</Paper>
+				</AnimateIn>
+			</Box>
 
 			<UserBookingsModal
 				user={selectedUser}

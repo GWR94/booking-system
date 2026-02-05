@@ -1,20 +1,15 @@
-import {
-	Box,
-	Button,
-	Card,
-	CardActions,
-	CardContent,
-	Chip,
-	Grid2 as Grid,
-	Typography,
-} from '@mui/material';
+import { alpha, useTheme, useMediaQuery } from '@mui/material';
 import dayjs from 'dayjs';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useBasket, useAuth } from '@hooks';
+import { useBasket, useAuth, useSession } from '@hooks';
+import { useSnackbar } from '@context';
 import { calculateSlotPrice } from '@utils';
 import AdminBookingDialog from './AdminBookingDialog';
-import { GroupedTimeSlots } from './types';
+import { GroupedTimeSlots, GroupedSlot } from './types';
+import DesktopSlot from './DesktopSlot';
+import AdminSlotControls from './AdminSlotControls';
+import UserSlotControls from './UserSlotControls';
+import MobileSlot from './MobileSlot';
 
 type SlotProps = {
 	timeRange: string;
@@ -22,14 +17,24 @@ type SlotProps = {
 };
 
 const Slot = ({ timeSlots, timeRange }: SlotProps) => {
-	const { addToBasket, basket } = useBasket();
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const { basket, addToBasket, removeFromBasket } = useBasket();
+	const { showSnackbar } = useSnackbar();
 	const { isAdmin, user } = useAuth();
-	const navigate = useNavigate();
+	const { selectedBay } = useSession();
 
-	// Get hourly slots for this time slot
 	const hourlySlots = timeSlots[timeRange];
 
-	// Find slots that aren't in the basket yet
+	const slotsInBasket = basket.filter((basketSlot) =>
+		hourlySlots.some((slot) =>
+			slot.slotIds.some((id) => basketSlot.slotIds.includes(id)),
+		),
+	);
+	const basketCount = slotsInBasket.length;
+	const isInBasket = basketCount > 0;
+	const slotInBasket = slotsInBasket[0];
+
 	const availableSlots = hourlySlots.filter(
 		(slot) =>
 			!basket.some((basketSlot) =>
@@ -37,195 +42,141 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 			),
 	);
 
-	// Get representative slot for display
-	const slot = hourlySlots[0];
-	const startTime = dayjs(slot.startTime).format('h:mma');
-	const endTime = dayjs(slot.endTime).format('h:mma');
-	const slotPassed = slot.endTime.isBefore(dayjs());
+	const availability =
+		selectedBay === 5
+			? availableSlots.length === 4
+				? 'good'
+				: availableSlots.length === 3
+					? 'fair'
+					: availableSlots.length === 1 || availableSlots.length === 2
+						? 'limited'
+						: 'unavailable'
+			: undefined;
 
-	// Dialog state
-	const [adminDialogOpen, setAdminDialogOpen] = useState(false);
+	const handleSlotClick = () => {
+		if (isAdmin) {
+			setAdminDialogOpen(true);
+			return;
+		}
 
-	// Set availability text and color
-	let availabilityText = '';
-	let availabilityColor: 'success' | 'warning' | 'error' = 'error';
-
-	if (availableSlots.length >= 3) {
-		availabilityText = 'Good Availability';
-		availabilityColor = 'success';
-	} else if (availableSlots.length === 2) {
-		availabilityText = 'Limited Availability';
-		availabilityColor = 'warning';
-	} else if (availableSlots.length === 1) {
-		availabilityText = 'Very Limited Availability';
-		availabilityColor = 'error';
-	} else {
-		availabilityText = 'Fully Booked';
-		availabilityColor = 'error';
-	}
-
-	const handleAddToBasket = () => {
-		if (availableSlots.length > 0) {
-			addToBasket(availableSlots[0]);
+		if (selectedBay === 5) {
+			// In Any Bay mode, always try to add another if available
+			if (availableSlots.length > 0) {
+				addToBasket(availableSlots[0]);
+			}
+		} else {
+			// Toggle behavior for specific bay
+			if (slotInBasket) {
+				removeFromBasket(slotInBasket, {
+					onSuccess: () => {
+						showSnackbar('Removed from basket', 'info');
+					},
+				});
+			} else if (availableSlots.length > 0) {
+				addToBasket(availableSlots[0]);
+			}
 		}
 	};
 
+	const handleRemoveOne = () => {
+		if (slotsInBasket.length > 0) {
+			removeFromBasket(slotsInBasket[slotsInBasket.length - 1], {
+				onSuccess: () => {
+					showSnackbar('Removed from basket', 'info');
+				},
+			});
+		}
+	};
+
+	const displaySlot =
+		availableSlots.length > 0 ? availableSlots[0] : hourlySlots[0];
+	const slot = hourlySlots[0];
+
+	const [adminDialogOpen, setAdminDialogOpen] = useState(false);
+	const [selectedAdminSlot, setSelectedAdminSlot] =
+		useState<GroupedSlot | null>(null);
+
+	const handleAdminSlotClick = (slot: GroupedSlot) => {
+		setSelectedAdminSlot(slot);
+		setAdminDialogOpen(true);
+	};
+
+	const { originalPrice, discountedPrice, hasDiscount } = calculateSlotPrice(
+		slot.startTime,
+		user?.membershipTier,
+		user?.membershipStatus === 'ACTIVE',
+	);
+
+	const borderColor = isInBasket ? theme.palette.primary.main : 'divider';
+
 	return (
 		<>
-			<Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
-				<Card
-					elevation={1}
-					sx={{
-						p: { xs: 0, sm: 1 },
-						height: '100%',
-						display: 'flex',
-						flexDirection: 'column',
-						justifyContent: 'space-between',
-						borderRadius: 3,
-						transition: 'all 0.3s ease',
-						border: '1px solid transparent',
-						'&:hover': {
-							transform: 'translateY(-4px)',
-							boxShadow: `0 6px 12px rgba(0, 0, 0, 0.22)`,
-						},
+			{isMobile ? (
+				<MobileSlot
+					slot={displaySlot}
+					basketCount={basketCount}
+					availability={availability}
+					price={{
+						originalPrice,
+						discountedPrice,
+						hasDiscount,
 					}}
+					sx={{ borderColor }}
+					handleSlotClick={handleSlotClick}
+					handleRemoveOne={handleRemoveOne}
+				/>
+			) : isAdmin ? (
+				<DesktopSlot
+					slot={displaySlot}
+					basketCount={basketCount}
+					availability={availability}
+					price={{
+						originalPrice,
+						discountedPrice,
+						hasDiscount,
+					}}
+					sx={{ borderColor }}
 				>
-					<CardContent>
-						<Box
-							sx={{
-								display: 'flex',
-								justifyContent: 'space-between',
-								alignItems: 'flex-start',
-								mb: 1,
-							}}
-						>
-							<Typography variant="h6" sx={{ fontWeight: 800 }}>
-								{startTime} - {endTime}
-							</Typography>
-						</Box>
-
-						<Typography
-							variant="subtitle2"
-							gutterBottom
-							sx={{
-								fontWeight: 500,
-								color: 'text.secondary',
-								display: 'flex',
-								alignItems: 'center',
-								gap: 0.5,
-							}}
-						>
-							{dayjs(slot.startTime).format('dddd Do MMMM')}
-						</Typography>
-
-						{(() => {
-							const { originalPrice, discountedPrice, hasDiscount } =
-								calculateSlotPrice(
-									slot.startTime,
-									user?.membershipTier,
-									user?.membershipStatus === 'ACTIVE',
-								);
-							return (
-								<Box
-									sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}
-								>
-									{hasDiscount && (
-										<Typography
-											variant="body2"
-											sx={{
-												textDecoration: 'line-through',
-												color: 'text.secondary',
-												fontWeight: 500,
-											}}
-										>
-											£{originalPrice.toFixed(2)}
-										</Typography>
-									)}
-									<Typography
-										variant="h6"
-										color="primary"
-										sx={{ fontWeight: 700 }}
-									>
-										£{discountedPrice.toFixed(2)}
-									</Typography>
-								</Box>
-							);
-						})()}
-
-						<Chip
-							label={slotPassed ? 'Unavailable' : availabilityText}
-							color={slotPassed ? 'error' : availabilityColor}
-							size="small"
-							variant={slotPassed ? 'outlined' : 'filled'}
-							sx={{
-								mt: 2,
-								fontWeight: 600,
-								borderRadius: 1.5,
-							}}
-						/>
-					</CardContent>
-					{isAdmin ? (
-						<CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
-							{hourlySlots.map((slot) => (
-								<Box
-									component={Button}
-									key={slot.id}
-									variant="contained"
-									color="primary"
-									size="small"
-									sx={{
-										textTransform: 'none',
-										minWidth: '40px',
-										height: '30px',
-									}}
-									onClick={() => setAdminDialogOpen(true)}
-								>
-									Bay {slot.bayId}
-								</Box>
-							))}
-						</CardActions>
-					) : (
-						<CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-							<Button
-								variant="outlined"
-								disabled={slotPassed || availableSlots.length === 0}
-								color="primary"
-								size="small"
-								sx={{
-									textTransform: 'none',
-								}}
-								onClick={handleAddToBasket}
-							>
-								{availableSlots.length === 0 ? 'Sold Out' : 'Add to Basket'}
-							</Button>
-							<Button
-								variant="contained"
-								color="primary"
-								size="small"
-								disabled={slotPassed || availableSlots.length === 0}
-								sx={{
-									textTransform: 'none',
-								}}
-								onClick={() => {
-									handleAddToBasket();
-									navigate('/checkout');
-								}}
-							>
-								Checkout
-							</Button>
-						</CardActions>
-					)}
-				</Card>
-			</Grid>
-
-			{/* Admin booking dialog */}
-			<AdminBookingDialog
-				open={adminDialogOpen}
-				onClose={() => setAdminDialogOpen(false)}
-				slot={slot}
-				startTime={slot.startTime.format()}
-				endTime={slot.endTime.format()}
-			/>
+					<AdminSlotControls
+						hourlySlots={hourlySlots}
+						onAdminSlotClick={handleAdminSlotClick}
+					/>
+				</DesktopSlot>
+			) : (
+				<DesktopSlot
+					slot={displaySlot}
+					basketCount={basketCount}
+					availability={availability}
+					price={{
+						originalPrice,
+						discountedPrice,
+						hasDiscount,
+					}}
+					sx={{ borderColor }}
+				>
+					<UserSlotControls
+						slot={displaySlot}
+						selectedBay={selectedBay}
+						isInBasket={isInBasket}
+						basketCount={basketCount}
+						availability={availability}
+						handleSlotClick={handleSlotClick}
+						handleRemoveOne={handleRemoveOne}
+					/>
+				</DesktopSlot>
+			)}
+			{selectedAdminSlot && (
+				<AdminBookingDialog
+					open={adminDialogOpen}
+					onClose={() => {
+						setAdminDialogOpen(false);
+						setSelectedAdminSlot(null);
+					}}
+					slot={selectedAdminSlot}
+					startTime={dayjs(selectedAdminSlot.startTime).format()}
+					endTime={dayjs(selectedAdminSlot.endTime).format()}
+				/>
+			)}
 		</>
 	);
 };

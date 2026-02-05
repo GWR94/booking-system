@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Tiers from './Tiers';
 import { ThemeProvider } from '@context';
 import { useAuth } from '@hooks';
-import { useSnackbar } from '@context';
+import { useSnackbar, useUI } from '@context';
 import { createSubscriptionSession } from '@api';
 
 vi.mock('@hooks', () => ({
@@ -16,6 +16,7 @@ vi.mock('@context', async (importOriginal) => {
 	return {
 		...actual,
 		useSnackbar: vi.fn(),
+		useUI: vi.fn(),
 	};
 });
 
@@ -43,6 +44,7 @@ describe('Tiers', () => {
 		vi.clearAllMocks();
 		(useAuth as any).mockReturnValue({ isAuthenticated: true, user: null });
 		(useSnackbar as any).mockReturnValue({ showSnackbar: mockShowSnackbar });
+		(useUI as any).mockReturnValue({ openAuthModal: vi.fn() });
 	});
 
 	it('should render all three membership tiers', () => {
@@ -73,7 +75,9 @@ describe('Tiers', () => {
 		expect(screen.getByText(/£399.99\/month/i)).toBeInTheDocument();
 	});
 
-	it('should show warning if not authenticated', async () => {
+	it('should show warning and open auth modal if not authenticated', async () => {
+		const mockOpenAuthModal = vi.fn();
+		(useUI as any).mockReturnValue({ openAuthModal: mockOpenAuthModal });
 		(useAuth as any).mockReturnValue({ isAuthenticated: false, user: null });
 
 		render(
@@ -92,6 +96,7 @@ describe('Tiers', () => {
 				'You must be logged in to subscribe',
 				'warning',
 			);
+			expect(mockOpenAuthModal).toHaveBeenCalledWith('login');
 		});
 	});
 

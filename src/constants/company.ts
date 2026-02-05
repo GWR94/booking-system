@@ -2,6 +2,7 @@ export const COMPANY_INFO = {
 	name: 'The Short Grass',
 	email: 'theshortgrass@jamesgower.dev',
 	phone: '+44 7986 445123',
+	tagline: 'Play. Practice. Perform.',
 	address: 'Royal Star Arcade, High St, Maidstone ME14 1JL',
 	social: {
 		facebook: '#',

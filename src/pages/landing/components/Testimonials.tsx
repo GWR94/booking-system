@@ -1,8 +1,8 @@
+import { useRef } from 'react';
 import {
 	Box,
 	Container,
 	Typography,
-	Grid2 as Grid,
 	Card,
 	CardContent,
 	Avatar,
@@ -10,47 +10,36 @@ import {
 	useTheme,
 	alpha,
 	Stack,
-	Chip,
+	IconButton,
 	Divider,
 } from '@mui/material';
-import { FormatQuote, Verified } from '@mui/icons-material';
-import { AnimateIn } from '@ui';
+import {
+	FormatQuote,
+	Verified,
+	ArrowBack,
+	ArrowForward,
+} from '@mui/icons-material';
+import { SectionHeader } from '@ui';
+import testimonials from '@constants/testimonials';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-const testimonials = [
-	{
-		name: 'James Wilson',
-		position: 'Amateur Golfer',
-		handicap: '+2',
-		quote:
-			"The best simulator experience I've found in Kent. TrackMan technology has helped me identify and fix flaws in my swing that I never knew existed.",
-		avatar: 'https://randomuser.me/api/portraits/men/85.jpg?size=64',
-		stars: 5,
-		verified: true,
-	},
-	{
-		name: 'Sarah Mitchell',
-		position: 'Club Player',
-		handicap: '12',
-		quote:
-			'Perfect for practicing year-round regardless of weather. The data insights are incredible - my driving accuracy has improved dramatically in just a month.',
-		avatar: 'https://randomuser.me/api/portraits/women/54.jpg?size=64',
-		stars: 5,
-		verified: true,
-	},
-	{
-		name: 'Robert Johnson',
-		position: 'Golf Enthusiast',
-		handicap: '36',
-		quote:
-			'As a beginner, I was intimidated at first, but the staff are incredibly supportive. Playing virtual courses has helped me prepare for real games.',
-		avatar: 'https://randomuser.me/api/portraits/men/4.jpg?size=64',
-		stars: 4.5,
-		verified: true,
-	},
-];
+// Swiper styles override
+const swiperStyles = `
+  .swiper-pagination-bullet-active {
+    background-color: #1a1a1a !important;
+  }
+  .swiper-pagination-bullet {
+    background-color: #999;
+  }
+`;
 
 const Testimonials = () => {
 	const theme = useTheme();
+	const swiperRef = useRef<any>(null);
 
 	return (
 		<Box
@@ -59,168 +48,250 @@ const Testimonials = () => {
 				py: { xs: 8, md: 12 },
 				position: 'relative',
 				overflow: 'hidden',
-				background: `linear-gradient(to bottom, ${theme.palette.background.default} 0%, ${theme.palette.grey[200]} 100%)`,
+				background: `linear-gradient(to bottom, ${theme.palette.background.default} 0%, ${theme.palette.grey[100]} 100%)`,
 			}}
 		>
-			<Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-				<Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
-					<Typography variant="title" sx={{ mb: 4 }}>
-						What Our Customers Say
-					</Typography>
+			<style>{swiperStyles}</style>
+			<Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
+				<SectionHeader
+					subtitle="REVIEWS"
+					title="What Our Customers Say"
+					description="Join hundreds of satisfied golfers who've improved their game with our premium simulators"
+				/>
 
-					<Typography
-						variant="h6"
-						color="text.secondary"
-						sx={{
-							maxWidth: 700,
-							mx: 'auto',
-							fontWeight: 400,
-							mb: 2,
-						}}
-					>
-						Join hundreds of satisfied golfers who've improved their game with
-						our premium simulators
+				<Box
+					sx={{
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+						gap: 1,
+						mt: 3,
+						mb: 4,
+					}}
+				>
+					<Rating
+						value={4.8}
+						precision={0.1}
+						readOnly
+						sx={{ color: theme.palette.accent.main }}
+					/>
+					<Typography variant="body2" fontWeight={500} color="text.secondary">
+						4.8/5 from over 50 reviews
 					</Typography>
-
-					<Box
-						sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}
-					>
-						<Rating
-							value={4.8}
-							precision={0.1}
-							readOnly
-							sx={{ color: theme.palette.secondary.main }}
-						/>
-						<Typography variant="body2" fontWeight={500} color="text.secondary">
-							4.8/5 from over 200 reviews
-						</Typography>
-					</Box>
 				</Box>
 
-				<Grid container spacing={4} sx={{ mt: 4 }}>
-					{testimonials.map((testimonial, i) => (
-						<Grid size={{ xs: 12, md: 4 }} key={i}>
-							<AnimateIn delay={i * 0.1} style={{ height: '100%' }}>
-								<Card
-									sx={{
-										height: '100%',
-										display: 'flex',
-										flexDirection: 'column',
-										borderRadius: 3,
-										boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-										transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-										'&:hover': {
-											transform: 'translateY(-8px)',
-											boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
-										},
-										overflow: 'visible',
-										position: 'relative',
-									}}
-								>
-									<FormatQuote
-										sx={{
-											position: 'absolute',
-											color: alpha(theme.palette.primary.main, 0.1),
-											fontSize: '6rem',
-											top: -15,
-											left: -10,
-											transform: 'rotate(5deg)',
-										}}
-									/>
+				<Box sx={{ mx: 'auto', position: 'relative', mt: 4 }}>
+					<IconButton
+						onClick={() => swiperRef.current?.slidePrev()}
+						sx={{
+							position: 'absolute',
+							top: '180px',
+							left: -20,
+							zIndex: 10,
+							transform: 'translateY(-50%)',
+							bgcolor: 'background.paper',
+							boxShadow: 2,
+							width: 48,
+							height: 48,
+							display: { xs: 'none', lg: 'flex' },
+							'&:hover': { bgcolor: 'background.paper', boxShadow: 4 },
+						}}
+					>
+						<ArrowBack />
+					</IconButton>
+					<IconButton
+						onClick={() => swiperRef.current?.slideNext()}
+						sx={{
+							position: 'absolute',
+							top: '180px',
+							right: -20,
+							zIndex: 10,
+							transform: 'translateY(-50%)',
+							bgcolor: 'background.paper',
+							boxShadow: 2,
+							width: 48,
+							height: 48,
+							display: { xs: 'none', lg: 'flex' },
+							'&:hover': { bgcolor: 'background.paper', boxShadow: 4 },
+						}}
+					>
+						<ArrowForward />
+					</IconButton>
 
-									<CardContent
+					<Box
+						sx={{ position: 'relative', minHeight: 450, px: { xs: 0, lg: 4 } }}
+					>
+						<Swiper
+							modules={[Autoplay, Navigation, Pagination]}
+							spaceBetween={30}
+							slidesPerView={1}
+							loop={true}
+							autoplay={{
+								delay: 6000,
+								disableOnInteraction: false,
+							}}
+							pagination={{
+								clickable: true,
+								dynamicBullets: true,
+							}}
+							onBeforeInit={(swiper) => {
+								swiperRef.current = swiper;
+							}}
+							breakpoints={{
+								600: {
+									slidesPerView: 1,
+								},
+								900: {
+									slidesPerView: 2,
+								},
+								1050: {
+									slidesPerView: 3,
+								},
+								1200: {
+									slidesPerView: 4,
+								},
+							}}
+							style={{
+								paddingBottom: '50px',
+								paddingLeft: '4px',
+								paddingRight: '4px',
+							}}
+						>
+							{testimonials.map((testimonial, index) => (
+								<SwiperSlide key={index} style={{ height: 'auto' }}>
+									<Card
 										sx={{
-											flex: 1,
+											borderRadius: 4,
+											height: '300px',
 											display: 'flex',
 											flexDirection: 'column',
-											p: 3,
-											zIndex: 2,
+											boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+											position: 'relative',
+											overflow: 'hidden',
+											p: { xs: 2, md: 4 },
+											bgcolor: 'background.paper',
+											border: `1px solid ${theme.palette.divider}`,
 										}}
 									>
-										<Box sx={{ mb: 3 }}>
-											<Rating
-												value={testimonial.stars}
-												readOnly
-												precision={0.5}
-												size="small"
-												sx={{ color: theme.palette.secondary.main }}
-											/>
-										</Box>
-
-										<Typography
-											variant="body1"
-											color="text.primary"
+										<FormatQuote
 											sx={{
-												fontStyle: 'italic',
-												mb: 3,
-												fontWeight: 400,
-												lineHeight: 1.6,
-												minHeight: 120,
+												position: 'absolute',
+												color: alpha(theme.palette.secondary.main, 0.1),
+												fontSize: '8rem',
+												top: -20,
+												right: -10,
+												transform: 'rotate(10deg)',
+												zIndex: 0,
+											}}
+										/>
+										<CardContent
+											sx={{
 												position: 'relative',
-												zIndex: 5,
+												zIndex: 1,
+												display: 'flex',
+												flexDirection: 'column',
+												height: '100%',
 											}}
 										>
-											"{testimonial.quote}"
-										</Typography>
-
-										<Divider sx={{ mb: 3 }} />
-
-										<Stack direction="row" spacing={2} alignItems="center">
-											<Avatar
-												src={testimonial.avatar}
-												sx={{
-													width: 56,
-													height: 56,
-													border: `2px solid ${alpha(
-														theme.palette.primary.main,
-														0.2,
-													)}`,
-												}}
-											/>
-
 											<Box
 												sx={{
-													flex: 1,
+													flexGrow: 1,
+													textAlign: 'center',
+													mb: 2,
+													display: 'flex',
+													flexDirection: 'column',
+													alignItems: 'center',
+													justifyContent: 'center',
 												}}
 											>
-												<Box
+												<Typography
+													variant="body1"
 													sx={{
+														fontStyle: 'italic',
+														fontWeight: 400,
+														lineHeight: 1.6,
+														mb: 2,
+														height: 150,
 														display: 'flex',
 														alignItems: 'center',
-														mb: 0.5,
+														justifyContent: 'center',
+														color: 'text.secondary',
+														fontSize: { xs: '0.95rem', md: '1rem' },
+														overflow: 'hidden',
+														WebkitLineClamp: 6,
+														WebkitBoxOrient: 'vertical',
 													}}
 												>
-													<Typography variant="subtitle1" fontWeight={600}>
-														{testimonial.name}
-													</Typography>
-													{testimonial.verified && (
-														<Verified
-															sx={{
-																ml: 1,
-																fontSize: '1rem',
-																color: theme.palette.secondary.main,
-															}}
-														/>
-													)}
-												</Box>
-
-												<Typography
-													variant="caption"
-													color="text.secondary"
-													textAlign="center"
-													sx={{ display: 'block' }}
-												>
-													{testimonial.position} • {testimonial.handicap}{' '}
-													Handicap
+													"{testimonial.quote}"
 												</Typography>
+												<Rating
+													value={testimonial.stars}
+													readOnly
+													precision={0.5}
+													sx={{ color: theme.palette.accent.main }}
+												/>
 											</Box>
-										</Stack>
-									</CardContent>
-								</Card>
-							</AnimateIn>
-						</Grid>
-					))}
-				</Grid>
+
+											<Divider sx={{ mb: 2, mt: 'auto' }} />
+
+											<Stack
+												direction="row"
+												spacing={2}
+												alignItems="center"
+												justifyContent="center"
+												sx={{ minHeight: 60 }}
+											>
+												<Avatar
+													src={testimonial.avatar}
+													sx={{ width: 56, height: 56 }}
+												/>
+												<Box textAlign="left">
+													<Typography
+														variant="subtitle1"
+														fontWeight={700}
+														noWrap
+													>
+														{testimonial.name}
+														{testimonial.verified && (
+															<Verified
+																sx={{
+																	ml: 0.5,
+																	fontSize: '1rem',
+																	color: theme.palette.primary.main,
+																	verticalAlign: 'middle',
+																}}
+															/>
+														)}
+													</Typography>
+													<Typography
+														variant="body2"
+														color="text.secondary"
+														noWrap
+													>
+														{testimonial.position} •
+														<Typography
+															variant="body2"
+															component="span"
+															color={theme.palette.grey[500]}
+															sx={{
+																mt: 0.5,
+																fontWeight: 500,
+																fontSize: '0.8rem',
+															}}
+														>
+															{' '}
+															{testimonial.handicap} Handicap
+														</Typography>
+													</Typography>
+												</Box>
+											</Stack>
+										</CardContent>
+									</Card>
+								</SwiperSlide>
+							))}
+						</Swiper>
+					</Box>
+				</Box>
 			</Container>
 		</Box>
 	);

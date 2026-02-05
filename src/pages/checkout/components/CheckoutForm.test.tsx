@@ -9,12 +9,24 @@ import createWrapper from '@utils/test-utils';
 import { ThemeProvider, createTheme } from '@mui/material';
 
 vi.mock('@hooks', () => ({
-	useAuth: vi.fn(() => ({
-		user: null,
-		isAdmin: false,
-		isAuthenticated: false,
-	})),
+	useAuth: vi.fn(),
 	useBasket: vi.fn(),
+	useBookingManager: vi.fn(() => ({ setBooking: vi.fn() })),
+}));
+
+vi.mock('@context', () => ({
+	useSnackbar: vi.fn(() => ({ showSnackbar: vi.fn() })),
+	ThemeProvider: ({ children }: any) => <div>{children}</div>,
+}));
+
+vi.mock('@mui/icons-material', () => ({
+	Lock: () => <div data-testid="LockIcon" />,
+}));
+
+vi.mock('@ui', () => ({
+	AnimateIn: ({ children }: { children: React.ReactNode }) => (
+		<div data-testid="animate-in">{children}</div>
+	),
 }));
 
 vi.mock('@stripe/react-stripe-js', () => ({
@@ -82,10 +94,11 @@ describe('CheckoutForm', () => {
 			basket: mockBasket,
 			basketPrice: '45.00',
 			removeFromBasket: vi.fn(),
+			clearBasket: vi.fn(),
 		});
 	});
 
-	it('should render basic structure', () => {
+	it('should render basic structure', async () => {
 		render(
 			<ThemeProvider theme={theme}>
 				<CheckoutForm guest={null} />
@@ -93,33 +106,16 @@ describe('CheckoutForm', () => {
 			{ wrapper: createWrapper() },
 		);
 
+		expect(screen.getByText(/Order Summary/i)).toBeInTheDocument();
+		expect(screen.getByText(/Subtotal/i)).toBeInTheDocument();
+		expect(screen.getByText(/VAT/i)).toBeInTheDocument();
+		// Button also contains the total
 		expect(
-			screen.getByRole('heading', { level: 4, name: /Checkout/i }),
+			screen.getByRole('button', { name: /Pay £45/i }),
 		).toBeInTheDocument();
-		// Use specific regex to avoid matching "Subtotal"
-		expect(screen.getByText(/^Total:/i)).toBeInTheDocument();
 		expect(screen.getByTestId('mock-checkout-item')).toBeInTheDocument();
 		expect(screen.getByTestId('mock-payment-notice')).toBeInTheDocument();
 		expect(screen.getByTestId('payment-element')).toBeInTheDocument();
-	});
-
-	it('should redirect if basket is empty', async () => {
-		(useBasket as any).mockReturnValue({
-			basket: [],
-			basketPrice: '0.00',
-			removeFromBasket: vi.fn(),
-		});
-
-		render(
-			<ThemeProvider theme={theme}>
-				<CheckoutForm guest={null} />
-			</ThemeProvider>,
-			{ wrapper: createWrapper() },
-		);
-
-		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith('/basket');
-		});
 	});
 
 	it('should handle successful payment submission', async () => {
@@ -131,7 +127,7 @@ describe('CheckoutForm', () => {
 			{ wrapper: createWrapper() },
 		);
 
-		const payButton = screen.getByRole('button', { name: /with Stripe/i });
+		const payButton = screen.getByRole('button', { name: /Pay/i });
 		fireEvent.submit(payButton.closest('form')!);
 
 		await waitFor(() => {
@@ -150,18 +146,17 @@ describe('CheckoutForm', () => {
 			{ wrapper: createWrapper() },
 		);
 
-		const payButton = screen.getByRole('button', { name: /with Stripe/i });
+		const payButton = screen.getByRole('button', { name: /Pay/i });
 		fireEvent.submit(payButton.closest('form')!);
 
 		expect(await screen.findByText('Insufficient funds')).toBeInTheDocument();
 	});
 
 	it('should handle free booking submission', async () => {
-		(confirmFreeBooking as any).mockResolvedValue({ success: true });
-		// Mock window.location
-		const originalLocation = window.location;
-		delete (window as any).location;
-		(window as any).location = { href: '' };
+		(confirmFreeBooking as any).mockResolvedValue({
+			success: true,
+			booking: { id: 'booking1' },
+		});
 
 		render(
 			<ThemeProvider theme={theme}>
@@ -170,15 +165,15 @@ describe('CheckoutForm', () => {
 			{ wrapper: createWrapper() },
 		);
 
-		const payButton = screen.getByRole('button', { name: /with Stripe/i });
+		const payButton = screen.getByRole('button', { name: /Pay/i });
 		fireEvent.submit(payButton.closest('form')!);
 
 		await waitFor(() => {
 			expect(confirmFreeBooking).toHaveBeenCalled();
-			expect((window as any).location.href).toContain('/checkout/complete');
+			expect(mockNavigate).toHaveBeenCalledWith(
+				'/checkout/complete?success=true',
+			);
 		});
-
-		(window as any).location = originalLocation;
 	});
 
 	it('should show membership warning for PAR tier on weekends', async () => {

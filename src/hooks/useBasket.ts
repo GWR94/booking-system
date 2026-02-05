@@ -23,7 +23,7 @@ export function useBasket() {
 			const updatedBasket = basketData.filter((item) =>
 				dayjs(item.startTime).isAfter(dayjs()),
 			);
-			if (updatedBasket.length !== basket.length) {
+			if (updatedBasket.length !== basketData.length) {
 				showSnackbar(
 					'Basket contains slots which have passed. Removing the slot.',
 					'warning',
@@ -34,7 +34,7 @@ export function useBasket() {
 		};
 
 		fetchBasket();
-	}, [queryClient]);
+	}, [basket, queryClient, showSnackbar]);
 
 	const addToBasketMutation = useMutation({
 		mutationFn: (slot: GroupedSlot) => {
@@ -46,9 +46,12 @@ export function useBasket() {
 			}
 			return Promise.resolve(saveBasket([...basket, slot]));
 		},
-		onSuccess: () => {
+		onSuccess: (_, { startTime, endTime, bayId }) => {
 			queryClient.invalidateQueries({ queryKey: ['basket'] });
-			showSnackbar('Added to basket', 'success');
+			showSnackbar(
+				`Bay ${bayId} • ${startTime.format('h:mma')} - ${endTime.format('h:mma')} added to basket`,
+				'success',
+			);
 		},
 		onError: (error: Error) => {
 			showSnackbar(error.message, 'error');

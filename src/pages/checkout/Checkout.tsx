@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Container, useTheme } from '@mui/material';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
@@ -9,16 +9,19 @@ import {
 	CheckoutForm,
 	GuestUser,
 	GuestInfo,
+	CheckoutSkeleton,
 } from './components';
-import { useBasket, useAuth } from '@hooks';
+import { useBasket, useAuth, useBookingManager } from '@hooks';
 import { useSnackbar } from '@context';
-import { LoadingSpinner } from '@ui';
+import { LoadingSpinner, SectionHeader, AnimateIn } from '@ui';
+import { useNavigate } from 'react-router-dom';
 
 const stripe = loadStripe(
 	import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string,
 );
 
 const Checkout = () => {
+	const navigate = useNavigate();
 	const location = useLocation();
 	const queryParams = new URLSearchParams(location.search);
 	const paymentIntentClientSecret = queryParams.get(
@@ -35,8 +38,36 @@ const Checkout = () => {
 	const { showSnackbar } = useSnackbar();
 	const { basket } = useBasket();
 	const { isAuthenticated } = useAuth();
+	const theme = useTheme();
+	const { booking } = useBookingManager();
 
 	const [isFreeBooking, setIsFreeBooking] = useState(false);
+
+	useEffect(() => {
+		// Only redirect if:
+		// 1. Basket is empty
+		// 2. We're NOT on the /complete page
+		// 3. We're NOT returning from a payment (no client secret)
+		// 4. We don't have a fresh booking already (free flow return)
+		const isReturningFromStripe = !!paymentIntentClientSecret;
+		const isOnCompletePage = location.pathname.includes('/complete');
+		const hasJustFinishedFreeBooking = queryParams.get('success') === 'true';
+
+		if (
+			basket.length === 0 &&
+			!isOnCompletePage &&
+			!isReturningFromStripe &&
+			!hasJustFinishedFreeBooking
+		) {
+			navigate('/book');
+		}
+	}, [
+		basket.length,
+		location.pathname,
+		paymentIntentClientSecret,
+		navigate,
+		queryParams,
+	]);
 
 	useEffect(() => {
 		if (paymentIntentClientSecret) return;
@@ -73,6 +104,10 @@ const Checkout = () => {
 
 	const appearance: Appearance = {
 		theme: 'stripe',
+		variables: {
+			colorPrimary: theme.palette.primary.main,
+			colorText: theme.palette.text.primary,
+		},
 	};
 
 	const handleSubmitGuest = async (
@@ -104,32 +139,30 @@ const Checkout = () => {
 
 	const loader = 'auto';
 
-	if (!isAuthenticated && !guestInfo && !paymentIntentClientSecret) {
-		return (
-			<Box maxWidth="md" sx={{ p: 3, my: 3, mx: 'auto' }}>
-				<GuestInfo onSubmit={handleSubmitGuest} />
-			</Box>
-		);
-	}
+	const renderContent = () => {
+		if (isLoading) {
+			return <CheckoutSkeleton />;
+		}
 
-	if (isLoading) return <LoadingSpinner />;
+		if (!isAuthenticated && !guestInfo && !paymentIntentClientSecret) {
+			return <GuestInfo onSubmit={handleSubmitGuest} />;
+		}
 
-	if (isFreeBooking) {
-		return (
-			<Box maxWidth="lg" sx={{ p: 3, my: 3, mx: 'auto' }}>
+		if (isFreeBooking) {
+			return (
 				<CheckoutForm
 					guest={guestInfo}
 					recaptchaToken={recaptchaToken}
 					isFree={true}
 				/>
-			</Box>
-		);
-	}
+			);
+		}
 
-	if (!clientSecret) return <LoadingSpinner />;
+		if (!clientSecret) {
+			return <CheckoutSkeleton />;
+		}
 
-	return (
-		<Box maxWidth="lg" sx={{ p: 3, my: 3, mx: 'auto' }}>
+		return (
 			<Elements options={{ clientSecret, appearance, loader }} stripe={stripe}>
 				<Routes>
 					<Route
@@ -141,6 +174,35 @@ const Checkout = () => {
 					<Route path="/complete" element={<CompleteBooking />} />
 				</Routes>
 			</Elements>
+		);
+	};
+
+	// Don't show header on success page, let CompleteBooking handle it
+	const isCompletePage = location.pathname.includes('/complete');
+
+	return (
+		<Box
+			sx={{
+				minHeight: '100vh',
+				bgcolor: 'grey.50',
+				pt: { xs: 4, md: 8 },
+				pb: { xs: 8, md: 12 },
+			}}
+		>
+			<Container maxWidth="lg">
+				{!isCompletePage && (
+					<SectionHeader
+						title="Review & Pay"
+						subtitle="CHECKOUT"
+						description="Review your booking details and securely complete your payment."
+					/>
+				)}
+				<AnimateIn>
+					<Box maxWidth="lg" sx={{ mx: 'auto' }}>
+						{renderContent()}
+					</Box>
+				</AnimateIn>
+			</Container>
 		</Box>
 	);
 };

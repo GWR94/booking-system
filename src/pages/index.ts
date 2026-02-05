@@ -5,8 +5,6 @@ export { default as AdminUsers } from './admin/AdminUsers';
 export { default as Overview } from './profile/Overview';
 export { default as MyBookings } from './profile/MyBookings';
 export { default as Settings } from './profile/Settings';
-export { default as Login } from './auth/Login';
-export { default as RegisterUser } from './auth/RegisterUser';
 export { default as ResetPassword } from './auth/ResetPassword';
 export { default as About } from './about/About';
 export { default as Terms } from './legal/Terms';

@@ -9,7 +9,7 @@ const AdminRoute: React.FC = () => {
 	const { showSnackbar } = useSnackbar();
 
 	useEffect(() => {
-		if (!isLoading && (!isAuthenticated || !isAdmin)) {
+		if (!isLoading && isAuthenticated && !isAdmin) {
 			showSnackbar('You must be an admin to view this page', 'error');
 		}
 	}, [isLoading, isAuthenticated, isAdmin, showSnackbar]);

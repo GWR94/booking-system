@@ -19,6 +19,8 @@ import {
 import { ExpandMore, Cookie } from '@mui/icons-material';
 import { useCookie } from '@context';
 import { useSnackbar } from '@context';
+import { COMPANY_INFO } from '@constants/company';
+
 const CookiesPolicy: React.FC = () => {
 	const theme = useTheme();
 	const { preferences, savePreferences, acceptAll, rejectAll } = useCookie();
@@ -506,17 +508,13 @@ const CookiesPolicy: React.FC = () => {
 						at:
 					</Typography>
 					<Typography variant="body1">
-						The Short Grass
+						{COMPANY_INFO.name}
 						<br />
-						123 Golf Lane
+						{COMPANY_INFO.address}
 						<br />
-						London, SW1 2AB
+						{COMPANY_INFO.email}
 						<br />
-						United Kingdom
-						<br />
-						golf@jamesgower.dev
-						<br />
-						+44 (0) 123 456 7890
+						{COMPANY_INFO.phone}
 					</Typography>
 				</Box>
 			</Paper>

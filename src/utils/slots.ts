@@ -77,3 +77,60 @@ export const getGroupedTimeSlots = (
 	});
 	return groupedSlots;
 };
+
+export const groupSlotsByBay = (slots: iSlot[]): GroupedSlot[] => {
+	if (!slots || slots.length === 0) return [];
+
+	const grouped: GroupedSlot[] = [];
+	const sortedSlots = [...slots].sort(
+		(a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf(),
+	);
+
+	const bayGroups: { [key: number]: iSlot[] } = {};
+	sortedSlots.forEach((slot) => {
+		if (!bayGroups[slot.bayId]) {
+			bayGroups[slot.bayId] = [];
+		}
+		bayGroups[slot.bayId].push(slot);
+	});
+
+	Object.values(bayGroups).forEach((baySlots) => {
+		let currentGroup: iSlot[] = [];
+
+		baySlots.forEach((slot, index) => {
+			if (index === 0) {
+				currentGroup = [slot];
+			} else {
+				const prevSlot = baySlots[index - 1];
+				const isConsecutive = dayjs(slot.startTime).isSame(
+					dayjs(prevSlot.endTime).add(5, 'minutes'),
+				);
+
+				if (isConsecutive) {
+					currentGroup.push(slot);
+				} else {
+					grouped.push({
+						id: currentGroup[0].id,
+						startTime: dayjs(currentGroup[0].startTime),
+						endTime: dayjs(currentGroup[currentGroup.length - 1].endTime),
+						bayId: currentGroup[0].bayId,
+						slotIds: currentGroup.map((s) => s.id),
+					});
+					currentGroup = [slot];
+				}
+			}
+
+			if (index === baySlots.length - 1) {
+				grouped.push({
+					id: currentGroup[0].id,
+					startTime: dayjs(currentGroup[0].startTime),
+					endTime: dayjs(currentGroup[currentGroup.length - 1].endTime),
+					bayId: currentGroup[0].bayId,
+					slotIds: currentGroup.map((s) => s.id),
+				});
+			}
+		});
+	});
+
+	return grouped;
+};

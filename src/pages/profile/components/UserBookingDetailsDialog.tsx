@@ -25,7 +25,7 @@ type UserBookingDetailsDialogProps = {
 	booking: any;
 	open: boolean;
 	onClose: () => void;
-	onCancelBooking: () => void;
+	onCancelBooking: (id: number) => void;
 	getStatusColor: (
 		status: string,
 	) => 'success' | 'warning' | 'error' | 'default';
@@ -162,7 +162,7 @@ const UserBookingDetailsDialog = ({
 										</Typography>
 									</Box>
 									<Chip
-										label={slot.bay?.name || `Bay ${slot.bayId}`}
+										label={`Bay ${slot.bayId}`}
 										size="small"
 										variant="outlined"
 										sx={{ fontWeight: 600 }}
@@ -179,7 +179,7 @@ const UserBookingDetailsDialog = ({
 						variant="outlined"
 						color="error"
 						startIcon={<CancelIcon />}
-						onClick={onCancelBooking}
+						onClick={() => onCancelBooking(booking.id)}
 					>
 						Cancel Booking
 					</Button>

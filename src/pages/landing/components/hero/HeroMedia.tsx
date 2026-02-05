@@ -1,10 +1,14 @@
-import { Box } from '@mui/material';
-import TestimonialCarousel from '../TestimonialCarousel';
+import { Box, SxProps, Theme } from '@mui/material';
+
 import { AnimateIn } from '@ui';
 
-const HeroMedia = () => {
+interface HeroMediaProps {
+	sx?: SxProps<Theme>;
+}
+
+const HeroMedia = ({ sx }: HeroMediaProps) => {
 	return (
-		<Box sx={{ display: { xs: 'none', md: 'block' } }}>
+		<Box sx={{ display: { xs: 'none', md: 'block' }, ...sx }}>
 			<AnimateIn delay={0.2} type="fade-left">
 				<Box sx={{ position: 'relative', perspective: '1000px' }}>
 					<Box
@@ -30,18 +34,9 @@ const HeroMedia = () => {
 							position: 'relative',
 							zIndex: 1,
 							display: 'block',
+							objectFit: 'cover',
 						}}
 					/>
-					<Box
-						sx={{
-							position: 'relative',
-							zIndex: 2,
-							mx: { md: 4 },
-							mt: { xs: -4, md: 0 },
-						}}
-					>
-						<TestimonialCarousel />
-					</Box>
 				</Box>
 			</AnimateIn>
 		</Box>

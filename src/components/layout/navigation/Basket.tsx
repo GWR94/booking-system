@@ -63,7 +63,7 @@ const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 					},
 				}}
 			>
-				<Badge badgeContent={basket.length} color="secondary">
+				<Badge badgeContent={basket.length} color="accent">
 					<ShoppingCart />
 				</Badge>
 			</IconButton>
@@ -88,7 +88,6 @@ const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 					vertical: 'top',
 					horizontal: 'right',
 				}}
-				disableScrollLock={true}
 				TransitionProps={{ timeout: 0 }}
 				sx={{ zIndex: theme.zIndex.modal + 1 }}
 				slotProps={{

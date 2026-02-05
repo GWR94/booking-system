@@ -1,5 +1,5 @@
 import { TestPaymentNotice } from '@pages/checkout/components';
-import { useSnackbar } from '@context';
+import { useSnackbar, useUI } from '@context';
 import { useAuth } from '@hooks';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -57,6 +57,7 @@ const membershipTiers = [
 const Tiers = () => {
 	const theme = useTheme();
 	const { showSnackbar } = useSnackbar();
+	const { openAuthModal } = useUI();
 	const [loadingTier, setLoadingTier] = useState<string | null>(null);
 	const { isAuthenticated, user } = useAuth();
 	const navigate = useNavigate();
@@ -64,7 +65,7 @@ const Tiers = () => {
 	const handleSubscribe = async (tierName: string) => {
 		if (!isAuthenticated) {
 			showSnackbar('You must be logged in to subscribe', 'warning');
-			navigate('/login');
+			openAuthModal('login');
 			return;
 		}
 		try {

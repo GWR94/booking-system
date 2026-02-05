@@ -2,37 +2,24 @@ import React from 'react';
 import { Box, Container, Typography, Paper, useTheme } from '@mui/material';
 import { ContactForm } from '@shared';
 import { COMPANY_INFO } from '@constants/company';
+import { SEO } from '@layout';
+import { SectionHeader } from '@ui';
 
 const Contact: React.FC = () => {
 	const theme = useTheme();
 
 	return (
 		<Box sx={{ py: 4 }}>
-			<Container maxWidth="xl">
-				<Typography
-					variant="h3"
-					component="h1"
-					align="center"
-					gutterBottom
-					sx={{
-						color: theme.palette.primary.main,
-						fontWeight: 600,
-						mb: 2,
-					}}
-				>
-					Contact Us
-				</Typography>
-
-				<Typography
-					variant="h6"
-					component="h2"
-					align="center"
-					color="text.secondary"
-					sx={{ maxWidth: 700, mx: 'auto', mb: 6 }}
-				>
-					We're here to help with any questions you might have about our golf
-					simulator facilities
-				</Typography>
+			<SEO
+				title="Contact Us"
+				description={`Get in touch with ${COMPANY_INFO.name}. Located in Maidstone, we offer premium golf simulation experiences.`}
+			/>
+			<Container maxWidth="xl" sx={{ px: { xs: 0, sm: 0, md: 3 } }}>
+				<SectionHeader
+					subtitle="GET IN TOUCH"
+					title="Contact Us"
+					description="We're here to help with any questions you might have about our golf simulator facilities"
+				/>
 
 				<ContactForm />
 
@@ -87,7 +74,7 @@ const Contact: React.FC = () => {
 									Getting Here
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
-									Located just 5 minutes from Central Station
+									Located in the heart of Maidstone Town Centre
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
 									Free parking available for all customers
@@ -102,7 +89,7 @@ const Contact: React.FC = () => {
 									Bus Routes: 14, 36, 42
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
-									Underground: Central Line to Green Park
+									Train: Maidstone East or Maidstone West
 								</Typography>
 							</Box>
 						</Box>

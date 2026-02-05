@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import BasketContent from './BasketContent';
 import createWrapper from '@utils/test-utils';
 import { useBasket, useAuth } from '@hooks';
-import { ThemeProvider } from '@context';
+import { useUI, ThemeProvider } from '@context';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -18,6 +18,11 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('@hooks', () => ({
 	useBasket: vi.fn(),
 	useAuth: vi.fn(),
+}));
+
+vi.mock('@context', () => ({
+	useUI: vi.fn(),
+	ThemeProvider: ({ children }: any) => <div>{children}</div>,
 }));
 
 vi.mock('./EmptyBasket', () => ({
@@ -42,6 +47,8 @@ describe('BasketContent', () => {
 	});
 
 	it('should render empty state when basket is empty', () => {
+		const mockOpenAuthModal = vi.fn();
+		(useUI as any).mockReturnValue({ openAuthModal: mockOpenAuthModal });
 		render(
 			<ThemeProvider>
 				<BasketContent isMobile={false} />
@@ -109,7 +116,9 @@ describe('BasketContent', () => {
 		expect(mockNavigate).toHaveBeenCalledWith('/checkout');
 	});
 
-	it('should navigate to login when Continue button is clicked (unauthenticated)', () => {
+	it('should open auth modal when Continue button is clicked (unauthenticated)', () => {
+		const mockOpenAuthModal = vi.fn();
+		(useUI as any).mockReturnValue({ openAuthModal: mockOpenAuthModal });
 		(useAuth as any).mockReturnValue({ isAuthenticated: false });
 		(useBasket as any).mockReturnValue({
 			basket: [{ id: '1' }],
@@ -125,7 +134,7 @@ describe('BasketContent', () => {
 		);
 
 		fireEvent.click(screen.getByText(/Sign in and Checkout/i));
-		expect(mockNavigate).toHaveBeenCalledWith('/login');
+		expect(mockOpenAuthModal).toHaveBeenCalledWith('login');
 	});
 
 	it('should navigate to guest checkout when Guest Checkout button is clicked', () => {

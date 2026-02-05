@@ -119,7 +119,11 @@ const Footer: React.FC = () => {
 						<Typography
 							variant="h6"
 							gutterBottom
-							sx={{ fontWeight: 'bold', color: theme.palette.secondary.light }}
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.secondary.light,
+								opacity: 0.9,
+							}}
 						>
 							Links
 						</Typography>
@@ -129,7 +133,7 @@ const Footer: React.FC = () => {
 								to="/"
 								color="inherit"
 								underline="hover"
-								sx={{ mb: 1 }}
+								sx={{ mb: 1, opacity: 0.85, '&:hover': { opacity: 1 } }}
 							>
 								Home
 							</Link>
@@ -176,6 +180,7 @@ const Footer: React.FC = () => {
 								to="/terms"
 								color="inherit"
 								underline="hover"
+								sx={{ opacity: 0.85, '&:hover': { opacity: 1 } }}
 							>
 								Terms & Conditions
 							</Link>
@@ -214,15 +219,25 @@ const Footer: React.FC = () => {
 							Contact Us
 						</Typography>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-							<LocationOn sx={{ mr: 1, color: theme.palette.error.light }} />
-							<Typography variant="body2">{COMPANY_INFO.address}</Typography>
+							<LocationOn
+								sx={{ mr: 1, color: theme.palette.error.light, opacity: 0.85 }}
+							/>
+							<Typography variant="body2" sx={{ opacity: 0.85 }}>
+								{COMPANY_INFO.address}
+							</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-							<Phone sx={{ mr: 1, color: theme.palette.error.main }} />
-							<Typography variant="body2">{COMPANY_INFO.phone}</Typography>
+							<Phone
+								sx={{ mr: 1, color: theme.palette.error.main, opacity: 0.85 }}
+							/>
+							<Typography variant="body2" sx={{ opacity: 0.85 }}>
+								{COMPANY_INFO.phone}
+							</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Email sx={{ mr: 1, color: theme.palette.error.dark }} />
+							<Email
+								sx={{ mr: 1, color: theme.palette.error.dark, opacity: 0.85 }}
+							/>
 							<Typography variant="body2">
 								<Box
 									component="a"
@@ -230,8 +245,10 @@ const Footer: React.FC = () => {
 									sx={{
 										color: '#fff',
 										textDecoration: 'none',
+										opacity: 0.85,
 										'&:hover': {
 											textDecoration: 'underline',
+											opacity: 1,
 										},
 									}}
 								>

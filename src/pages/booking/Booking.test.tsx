@@ -22,6 +22,11 @@ vi.mock('@ui', () => ({
 	LoadingSpinner: ({ sx }: any) => (
 		<div data-testid="loading-spinner">Loading...</div>
 	),
+	SectionHeader: ({ title, subtitle }: any) => (
+		<div data-testid="section-header">
+			{title} {subtitle}
+		</div>
+	),
 }));
 
 describe('Booking Page', () => {

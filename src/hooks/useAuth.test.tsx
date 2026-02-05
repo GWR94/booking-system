@@ -18,31 +18,25 @@ describe('useAuth', () => {
 	});
 
 	it('should initialize with no user', async () => {
-		// Arrange
 		(verifyUser as any).mockResolvedValue(null);
 
-		// Act
 		const { result } = renderHook(() => useAuth(), {
 			wrapper: createWrapper(),
 		});
 
-		// Assert
 		await waitFor(() => expect(result.current.isLoading).toBe(false));
 		expect(result.current.user).toBeNull();
 		expect(result.current.isAuthenticated).toBe(false);
 	});
 
 	it('should initialize with authenticated user', async () => {
-		// Arrange
 		const mockUser = { id: 1, name: 'Test User', role: 'user' };
 		(verifyUser as any).mockResolvedValue(mockUser);
 
-		// Act
 		const { result } = renderHook(() => useAuth(), {
 			wrapper: createWrapper(),
 		});
 
-		// Assert
 		await waitFor(() => {
 			expect(verifyUser).toHaveBeenCalled();
 			if (result.current.isLoading) throw new Error('Still loading');
@@ -53,7 +47,6 @@ describe('useAuth', () => {
 	});
 
 	it('should login successfully', async () => {
-		// Arrange
 		const mockUser = { id: 1, name: 'Test User', role: 'user' };
 		(verifyUser as any).mockResolvedValue(null);
 		(loginUser as any).mockResolvedValue(mockUser);
@@ -63,7 +56,6 @@ describe('useAuth', () => {
 		});
 		await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-		// Act
 		await act(async () => {
 			await result.current.login({
 				email: 'test@test.com',
@@ -71,7 +63,6 @@ describe('useAuth', () => {
 			} as any);
 		});
 
-		// Assert
 		expect(loginUser).toHaveBeenCalledWith({
 			email: 'test@test.com',
 			password: 'password',
@@ -81,7 +72,6 @@ describe('useAuth', () => {
 	});
 
 	it('should logout successfully', async () => {
-		// Arrange
 		(verifyUser as any).mockResolvedValue({ id: 1 });
 		(logoutUser as any).mockResolvedValue({});
 
@@ -90,26 +80,21 @@ describe('useAuth', () => {
 		});
 		await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-		// Act
 		await act(async () => {
 			await result.current.logout();
 		});
 
-		// Assert
 		expect(logoutUser).toHaveBeenCalled();
 	});
 
 	it('should identify admin user correctly', async () => {
-		// Arrange
 		const adminUser = { id: 1, name: 'Admin User', role: 'admin' };
 		(verifyUser as any).mockResolvedValue(adminUser);
 
-		// Act
 		const { result } = renderHook(() => useAuth(), {
 			wrapper: createWrapper(),
 		});
 
-		// Assert
 		await waitFor(() => {
 			expect(result.current.isLoading).toBe(false);
 			expect(result.current.user).toEqual(adminUser);
@@ -119,7 +104,6 @@ describe('useAuth', () => {
 	});
 
 	it('should handle login error', async () => {
-		// Arrange
 		(verifyUser as any).mockResolvedValue(null);
 		const errorResponse = {
 			response: { data: { message: 'Invalid credentials' } },
@@ -150,7 +134,6 @@ describe('useAuth', () => {
 	});
 
 	it('should register user successfully', async () => {
-		// Arrange
 		(verifyUser as any).mockResolvedValue(null);
 		(registerUser as any).mockResolvedValue({ id: 1, name: 'New User' });
 
@@ -159,7 +142,6 @@ describe('useAuth', () => {
 		});
 		await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-		// Act
 		await act(async () => {
 			await result.current.register({
 				email: 'new@test.com',
@@ -168,7 +150,6 @@ describe('useAuth', () => {
 			} as any);
 		});
 
-		// Assert
 		expect(registerUser).toHaveBeenCalledWith({
 			email: 'new@test.com',
 			password: 'password',
@@ -177,7 +158,6 @@ describe('useAuth', () => {
 	});
 
 	it('should handle register error', async () => {
-		// Arrange
 		(verifyUser as any).mockResolvedValue(null);
 		const errorResponse = {
 			response: { data: { message: 'Email already exists' } },

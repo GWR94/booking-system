@@ -21,7 +21,7 @@ const BasketItem = ({ item, isMobile }: Props) => {
 	const theme = useTheme();
 	const { removeFromBasket } = useBasket();
 	const { user } = useAuth();
-	const { discountedPrice } = calculateSlotPrice(
+	const { discountedPrice, originalPrice, hasDiscount } = calculateSlotPrice(
 		item.startTime,
 		user?.membershipTier,
 		user?.membershipStatus === 'ACTIVE',
@@ -30,16 +30,13 @@ const BasketItem = ({ item, isMobile }: Props) => {
 		<Box
 			sx={{
 				mb: 1,
-				p: 1.5,
+				p: 0.5,
 				borderRadius: 1,
-				backgroundColor: isMobile
-					? 'rgba(255,255,255,0.1)'
-					: 'background.default',
-				'&:hover': {
-					backgroundColor: isMobile
-						? 'rgba(255,255,255,0.15)'
-						: theme.palette.action.hover,
-				},
+				...(!isMobile && {
+					'&:hover': {
+						backgroundColor: theme.palette.action.hover,
+					},
+				}),
 				display: 'flex',
 				justifyContent: 'space-between',
 				alignItems: 'center',
@@ -73,19 +70,33 @@ const BasketItem = ({ item, isMobile }: Props) => {
 							item.endTime,
 						).format('h:mm A')}`}
 					</Typography>
-					<Typography
-						variant="body2"
-						sx={{
-							fontWeight: 'bold',
-							color: isMobile
-								? 'rgba(255,255,255,0.8)'
-								: theme.palette.primary.main,
-
-							mt: 0.5,
-						}}
-					>
-						£{(item.slotIds.length * discountedPrice).toFixed(2)}
-					</Typography>
+					<Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5, gap: 1 }}>
+						{hasDiscount && (
+							<Typography
+								variant="body2"
+								sx={{
+									textDecoration: 'line-through',
+									color: isMobile
+										? 'rgba(255,255,255,0.5)'
+										: theme.palette.text.secondary,
+									fontSize: '0.8rem',
+								}}
+							>
+								£{(item.slotIds.length * originalPrice).toFixed(2)}
+							</Typography>
+						)}
+						<Typography
+							variant="body2"
+							sx={{
+								fontWeight: 'bold',
+								color: isMobile
+									? 'rgba(255,255,255,0.8)'
+									: theme.palette.primary.main,
+							}}
+						>
+							£{(item.slotIds.length * discountedPrice).toFixed(2)}
+						</Typography>
+					</Box>
 				</Box>
 			</Box>
 			<Tooltip title="Remove" arrow placement="top">

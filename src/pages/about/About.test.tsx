@@ -7,13 +7,10 @@ vi.mock('../../components/shared', () => ({
 }));
 
 vi.mock('./components', () => ({
-	Intro: () => <div>Intro Component</div>,
-	OurStory: () => <div>Our Story Component</div>,
-	WhatWeOffer: () => <div>What We Offer Component</div>,
-	Features: () => <div>Features Component</div>,
+	AboutHero: () => <div>About Hero Component</div>,
+	ServicesOverview: () => <div>Services Overview Component</div>,
 	Team: () => <div>Team Component</div>,
-	MiniFeatures: () => <div>Mini Features Component</div>,
-	BookingPreview: () => <div>Booking Preview Component</div>,
+	BarAndEntertainment: () => <div>Bar And Entertainment Component</div>,
 }));
 
 import createWrapper from '@utils/test-utils';
@@ -22,13 +19,12 @@ describe('About Page', () => {
 	it('renders all child components', () => {
 		render(<About />, { wrapper: createWrapper() });
 
-		expect(screen.getByText('Intro Component')).toBeInTheDocument();
-		expect(screen.getByText('Mini Features Component')).toBeInTheDocument();
-		expect(screen.getByText('Our Story Component')).toBeInTheDocument();
+		expect(screen.getByText('About Hero Component')).toBeInTheDocument();
+		expect(screen.getByText('Services Overview Component')).toBeInTheDocument();
+		expect(
+			screen.getByText('Bar And Entertainment Component'),
+		).toBeInTheDocument();
 		expect(screen.getByText('Team Component')).toBeInTheDocument();
-		expect(screen.getByText('Features Component')).toBeInTheDocument();
-		expect(screen.getByText('What We Offer Component')).toBeInTheDocument();
-		expect(screen.getByText('Booking Preview Component')).toBeInTheDocument();
 		expect(screen.getByText('Call To Action Component')).toBeInTheDocument();
 	});
 });

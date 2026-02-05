@@ -39,6 +39,7 @@ declare module '*.jpg' {
 	const content: string;
 	export default content;
 }
+
 // React augmentation for experimental attributes
 import 'react';
 

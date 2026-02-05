@@ -2,12 +2,17 @@ import React from 'react';
 import { Container, Typography, Button, Box, Stack } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '@layout';
 
 const NotFound = () => {
 	const navigate = useNavigate();
 
 	return (
 		<Container maxWidth="md">
+			<SEO
+				title="404 Not Found"
+				description="The page you are looking for does not exist."
+			/>
 			<Box
 				sx={{
 					display: 'flex',

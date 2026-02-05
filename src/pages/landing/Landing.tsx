@@ -1,14 +1,13 @@
 import { Box, Skeleton, Container } from '@mui/material';
 import { Suspense, lazy } from 'react';
 import { SEO, StructuredData } from '@layout';
-
-import Hero from './components/hero/Hero';
+import { LandingHero } from './components';
 
 const Features = lazy(() => import('./components/Features'));
 const Testimonials = lazy(() => import('./components/Testimonials'));
-const Stats = lazy(() => import('./components/Stats'));
 const FeaturedCourses = lazy(() => import('./components/FeaturedCourses'));
 const MembershipPreview = lazy(() => import('./components/MembershipPreview'));
+const ServicesOverview = lazy(() => import('@shared/ServicesOverview'));
 const CallToAction = lazy(() => import('@shared/CallToAction'));
 
 const SectionSkeleton = () => (
@@ -25,7 +24,7 @@ const Landing = () => {
 	return (
 		<Box>
 			<SEO
-				title="Premium Golf Simulators in Maidstone"
+				title="Home"
 				description="Experience the best indoor golf in Maidstone at The Short Grass. Features TrackMan technology, premium bays, and flexible memberships. Book your sim time today!"
 				keywords={[
 					'golf simulator',
@@ -78,11 +77,12 @@ const Landing = () => {
 					priceRange: '££',
 				}}
 			/>
-			<Hero />
+			<LandingHero />
+
 			<Suspense fallback={<SectionSkeleton />}>
+				<ServicesOverview />
 				<FeaturedCourses />
 				<Features />
-				<Stats />
 				<MembershipPreview />
 				<Testimonials />
 				<CallToAction />

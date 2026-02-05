@@ -92,7 +92,6 @@ const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
 							vertical: 'top',
 							horizontal: 'right',
 						}}
-						disableScrollLock={true}
 						TransitionProps={{ timeout: 0 }}
 						slotProps={{
 							paper: {
