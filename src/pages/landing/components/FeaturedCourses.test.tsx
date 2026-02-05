@@ -14,7 +14,7 @@ describe('FeaturedCourses', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/Featured Courses/i)).toBeInTheDocument();
+		expect(screen.getByText(/World Famous Venues/i)).toBeInTheDocument();
 		expect(
 			screen.getByText(/Experience world-class golf courses/i),
 		).toBeInTheDocument();

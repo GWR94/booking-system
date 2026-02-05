@@ -9,8 +9,6 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
-	Alert,
-	Stack,
 	Chip,
 	Table,
 	TableBody,
@@ -25,7 +23,9 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogActions,
+	Container,
 } from '@mui/material';
+import { AnimateIn, SectionHeader } from '@ui';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { blockSlots, unblockSlots, getSlots } from '@api';
@@ -95,7 +95,6 @@ const AdminBlockOuts = () => {
 	const handleOpenBlockDialog = () => {
 		if (!selectedDate) return;
 
-		// Check for existing bookings in the visible slots
 		// (We check visible/future slots because blocking past bookings doesn't matter)
 		const conflicts = visibleSlots.filter(
 			(slot) => slot.status === 'booked' || slot.status === 'confirmed',
@@ -178,172 +177,199 @@ const AdminBlockOuts = () => {
 	};
 
 	return (
-		<Box sx={{ maxWidth: 1000, mx: 'auto', p: 4 }}>
-			<Box
-				sx={{
-					mb: 4,
-					display: 'flex',
-					justifyContent: 'space-between',
-					alignItems: 'center',
-				}}
-			>
-				<Box>
-					<Typography variant="h4" fontWeight={800} gutterBottom>
-						Block Out Management
-					</Typography>
-					<Typography variant="body1" color="text.secondary">
-						Select a day to view and manage slot availability.
-					</Typography>
+		<Box sx={{ py: 4 }}>
+			<Container maxWidth="lg">
+				<Box
+					sx={{
+						mb: 4,
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+					}}
+				>
+					<Box sx={{ flex: 1 }}>
+						<SectionHeader
+							title="Block Out Management"
+							subtitle="Admin Portal"
+							description="Select a day to view and manage slot availability."
+							noAnimation
+							sx={{ mb: 0, textAlign: 'left', alignItems: 'flex-start' }}
+						/>
+					</Box>
+					<Button startIcon={<RefreshIcon />} onClick={fetchSlots}>
+						Refresh
+					</Button>
 				</Box>
-				<Button startIcon={<RefreshIcon />} onClick={fetchSlots}>
-					Refresh
-				</Button>
-			</Box>
+				<AnimateIn type="fade-up">
+					<Paper
+						elevation={0}
+						sx={{
+							p: 4,
+							borderRadius: 4,
+							mb: 4,
+							border: 'none',
+							boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+						}}
+					>
+						<Grid container spacing={3} alignItems="center">
+							<Grid size={{ xs: 12, md: 4 }}>
+								<DatePicker
+									label="Select Date"
+									value={selectedDate}
+									onChange={(newValue) => setSelectedDate(newValue)}
+									sx={{ width: '100%' }}
+								/>
+							</Grid>
+							<Grid size={{ xs: 12, md: 4 }}>
+								<FormControl fullWidth>
+									<InputLabel>Filter by Bay</InputLabel>
+									<Select
+										value={selectedBay}
+										label="Filter by Bay"
+										onChange={(e) =>
+											setSelectedBay(e.target.value as number | '')
+										}
+									>
+										<MenuItem value="">
+											<em>All Bays</em>
+										</MenuItem>
+										<MenuItem value={1}>Bay 1</MenuItem>
+										<MenuItem value={2}>Bay 2</MenuItem>
+										<MenuItem value={3}>Bay 3</MenuItem>
+										<MenuItem value={4}>Bay 4</MenuItem>
+									</Select>
+								</FormControl>
+							</Grid>
+							<Grid size={{ xs: 12, md: 4 }}>
+								<Button
+									variant="contained"
+									color="error"
+									fullWidth
+									size="large"
+									startIcon={<BlockIcon />}
+									onClick={handleOpenBlockDialog}
+									disabled={loading || !selectedDate}
+									sx={{ height: 56 }}
+								>
+									Block Day
+								</Button>
+							</Grid>
+						</Grid>
+					</Paper>
 
-			<Paper sx={{ p: 4, borderRadius: 4, mb: 4 }}>
-				<Grid container spacing={3} alignItems="center">
-					<Grid size={{ xs: 12, md: 4 }}>
-						<DatePicker
-							label="Select Date"
-							value={selectedDate}
-							onChange={(newValue) => setSelectedDate(newValue)}
-							sx={{ width: '100%' }}
-						/>
-					</Grid>
-					<Grid size={{ xs: 12, md: 4 }}>
-						<FormControl fullWidth>
-							<InputLabel>Filter by Bay</InputLabel>
-							<Select
-								value={selectedBay}
-								label="Filter by Bay"
-								onChange={(e) => setSelectedBay(e.target.value as number | '')}
-							>
-								<MenuItem value="">
-									<em>All Bays</em>
-								</MenuItem>
-								<MenuItem value={1}>Bay 1</MenuItem>
-								<MenuItem value={2}>Bay 2</MenuItem>
-								<MenuItem value={3}>Bay 3</MenuItem>
-								<MenuItem value={4}>Bay 4</MenuItem>
-							</Select>
-						</FormControl>
-					</Grid>
-					<Grid size={{ xs: 12, md: 4 }}>
-						<Button
-							variant="contained"
-							color="error"
-							fullWidth
-							size="large"
-							startIcon={<BlockIcon />}
-							onClick={handleOpenBlockDialog}
-							disabled={loading || !selectedDate}
-							sx={{ height: 56 }}
-						>
-							Block Day
-						</Button>
-					</Grid>
-				</Grid>
-			</Paper>
+					<Paper
+						elevation={0}
+						sx={{
+							borderRadius: 4,
+							overflow: 'hidden',
+							border: 'none',
+							boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+						}}
+					>
+						{loading ? (
+							<Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
+								<CircularProgress />
+							</Box>
+						) : slots.length === 0 ? (
+							<Box sx={{ p: 4, textAlign: 'center' }}>
+								<Typography color="text.secondary">
+									No slots found for this date.
+								</Typography>
+							</Box>
+						) : (
+							<>
+								<TableContainer>
+									<Table>
+										<TableHead sx={{ bgcolor: 'grey.50' }}>
+											<TableRow>
+												<TableCell>Time</TableCell>
+												<TableCell>Bay</TableCell>
+												<TableCell>Status</TableCell>
+												<TableCell align="right">Action</TableCell>
+											</TableRow>
+										</TableHead>
+										<TableBody>
+											{visibleSlots
+												.slice(
+													page * rowsPerPage,
+													page * rowsPerPage + rowsPerPage,
+												)
+												.map((slot) => {
+													const isProcessing = actionLoading === slot.id;
+													const isBooked =
+														slot.status === 'booked' ||
+														slot.status === 'confirmed';
+													const isMaintenance = slot.status === 'maintenance';
 
-			<Paper sx={{ borderRadius: 4, overflow: 'hidden' }}>
-				{loading ? (
-					<Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
-						<CircularProgress />
-					</Box>
-				) : slots.length === 0 ? (
-					<Box sx={{ p: 4, textAlign: 'center' }}>
-						<Typography color="text.secondary">
-							No slots found for this date.
-						</Typography>
-					</Box>
-				) : (
-					<>
-						<TableContainer>
-							<Table>
-								<TableHead sx={{ bgcolor: 'grey.50' }}>
-									<TableRow>
-										<TableCell>Time</TableCell>
-										<TableCell>Bay</TableCell>
-										<TableCell>Status</TableCell>
-										<TableCell align="right">Action</TableCell>
-									</TableRow>
-								</TableHead>
-								<TableBody>
-									{visibleSlots
-										.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-										.map((slot) => {
-											const isProcessing = actionLoading === slot.id;
-											const isBooked =
-												slot.status === 'booked' || slot.status === 'confirmed';
-											const isMaintenance = slot.status === 'maintenance';
-
-											return (
-												<TableRow key={slot.id} hover>
-													<TableCell>
-														<Typography fontWeight={600}>
-															{dayjs(slot.startTime).format('HH:mm')} -{' '}
-															{dayjs(slot.endTime).format('HH:mm')}
-														</Typography>
-													</TableCell>
-													<TableCell>
-														{slot.bay?.name || `Bay ${slot.bayId}`}
-													</TableCell>
-													<TableCell>
-														<Chip
-															label={slot.status}
-															color={getStatusColor(slot.status) as any}
-															size="small"
-															sx={{ textTransform: 'capitalize' }}
-														/>
-													</TableCell>
-													<TableCell align="right">
-														{!isBooked && (
-															<Button
-																variant={
-																	isMaintenance ? 'outlined' : 'contained'
-																}
-																color={isMaintenance ? 'success' : 'error'}
-																size="small"
-																disabled={isProcessing}
-																startIcon={
-																	isMaintenance ? (
-																		<UnblockIcon />
-																	) : (
-																		<BlockIcon />
-																	)
-																}
-																onClick={() => handleToggleBlock(slot)}
-															>
-																{isMaintenance ? 'Unblock' : 'Block'}
-															</Button>
-														)}
-														{isBooked && (
-															<Typography
-																variant="caption"
-																color="text.disabled"
-															>
-																Booked
-															</Typography>
-														)}
-													</TableCell>
-												</TableRow>
-											);
-										})}
-								</TableBody>
-							</Table>
-						</TableContainer>
-						<TablePagination
-							rowsPerPageOptions={[10, 25, 50]}
-							component="div"
-							count={visibleSlots.length}
-							rowsPerPage={rowsPerPage}
-							page={page}
-							onPageChange={handleChangePage}
-							onRowsPerPageChange={handleChangeRowsPerPage}
-						/>
-					</>
-				)}
-			</Paper>
+													return (
+														<TableRow key={slot.id} hover>
+															<TableCell>
+																<Typography fontWeight={600}>
+																	{dayjs(slot.startTime).format('HH:mm')} -{' '}
+																	{dayjs(slot.endTime).format('HH:mm')}
+																</Typography>
+															</TableCell>
+															<TableCell>
+																{slot.bay?.name || `Bay ${slot.bayId}`}
+															</TableCell>
+															<TableCell>
+																<Chip
+																	label={slot.status}
+																	color={getStatusColor(slot.status) as any}
+																	size="small"
+																	sx={{ textTransform: 'capitalize' }}
+																/>
+															</TableCell>
+															<TableCell align="right">
+																{!isBooked && (
+																	<Button
+																		variant={
+																			isMaintenance ? 'outlined' : 'contained'
+																		}
+																		color={isMaintenance ? 'success' : 'error'}
+																		size="small"
+																		disabled={isProcessing}
+																		startIcon={
+																			isMaintenance ? (
+																				<UnblockIcon />
+																			) : (
+																				<BlockIcon />
+																			)
+																		}
+																		onClick={() => handleToggleBlock(slot)}
+																	>
+																		{isMaintenance ? 'Unblock' : 'Block'}
+																	</Button>
+																)}
+																{isBooked && (
+																	<Typography
+																		variant="caption"
+																		color="text.disabled"
+																	>
+																		Booked
+																	</Typography>
+																)}
+															</TableCell>
+														</TableRow>
+													);
+												})}
+										</TableBody>
+									</Table>
+								</TableContainer>
+								<TablePagination
+									rowsPerPageOptions={[10, 25, 50]}
+									component="div"
+									count={visibleSlots.length}
+									rowsPerPage={rowsPerPage}
+									page={page}
+									onPageChange={handleChangePage}
+									onRowsPerPageChange={handleChangeRowsPerPage}
+								/>
+							</>
+						)}
+					</Paper>
+				</AnimateIn>
+			</Container>
 
 			<Dialog
 				open={confirmDialogOpen}

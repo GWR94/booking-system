@@ -11,7 +11,7 @@ import {
 	SessionPicker,
 	NextPreviousButtons,
 } from './components';
-import { LoadingSpinner } from '@ui';
+import { LoadingSpinner, SectionHeader } from '@ui';
 import { useSlots, useAuth } from '@hooks';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
@@ -21,11 +21,6 @@ const Booking = () => {
 	const theme = useTheme();
 
 	const membershipUsage = user?.membershipUsage;
-
-	/**
-	 * FIXME - when there is slots in the basket and the user logs in,
-	 * the slots disappear
-	 */
 
 	return (
 		<Box
@@ -37,27 +32,11 @@ const Booking = () => {
 			}}
 		>
 			<Container maxWidth="xl">
-				<Box sx={{ mb: 4, textAlign: 'center' }}>
-					<Typography
-						variant="h4"
-						component="h1"
-						gutterBottom
-						sx={{
-							fontWeight: 800,
-							background: (theme) =>
-								`linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-							backgroundClip: 'text',
-							textFillColor: 'transparent',
-							WebkitBackgroundClip: 'text',
-							WebkitTextFillColor: 'transparent',
-						}}
-					>
-						Book Your Session
-					</Typography>
-					<Typography variant="subtitle1" color="text.secondary">
-						Choose your preferred time and bay to get started
-					</Typography>
-				</Box>
+				<SectionHeader
+					title="Book Your Session"
+					description="Choose your preferred time and bay to get started"
+					subtitle="Instant Reservations"
+				/>
 
 				{membershipUsage && (
 					<Box

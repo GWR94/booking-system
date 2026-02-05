@@ -1,24 +1,33 @@
 import { useAdminBookings } from './hooks/useAdminBookings';
 import { adminCheckExtendAvailability } from '@api';
-import { Box } from '@mui/material';
-import { LoadingSpinner } from '@ui';
-import { useState, useEffect } from 'react';
 import {
-	BookingsTable,
-	BookingDetailsDialog,
-	CancelBookingDialog,
-	ExtendErrorDialog,
-	ExtendSuccessDialog,
-} from './components';
+	Box,
+	Paper,
+	Typography,
+	useTheme,
+	alpha,
+	Container,
+} from '@mui/material';
+import { LoadingSpinner, AnimateIn, SectionHeader } from '@ui';
+import { useState, useEffect } from 'react';
+import { BookingsTable, BookingDetailsDialog, AdminDialog } from './components';
 
 const AdminBookings = () => {
+	const theme = useTheme();
 	const [selectedBooking, setSelectedBooking] = useState<any>(null);
 	const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-	const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
-	const [isExtendErrorOpen, setIsExtendErrorOpen] = useState(false);
-	const [isExtendSuccessOpen, setIsExtendSuccessOpen] = useState(false);
-	const [extendErrorMessage, setExtendErrorMessage] = useState('');
-	const [extendSuccessMessage, setExtendSuccessMessage] = useState('');
+	const [dialogConfig, setDialogConfig] = useState<{
+		open: boolean;
+		title: string;
+		description: string;
+		type: 'success' | 'error' | 'confirm' | 'info';
+		onConfirm?: () => void;
+	}>({
+		open: false,
+		title: '',
+		description: '',
+		type: 'info',
+	});
 	const [extendAvailability, setExtendAvailability] = useState<{
 		canExtend1Hour: boolean;
 		canExtend2Hours: boolean;
@@ -47,8 +56,12 @@ const AdminBookings = () => {
 			const error = extendError as any;
 			const message =
 				error.response?.data?.message || 'Failed to extend booking';
-			setExtendErrorMessage(message);
-			setIsExtendErrorOpen(true);
+			setDialogConfig({
+				open: true,
+				title: 'Unable to Extend Booking',
+				description: message,
+				type: 'error',
+			});
 		}
 	}, [extendError]);
 
@@ -96,7 +109,7 @@ const AdminBookings = () => {
 			deleteBooking(selectedBooking.id, {
 				onSuccess: () => {
 					setIsDetailsOpen(false);
-					setIsCancelConfirmOpen(false);
+					setDialogConfig({ ...dialogConfig, open: false });
 				},
 			});
 		}
@@ -118,10 +131,13 @@ const AdminBookings = () => {
 			{
 				onSuccess: (data) => {
 					setIsDetailsOpen(false);
-					setExtendSuccessMessage(
-						data.message || 'Booking extended by 1 hour successfully',
-					);
-					setIsExtendSuccessOpen(true);
+					setDialogConfig({
+						open: true,
+						title: 'Booking Extended Successfully',
+						description:
+							data.message || 'Booking extended by 1 hour successfully',
+						type: 'success',
+					});
 				},
 			},
 		);
@@ -136,35 +152,67 @@ const AdminBookings = () => {
 			{
 				onSuccess: (data) => {
 					setIsDetailsOpen(false);
-					setExtendSuccessMessage(
-						data.message || 'Booking extended by 2 hours successfully',
-					);
-					setIsExtendSuccessOpen(true);
+					setDialogConfig({
+						open: true,
+						title: 'Booking Extended Successfully',
+						description:
+							data.message || 'Booking extended by 2 hours successfully',
+						type: 'success',
+					});
 				},
 			},
 		);
 	};
 
 	return (
-		<Box>
-			<BookingsTable
-				bookings={bookings}
-				totalBookings={totalBookings}
-				page={page}
-				rowsPerPage={rowsPerPage}
-				search={search}
-				onPageChange={setPage}
-				onRowsPerPageChange={setRowsPerPage}
-				onSearchChange={setSearch}
-				onViewDetails={handleOpenDetails}
-				getStatusColor={getStatusColor}
-			/>
+		<Box sx={{ py: 4 }}>
+			<Container maxWidth="xl">
+				<SectionHeader
+					title="Bookings Management"
+					subtitle="Admin Portal"
+					description="View and manage all simulator reservations"
+					noAnimation
+				/>
+				<AnimateIn type="fade-up">
+					<Paper
+						elevation={0}
+						sx={{
+							borderRadius: 4,
+							border: 'none',
+							boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+							overflow: 'hidden',
+						}}
+					>
+						<BookingsTable
+							bookings={bookings}
+							totalBookings={totalBookings}
+							page={page}
+							rowsPerPage={rowsPerPage}
+							search={search}
+							onPageChange={setPage}
+							onRowsPerPageChange={setRowsPerPage}
+							onSearchChange={setSearch}
+							onViewDetails={handleOpenDetails}
+							getStatusColor={getStatusColor}
+						/>
+					</Paper>
+				</AnimateIn>
+			</Container>
 
 			<BookingDetailsDialog
 				booking={selectedBooking}
 				open={isDetailsOpen}
 				onClose={() => setIsDetailsOpen(false)}
-				onCancelBooking={() => setIsCancelConfirmOpen(true)}
+				onCancelBooking={() =>
+					setDialogConfig({
+						open: true,
+						title: 'Cancel Booking?',
+						description:
+							'Are you sure you want to cancel this booking and free up the slots?',
+						type: 'confirm',
+						onConfirm: handleCancelBooking,
+					})
+				}
 				onConfirmBooking={handleConfirmBooking}
 				onExtend1Hour={handleExtend1Hour}
 				onExtend2Hour={handleExtend2Hours}
@@ -173,22 +221,9 @@ const AdminBookings = () => {
 				getStatusColor={getStatusColor}
 			/>
 
-			<CancelBookingDialog
-				open={isCancelConfirmOpen}
-				onClose={() => setIsCancelConfirmOpen(false)}
-				onConfirm={handleCancelBooking}
-			/>
-
-			<ExtendErrorDialog
-				open={isExtendErrorOpen}
-				onClose={() => setIsExtendErrorOpen(false)}
-				errorMessage={extendErrorMessage}
-			/>
-
-			<ExtendSuccessDialog
-				open={isExtendSuccessOpen}
-				onClose={() => setIsExtendSuccessOpen(false)}
-				successMessage={extendSuccessMessage}
+			<AdminDialog
+				{...dialogConfig}
+				onClose={() => setDialogConfig({ ...dialogConfig, open: false })}
 			/>
 		</Box>
 	);

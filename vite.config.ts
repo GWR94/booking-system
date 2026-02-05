@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
 	},
 	resolve: {
 		alias: {
-			'@common': '/src/components/common',
+			'@constants': '/src/constants',
 			'@components': '/src/components',
 			'@hooks': '/src/hooks',
 			'@context': '/src/context',
@@ -45,6 +45,8 @@ export default defineConfig(({ mode }) => ({
 			'@ui': '/src/components/ui',
 			'@layout': '/src/components/layout',
 			'@shared': '/src/components/shared',
+			'@styles': '/src/styles',
+			'@validation': '/src/validation',
 		},
 	},
 	test: {

@@ -17,7 +17,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 			sx={{
 				width: '100%',
 				height: '100%',
-				minHeight: '80px',
+				minHeight: '50vh',
 				display: 'flex',
 				justifyContent: 'center',
 				alignItems: 'center',

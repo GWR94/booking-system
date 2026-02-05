@@ -54,10 +54,6 @@ const BookingsTable = ({
 
 	return (
 		<>
-			<Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
-				Bookings Management
-			</Typography>
-
 			<Paper
 				elevation={0}
 				sx={{
@@ -75,12 +71,14 @@ const BookingsTable = ({
 						size="small"
 						value={search}
 						onChange={(e) => onSearchChange(e.target.value)}
-						InputProps={{
-							startAdornment: (
-								<InputAdornment position="start">
-									<SearchIcon color="action" />
-								</InputAdornment>
-							),
+						slotProps={{
+							input: {
+								startAdornment: (
+									<InputAdornment position="start">
+										<SearchIcon color="action" />
+									</InputAdornment>
+								),
+							},
 						}}
 					/>
 				</Box>
@@ -123,9 +121,6 @@ const BookingsTable = ({
 										<Box>
 											<Typography variant="body2" fontWeight={600}>
 												{booking.user?.name || 'Guest'}
-											</Typography>
-											<Typography variant="caption" color="text.secondary">
-												{booking.user?.email || 'No email'}
 											</Typography>
 										</Box>
 									</TableCell>

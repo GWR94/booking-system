@@ -133,17 +133,21 @@ const ContactForm: React.FC<ContactFormProps> = ({
 	};
 
 	return (
-		<Container maxWidth={maxWidth} sx={{ py: 4 }}>
+		<Container
+			maxWidth={maxWidth}
+			sx={{
+				px: { xs: 0, md: 3 },
+			}}
+		>
 			<Paper
 				elevation={elevation}
 				sx={{
-					borderRadius: 2,
+					borderRadius: { xs: 0, md: 2 },
 					overflow: 'hidden',
-					border: `1px solid ${theme.palette.divider}`,
+					border: { xs: 'none', md: `1px solid ${theme.palette.divider}` },
 				}}
 			>
 				<Grid container>
-					{/* Contact Information Section */}
 					<Grid size={{ xs: 12, md: 4 }}>
 						<Box
 							sx={{
@@ -406,7 +410,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
 											<LoadingButton
 												type="submit"
 												variant="contained"
-												color="primary"
+												color="secondary"
 												size="large"
 												loading={loading}
 												disabled={loading}

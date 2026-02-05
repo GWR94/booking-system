@@ -106,7 +106,6 @@ describe('GuestInfo', () => {
 			screen.getByRole('button', { name: /Continue to Payment/i }),
 		);
 
-		// Check for helper text which is rendered in the DOM
 		expect(
 			await screen.findByText(/Email already registered/i),
 		).toBeInTheDocument();

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type AuthModalView = 'login' | 'register';
+export type AuthModalView = 'login' | 'register';
 
 interface UIContextType {
 	isAuthModalOpen: boolean;

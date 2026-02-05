@@ -36,7 +36,6 @@ const CallToAction = () => {
 								sx={{
 									fontWeight: 700,
 									mb: 2,
-									fontSize: { xs: '2.5rem', md: '3rem' },
 									textShadow: '0 2px 10px rgba(0,0,0,0.2)',
 								}}
 							>

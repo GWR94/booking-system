@@ -8,6 +8,7 @@ import {
 	useTheme,
 } from '@mui/material';
 import dayjs from 'dayjs';
+import { COMPANY_INFO } from '@constants/company';
 
 const PrivacyPolicy: React.FC = () => {
 	const theme = useTheme();
@@ -108,9 +109,8 @@ const PrivacyPolicy: React.FC = () => {
 						request information about our services from the Site. We store only
 						very limited, if any, financial information that we collect.
 						Otherwise, all financial information is stored by our payment
-						processor, [Payment Processor Name], and you are encouraged to
-						review their privacy policy and contact them directly for responses
-						to your questions.
+						processor, Stripe, and you are encouraged to review their privacy
+						policy and contact them directly for responses to your questions.
 					</Typography>
 				</Box>
 
@@ -341,17 +341,13 @@ const PrivacyPolicy: React.FC = () => {
 						contact us at:
 					</Typography>
 					<Typography variant="body1">
-						The Short Grass
+						{COMPANY_INFO.name}
 						<br />
-						123 Golf Lane
+						{COMPANY_INFO.address}
 						<br />
-						London, SW1 2AB
+						{COMPANY_INFO.email}
 						<br />
-						United Kingdom
-						<br />
-						golf@jamesgower.dev
-						<br />
-						+44 (0) 123 456 7890
+						{COMPANY_INFO.phone}
 					</Typography>
 				</Box>
 			</Paper>

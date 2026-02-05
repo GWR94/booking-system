@@ -1,50 +1,8 @@
-import { Stack, Card as MuiCard, ThemeOptions } from '@mui/material';
-import { Palette, PaletteColorOptions, styled } from '@mui/material/styles';
-
-export const SignInContainer = styled(Stack)(({ theme }) => ({
-	height: 'calc(100vh - 70px)',
-	minHeight: '100%',
-	padding: theme.spacing(2),
-	display: 'flex',
-	justifyContent: 'center',
-	alignItems: 'center',
-	[theme.breakpoints.up('sm')]: {
-		padding: theme.spacing(4),
-	},
-	'&::before': {
-		content: '""',
-		display: 'block',
-		position: 'absolute',
-		zIndex: -1,
-		inset: 0,
-		backgroundImage:
-			'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-		backgroundRepeat: 'no-repeat',
-		...theme.applyStyles('dark', {
-			backgroundImage:
-				'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
-		}),
-	},
-}));
-
-export const Card = styled(MuiCard)(({ theme }) => ({
-	display: 'flex',
-	flexDirection: 'column',
-	alignSelf: 'center',
-	width: '100%',
-	padding: theme.spacing(4),
-	gap: theme.spacing(2),
-	margin: 'auto',
-	[theme.breakpoints.up('sm')]: {
-		maxWidth: '450px',
-	},
-	boxShadow:
-		'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
-	...theme.applyStyles('dark', {
-		boxShadow:
-			'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
-	}),
-}));
+import {
+	Palette,
+	PaletteColorOptions,
+	ThemeOptions,
+} from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
 	interface Palette {
@@ -159,6 +117,238 @@ const blueTealYellowTheme: ThemePalette = {
 			contrastText: '#000000',
 		},
 	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 8,
+					fontWeight: 600,
+				},
+				contained: {
+					boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+				},
+			},
+		},
+		MuiCard: {
+			styleOverrides: {
+				root: {
+					borderRadius: 12,
+				},
+			},
+		},
+	},
 };
 
-export const themes: ThemePalette[] = [blueTealYellowTheme];
+const sapphireTheme: ThemePalette = {
+	id: 'sapphire-night',
+	name: 'Sapphire Night',
+	palette: {
+		primary: {
+			main: '#0f172a', // Deep Slate Blue works well for headers/nav
+			light: '#334155',
+			dark: '#020617',
+			contrastText: '#ffffff',
+		},
+		secondary: {
+			main: '#3b82f6', // Bright Blue for primary actions
+			light: '#60a5fa',
+			dark: '#1d4ed8',
+			contrastText: '#ffffff',
+		},
+		accent: {
+			main: '#8b5cf6', // Violet for highlights
+			light: '#a78bfa',
+			dark: '#7c3aed',
+			contrastText: '#ffffff',
+		},
+		warning: {
+			main: '#f59e0b', // Amber
+			light: '#fbbf24',
+			dark: '#d97706',
+			contrastText: '#000000',
+		},
+		error: {
+			main: '#ef4444', // Red
+			light: '#f87171',
+			dark: '#b91c1c',
+			contrastText: '#ffffff',
+		},
+		success: {
+			main: '#10b981', // Emerald
+			light: '#34d399',
+			dark: '#059669',
+			contrastText: '#ffffff',
+		},
+		link: {
+			main: '#0ea5e9', // Sky
+			light: '#38bdf8',
+			dark: '#0284c7',
+			contrastText: '#ffffff',
+		},
+	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 8,
+					fontWeight: 600,
+				},
+				contained: {
+					boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+				},
+			},
+		},
+		MuiCard: {
+			styleOverrides: {
+				root: {
+					borderRadius: 12,
+				},
+			},
+		},
+	},
+};
+
+const emeraldPrestigeTheme: ThemePalette = {
+	id: 'emerald-prestige',
+	name: 'Emerald Prestige',
+	palette: {
+		primary: {
+			main: '#064e3b', // Deep Emerald Green
+			light: '#059669',
+			dark: '#022c22',
+			contrastText: '#ffffff',
+		},
+		secondary: {
+			main: '#d97706', // Rich Gold
+			light: '#fbbf24',
+			dark: '#b45309',
+			contrastText: '#ffffff',
+		},
+		accent: {
+			main: '#10b981', // Vivid Green for highlights
+			light: '#34d399',
+			dark: '#059669',
+			contrastText: '#ffffff',
+		},
+		warning: {
+			main: '#f59e0b',
+			light: '#fbbf24',
+			dark: '#d97706',
+			contrastText: '#000000',
+		},
+		error: {
+			main: '#ef4444',
+			light: '#f87171',
+			dark: '#b91c1c',
+			contrastText: '#ffffff',
+		},
+		success: {
+			main: '#22c55e',
+			light: '#4ade80',
+			dark: '#15803d',
+			contrastText: '#ffffff',
+		},
+		link: {
+			main: '#f59e0b', // Gold links
+			light: '#fbbf24',
+			dark: '#d97706',
+			contrastText: '#000000',
+		},
+	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 8,
+					fontWeight: 600,
+				},
+				contained: {
+					boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+				},
+			},
+		},
+		MuiCard: {
+			styleOverrides: {
+				root: {
+					borderRadius: 12,
+				},
+			},
+		},
+	},
+};
+
+const midnightAmethystTheme: ThemePalette = {
+	id: 'midnight-amethyst',
+	name: 'Midnight Amethyst',
+	palette: {
+		primary: {
+			main: '#3b0764', // Deepest Purple
+			light: '#6b21a8',
+			dark: '#2e0249',
+			contrastText: '#ffffff',
+		},
+		secondary: {
+			main: '#c026d3', // Fuschia
+			light: '#e879f9',
+			dark: '#a21caf',
+			contrastText: '#ffffff',
+		},
+		accent: {
+			main: '#f472b6', // Pink highlight
+			light: '#fbcfe8',
+			dark: '#db2777',
+			contrastText: '#000000',
+		},
+		warning: {
+			main: '#f97316',
+			light: '#fdba74',
+			dark: '#c2410c',
+			contrastText: '#ffffff',
+		},
+		error: {
+			main: '#ef4444',
+			light: '#f87171',
+			dark: '#b91c1c',
+			contrastText: '#ffffff',
+		},
+		success: {
+			main: '#10b981',
+			light: '#34d399',
+			dark: '#059669',
+			contrastText: '#ffffff',
+		},
+		link: {
+			main: '#e879f9',
+			light: '#f0abfc',
+			dark: '#c026d3',
+			contrastText: '#000000',
+		},
+	},
+	components: {
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					borderRadius: 8,
+					fontWeight: 600,
+				},
+				contained: {
+					boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+				},
+			},
+		},
+		MuiCard: {
+			styleOverrides: {
+				root: {
+					borderRadius: 12,
+				},
+			},
+		},
+	},
+};
+
+export const themes: ThemePalette[] = [
+	blueTealYellowTheme,
+	sapphireTheme,
+	emeraldPrestigeTheme,
+	midnightAmethystTheme,
+];

@@ -14,6 +14,23 @@ vi.mock('@hooks', () => ({
 
 const theme = createTheme();
 
+vi.mock('@mui/icons-material', () => ({
+	DeleteOutline: () => <div data-testid="DeleteOutlineIcon" />,
+	CalendarMonth: () => <div data-testid="CalendarMonthIcon" />,
+	AccessTime: () => <div data-testid="AccessTimeIcon" />,
+	Timer: () => <div data-testid="TimerIcon" />,
+	SportsGolf: () => <div data-testid="SportsGolfIcon" />,
+}));
+
+// Mock utils
+vi.mock('@utils', () => ({
+	calculateSlotPrice: vi.fn(() => ({
+		originalPrice: 45.0,
+		discountedPrice: 45.0,
+		hasDiscount: false,
+	})),
+}));
+
 const mockSlot = {
 	id: '1',
 	slotIds: ['slot1', 'slot2'],
@@ -44,9 +61,13 @@ describe('CheckoutItem', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/Saturday 20th Jan 2024/i)).toBeInTheDocument();
-		expect(screen.getByText(/10:00am - 12:00pm/i)).toBeInTheDocument();
-		expect(screen.getByText(/Bay 1/i)).toBeInTheDocument();
+		expect(screen.getByText(/Sat 20th Jan/i)).toBeInTheDocument();
+		expect(screen.getByText(/10:00 - 12:00/i)).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				(content) => content.includes('Bay') && content.includes('1'),
+			),
+		).toBeInTheDocument();
 		expect(screen.getByText(/2 hrs/i)).toBeInTheDocument();
 		expect(screen.getByText(/£90.00/i)).toBeInTheDocument();
 	});
@@ -58,7 +79,7 @@ describe('CheckoutItem', () => {
 			</ThemeProvider>,
 		);
 
-		const deleteBtn = screen.getByLabelText(/remove item/i);
+		const deleteBtn = screen.getByRole('button', { name: /remove item/i });
 		fireEvent.click(deleteBtn);
 		expect(mockRemoveFromBasket).toHaveBeenCalledWith(mockSlot);
 	});
@@ -71,5 +92,20 @@ describe('CheckoutItem', () => {
 		);
 
 		expect(screen.queryByLabelText(/remove item/i)).not.toBeInTheDocument();
+	});
+
+	it('should render duration with minutes correctly', () => {
+		const slotWithMinutes = {
+			...mockSlot,
+			endTime: '2024-01-20T11:45:00Z', // 1 hour 45 minutes
+		};
+
+		render(
+			<ThemeProvider theme={theme}>
+				<CheckoutItem slot={slotWithMinutes as any} />
+			</ThemeProvider>,
+		);
+
+		expect(screen.getByText(/1 hr 45 mins/i)).toBeInTheDocument();
 	});
 });

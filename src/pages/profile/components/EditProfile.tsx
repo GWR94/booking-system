@@ -31,7 +31,7 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 	const [userState, setUserState] = useState({
 		name: user?.name ?? '',
 		email: user?.email ?? '',
-		password: '*********',
+		password: '',
 		newPassword: '',
 		confirmPassword: '',
 	});
@@ -44,12 +44,29 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 	};
 
 	const handleSave = async () => {
+		if (changePassword) {
+			if (userState.newPassword !== userState.confirmPassword) {
+				showSnackbar('Passwords do not match', 'error');
+				return;
+			}
+			if (userState.newPassword && !userState.email) {
+				showSnackbar('Email is required to set a password', 'error');
+				return;
+			}
+			if (user?.hasPassword && !userState.password) {
+				showSnackbar('Please enter your current password', 'error');
+				return;
+			}
+		}
+
 		try {
 			await updateProfile(userState);
 			showSnackbar('Profile updated successfully', 'success');
 			handleEditToggle();
-		} catch (error) {
-			showSnackbar('Failed to update profile', 'error');
+		} catch (error: any) {
+			const message =
+				error.response?.data?.message || 'Failed to update profile';
+			showSnackbar(message, 'error');
 			console.error('Failed to update profile', error);
 		}
 	};
@@ -77,7 +94,6 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 							setUserState({ ...userState, name: e.target.value })
 						}
 						value={userState.name}
-						slotProps={{ inputLabel: { shrink: true } }}
 					/>
 					<TextField
 						fullWidth
@@ -87,11 +103,10 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 							setUserState({ ...userState, email: e.target.value })
 						}
 						value={userState.email}
-						slotProps={{ inputLabel: { shrink: true } }}
 					/>
 
-					{user.passwordHash && (
-						<Box>
+					<Box>
+						{user.hasPassword && (
 							<TextField
 								fullWidth
 								label={changePassword ? 'Current Password' : 'Password'}
@@ -104,63 +119,62 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 									setUserState({ ...userState, password: e.target.value })
 								}
 								value={userState.password}
-								slotProps={{ inputLabel: { shrink: true } }}
 							/>
-							{!changePassword && (
-								<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-									<Button
-										size="small"
-										onClick={() => {
-											setChangePassword(true);
-											setUserState({ ...userState, password: '' });
-										}}
-										sx={{ mt: 0.5, textTransform: 'none' }}
-									>
-										Change Password
-									</Button>
-								</Box>
-							)}
-							{changePassword && (
-								<Box
-									sx={{
-										display: 'flex',
-										flexDirection: 'column',
-										gap: 2,
-										mt: 2,
+						)}
+						{!changePassword && (
+							<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+								<Button
+									size="small"
+									onClick={() => {
+										setChangePassword(true);
+										setUserState({ ...userState, password: '' });
 									}}
+									sx={{ mt: 0.5, textTransform: 'none' }}
 								>
-									<TextField
-										fullWidth
-										label="New Password"
-										variant="outlined"
-										type="password"
-										placeholder="••••••••"
-										onChange={(e) =>
-											setUserState({
-												...userState,
-												newPassword: e.target.value,
-											})
-										}
-										value={userState.newPassword}
-									/>
-									<TextField
-										fullWidth
-										label="Confirm Password"
-										variant="outlined"
-										type="password"
-										placeholder="••••••••"
-										onChange={(e) =>
-											setUserState({
-												...userState,
-												confirmPassword: e.target.value,
-											})
-										}
-										value={userState.confirmPassword}
-									/>
-								</Box>
-							)}
-						</Box>
-					)}
+									{user.hasPassword ? 'Change Password' : 'Set Password'}
+								</Button>
+							</Box>
+						)}
+						{changePassword && (
+							<Box
+								sx={{
+									display: 'flex',
+									flexDirection: 'column',
+									gap: 2,
+									mt: 2,
+								}}
+							>
+								<TextField
+									fullWidth
+									label="New Password"
+									variant="outlined"
+									type="password"
+									placeholder="••••••••"
+									onChange={(e) =>
+										setUserState({
+											...userState,
+											newPassword: e.target.value,
+										})
+									}
+									value={userState.newPassword}
+								/>
+								<TextField
+									fullWidth
+									label="Confirm Password"
+									variant="outlined"
+									type="password"
+									placeholder="••••••••"
+									onChange={(e) =>
+										setUserState({
+											...userState,
+											confirmPassword: e.target.value,
+										})
+									}
+									value={userState.confirmPassword}
+								/>
+							</Box>
+						)}
+					</Box>
 				</Box>
 
 				<Box sx={{ mt: 4, mb: 4 }}>

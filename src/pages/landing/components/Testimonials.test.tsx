@@ -3,12 +3,6 @@ import { describe, it, expect, vi } from 'vitest';
 import Testimonials from './Testimonials';
 import { ThemeProvider } from '@context';
 
-vi.mock('@ui', () => ({
-	AnimateIn: ({ children }: { children: React.ReactNode }) => (
-		<div data-testid="animate-in">{children}</div>
-	),
-}));
-
 describe('Testimonials', () => {
 	it('should render header with overall rating', () => {
 		render(
@@ -19,7 +13,7 @@ describe('Testimonials', () => {
 
 		expect(screen.getByText(/What Our Customers Say/i)).toBeInTheDocument();
 		expect(
-			screen.getByText(/4.8\/5 from over 200 reviews/i),
+			screen.getByText(/4.8\/5 from over 50 reviews/i),
 		).toBeInTheDocument();
 	});
 

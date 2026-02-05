@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { Logo } from '@ui';
+import { COMPANY_INFO } from '@constants/company';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
@@ -118,7 +119,11 @@ const Footer: React.FC = () => {
 						<Typography
 							variant="h6"
 							gutterBottom
-							sx={{ fontWeight: 'bold', color: theme.palette.secondary.light }}
+							sx={{
+								fontWeight: 600,
+								color: theme.palette.secondary.light,
+								opacity: 0.9,
+							}}
 						>
 							Links
 						</Typography>
@@ -128,7 +133,7 @@ const Footer: React.FC = () => {
 								to="/"
 								color="inherit"
 								underline="hover"
-								sx={{ mb: 1 }}
+								sx={{ mb: 1, opacity: 0.85, '&:hover': { opacity: 1 } }}
 							>
 								Home
 							</Link>
@@ -175,6 +180,7 @@ const Footer: React.FC = () => {
 								to="/terms"
 								color="inherit"
 								underline="hover"
+								sx={{ opacity: 0.85, '&:hover': { opacity: 1 } }}
 							>
 								Terms & Conditions
 							</Link>
@@ -213,30 +219,40 @@ const Footer: React.FC = () => {
 							Contact Us
 						</Typography>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-							<LocationOn sx={{ mr: 1, color: theme.palette.error.light }} />
-							<Typography variant="body2">
-								Royal Star Arcade, High St, Maidstone ME14 1JL
+							<LocationOn
+								sx={{ mr: 1, color: theme.palette.error.light, opacity: 0.85 }}
+							/>
+							<Typography variant="body2" sx={{ opacity: 0.85 }}>
+								{COMPANY_INFO.address}
 							</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-							<Phone sx={{ mr: 1, color: theme.palette.error.main }} />
-							<Typography variant="body2">+44 7986 445123</Typography>
+							<Phone
+								sx={{ mr: 1, color: theme.palette.error.main, opacity: 0.85 }}
+							/>
+							<Typography variant="body2" sx={{ opacity: 0.85 }}>
+								{COMPANY_INFO.phone}
+							</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Email sx={{ mr: 1, color: theme.palette.error.dark }} />
+							<Email
+								sx={{ mr: 1, color: theme.palette.error.dark, opacity: 0.85 }}
+							/>
 							<Typography variant="body2">
 								<Box
 									component="a"
-									href="mailto:theshortgrass@jamesgower.dev"
+									href={`mailto:${COMPANY_INFO.email}`}
 									sx={{
 										color: '#fff',
 										textDecoration: 'none',
+										opacity: 0.85,
 										'&:hover': {
 											textDecoration: 'underline',
+											opacity: 1,
 										},
 									}}
 								>
-									theshortgrass@jamesgower.dev
+									{COMPANY_INFO.email}
 								</Box>
 							</Typography>
 						</Box>
@@ -256,7 +272,8 @@ const Footer: React.FC = () => {
 						variant="body2"
 						sx={{ color: theme.palette.grey[500], mb: { xs: 2, sm: 0 } }}
 					>
-						© {new Date().getFullYear()} The Short Grass. All rights reserved.
+						© {new Date().getFullYear()} {COMPANY_INFO.name}. All rights
+						reserved.
 					</Typography>
 				</Box>
 			</Container>

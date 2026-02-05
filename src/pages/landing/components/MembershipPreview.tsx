@@ -1,201 +1,155 @@
+import { useNavigate } from 'react-router-dom';
+import { AnimateIn, SectionHeader } from '@ui';
 import {
-	Box,
-	Container,
-	Typography,
-	Grid2 as Grid,
 	Card,
 	CardContent,
-	CardActions,
+	Typography,
+	Grid2 as Grid,
+	Container,
+	Box,
 	Button,
+	List,
+	ListItem,
+	ListItemIcon,
+	ListItemText,
 	useTheme,
+	Chip,
+	alpha,
 } from '@mui/material';
-import { CheckCircleOutline } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { AnimateIn } from '@ui';
-
-const membershipTiers = [
-	{
-		name: 'Par',
-		price: '£199.99/month',
-		perks: [
-			'5 hours of simulator access per month',
-			'Access to weekday bookings only',
-			'10% discount on additional bookings',
-			'10% discount on additional bookings',
-		],
-		id: 'PAR',
-		color: '#5a5a5aff',
-	},
-	{
-		name: 'Birdie',
-		price: '£299.99/month',
-		perks: [
-			'10 hours of simulator access per month',
-			'Access to weekday and weekend bookings',
-			'15% discount on additional bookings',
-		],
-		id: 'BIRDIE',
-		color: '#D22B2B',
-	},
-	{
-		name: 'Hole-In-One',
-		price: '£399.99/month',
-		perks: [
-			'15 hours of simulator access per month',
-			'Access to all booking times',
-			'20% discount on additional bookings',
-		],
-		id: 'HOLEINONE',
-		color: '#FFD700',
-	},
-];
+import { Check, Star } from '@mui/icons-material';
+import memberships from '@constants/memberships';
 
 const MembershipPreview = () => {
 	const theme = useTheme();
 	const navigate = useNavigate();
 
-	return (
-		<Box sx={{ py: 10, bgcolor: theme.palette.background.default }}>
-			<Container maxWidth="lg">
-				<Box sx={{ textAlign: 'center', mb: 8 }}>
-					<AnimateIn type="fade-up">
-						<Typography
-							variant="title"
-							component="h2"
-							gutterBottom
-							sx={{ fontWeight: 700, mb: 4 }}
-						>
-							Flexible Membership Plans
-						</Typography>
-						<Typography
-							variant="h6"
-							color="text.secondary"
-							sx={{ maxWidth: 700, mx: 'auto', fontWeight: 400 }}
-						>
-							Join The Short Grass community and enjoy regular access to our
-							state-of-the-art simulators at the best rates.
-						</Typography>
-					</AnimateIn>
-				</Box>
+	const cardStyles = {
+		p: 3,
+		height: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+		position: 'relative',
+		borderRadius: 4,
+		border: '1px solid',
+		bgcolor: 'background.paper',
+		transition: 'all 0.3s ease',
+		'&:hover': {
+			transform: 'translateY(-8px)',
+		},
+	};
 
-				<Grid container spacing={4} justifyContent="center">
-					{membershipTiers.map((tier, index) => (
-						<Grid size={{ xs: 12, md: 4 }} key={index}>
+	return (
+		<Box sx={{ py: 8, bgcolor: 'grey.50' }}>
+			<Container maxWidth="lg">
+				<SectionHeader
+					subtitle="MEMBERSHIP"
+					title="Flexible Membership Plans"
+					description="Join The Short Grass community and enjoy exclusive benefits, priority access, and unlimited improvement for your game."
+				/>
+
+				<Grid
+					container
+					spacing={4}
+					alignItems="stretch"
+					justifyContent="center"
+				>
+					{memberships.map((tier, index) => (
+						<Grid key={tier.title} size={{ xs: 12, md: 4 }}>
 							<AnimateIn
 								type="fade-up"
 								delay={index * 0.1}
 								style={{ height: '100%' }}
 							>
 								<Card
-									elevation={tier.id === 'HOLEINONE' ? 8 : 2}
+									elevation={0}
 									sx={{
-										height: '100%',
-										display: 'flex',
-										flexDirection: 'column',
-										borderRadius: 4,
-										position: 'relative',
-										overflow: 'visible',
-										border: `2px solid ${tier.color}`,
-										transition: 'transform 0.3s ease',
+										...cardStyles,
+										borderColor: tier.recommended
+											? 'primary.main'
+											: theme.palette.divider,
+										boxShadow: tier.recommended
+											? `0 8px 40px ${alpha(theme.palette.primary.main, 0.12)}`
+											: '0 4px 20px rgba(0,0,0,0.04)',
+										transition: 'all 0.3s ease',
 										'&:hover': {
 											transform: 'translateY(-8px)',
+											boxShadow: tier.recommended
+												? `0 12px 48px ${alpha(theme.palette.primary.main, 0.2)}`
+												: '0 8px 30px rgba(0,0,0,0.08)',
 										},
 									}}
 								>
-									{tier.id === 'HOLEINONE' && (
-										<Box
+									{tier.recommended && (
+										<Chip
+											label="Most Popular"
+											color="secondary"
+											size="small"
+											icon={<Star fontSize="small" />}
 											sx={{
 												position: 'absolute',
-												top: -12,
-												left: '50%',
-												transform: 'translateX(-50%)',
-												bgcolor: '#FFD700',
-												color: '#000',
-												px: 2,
-												py: 0.5,
-												borderRadius: 2,
-												fontWeight: 700,
-												fontSize: '0.875rem',
-												boxShadow: 2,
+												top: 16,
+												right: 16,
+												fontWeight: 600,
 											}}
-										>
-											BEST VALUE
-										</Box>
+										/>
 									)}
-									<CardContent sx={{ flexGrow: 1, p: 4 }}>
+									<CardContent sx={{ flexGrow: 1 }}>
 										<Typography
 											variant="h5"
 											component="h3"
 											gutterBottom
-											sx={{
-												fontWeight: 700,
-												color: tier.color,
-											}}
+											sx={{ fontWeight: 700 }}
 										>
-											{tier.name}
+											{tier.title}
 										</Typography>
-										<Typography
-											variant="h4"
-											gutterBottom
-											sx={{ fontWeight: 700, mb: 3 }}
+										<Box
+											sx={{ display: 'flex', alignItems: 'baseline', mb: 2 }}
 										>
-											{tier.price}
-										</Typography>
-										<Box>
-											{tier.perks.map((perk, i) => (
-												<Box
-													key={i}
-													sx={{
-														display: 'flex',
-														alignItems: 'flex-start',
-														mb: 2,
-													}}
-												>
-													<CheckCircleOutline
-														sx={{
-															mr: 1.5,
-															color: theme.palette.success.main,
-															fontSize: 20,
-															mt: 0.5,
+											<Typography
+												variant="h3"
+												component="span"
+												color="primary"
+												sx={{ fontWeight: 800 }}
+											>
+												{tier.price}
+											</Typography>
+											<Typography variant="subtitle1" color="text.secondary">
+												{tier.period}
+											</Typography>
+										</Box>
+										<List sx={{ mb: 2 }}>
+											{tier.features.map((feature) => (
+												<ListItem key={feature} disableGutters sx={{ py: 0.5 }}>
+													<ListItemIcon sx={{ minWidth: 32 }}>
+														<Check color="secondary" fontSize="small" />
+													</ListItemIcon>
+													<ListItemText
+														primary={feature}
+														primaryTypographyProps={{
+															variant: 'body2',
 														}}
 													/>
-													<Typography variant="body2" color="text.secondary">
-														{perk}
-													</Typography>
-												</Box>
+												</ListItem>
 											))}
-										</Box>
+										</List>
 									</CardContent>
-									<CardActions sx={{ p: 4, pt: 0 }}>
+									<Box sx={{ p: 2, pt: 0 }}>
 										<Button
-											variant={
-												tier.id === 'HOLEINONE' ? 'contained' : 'outlined'
-											}
-											color="primary"
+											variant={tier.recommended ? 'contained' : 'outlined'}
 											fullWidth
+											color="primary"
 											size="large"
+											sx={{ borderRadius: 3, py: 1.5 }}
 											onClick={() => navigate('/membership')}
-											sx={{ borderRadius: 2 }}
 										>
-											View Details
+											Choose {tier.title}
 										</Button>
-									</CardActions>
+									</Box>
 								</Card>
 							</AnimateIn>
 						</Grid>
 					))}
 				</Grid>
-
-				<Box sx={{ textAlign: 'center', mt: 6 }}>
-					<Button
-						variant="text"
-						color="inherit"
-						onClick={() => navigate('/membership')}
-						sx={{ fontSize: '1rem', textTransform: 'none' }}
-					>
-						Compare all membership benefits →
-					</Button>
-				</Box>
 			</Container>
 		</Box>
 	);

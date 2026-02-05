@@ -1,37 +1,25 @@
 import React from 'react';
 import { Box, Container, Typography, Paper, useTheme } from '@mui/material';
 import { ContactForm } from '@shared';
+import { COMPANY_INFO } from '@constants/company';
+import { SEO } from '@layout';
+import { SectionHeader } from '@ui';
 
 const Contact: React.FC = () => {
 	const theme = useTheme();
 
 	return (
 		<Box sx={{ py: 4 }}>
-			<Container maxWidth="xl">
-				<Typography
-					variant="h3"
-					component="h1"
-					align="center"
-					gutterBottom
-					sx={{
-						color: theme.palette.primary.main,
-						fontWeight: 600,
-						mb: 2,
-					}}
-				>
-					Contact Us
-				</Typography>
-
-				<Typography
-					variant="h6"
-					component="h2"
-					align="center"
-					color="text.secondary"
-					sx={{ maxWidth: 700, mx: 'auto', mb: 6 }}
-				>
-					We're here to help with any questions you might have about our golf
-					simulator facilities
-				</Typography>
+			<SEO
+				title="Contact Us"
+				description={`Get in touch with ${COMPANY_INFO.name}. Located in Maidstone, we offer premium golf simulation experiences.`}
+			/>
+			<Container maxWidth="xl" sx={{ px: { xs: 0, sm: 0, md: 3 } }}>
+				<SectionHeader
+					subtitle="GET IN TOUCH"
+					title="Contact Us"
+					description="We're here to help with any questions you might have about our golf simulator facilities"
+				/>
 
 				<ContactForm />
 
@@ -61,14 +49,14 @@ const Contact: React.FC = () => {
 							}}
 						>
 							<iframe
-								src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2496.7280278529666!2d0.5157631767260644!3d51.2718865295977!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47df334ce5288035%3A0x308a415dedd49af5!2sHigh%20St%2C%20Maidstone%20ME14%201JL%2C%20UK!5e0!3m2!1sen!2sus!4v1712077333092!5m2!1sen!2sus"
+								src={COMPANY_INFO.googleMapsEmbedUrl}
 								width="100%"
 								height="100%"
 								style={{ border: 0 }}
 								allowFullScreen
 								loading="lazy"
 								referrerPolicy="no-referrer-when-downgrade"
-								title="The Short Grass Location"
+								title={`${COMPANY_INFO.name} Location`}
 							></iframe>
 						</Box>
 
@@ -86,7 +74,7 @@ const Contact: React.FC = () => {
 									Getting Here
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
-									Located just 5 minutes from Central Station
+									Located in the heart of Maidstone Town Centre
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
 									Free parking available for all customers
@@ -101,7 +89,7 @@ const Contact: React.FC = () => {
 									Bus Routes: 14, 36, 42
 								</Typography>
 								<Typography variant="body2" color="text.secondary">
-									Underground: Central Line to Green Park
+									Train: Maidstone East or Maidstone West
 								</Typography>
 							</Box>
 						</Box>

@@ -9,9 +9,10 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registrationSchema } from '../../../validation/schema';
+import { registrationSchema } from '@validation/schema';
 import { FormInput, FormInputType } from './types';
 import { useAuth } from '@hooks';
+import { useUI } from '@context';
 
 interface LegacyRegisterProps {
 	onSuccess?: () => void;
@@ -23,6 +24,7 @@ const LegacyRegister: React.FC<LegacyRegisterProps> = ({
 	onLoginClick,
 }) => {
 	const { register, isLoading } = useAuth();
+	const { openAuthModal } = useUI();
 	const navigate = useNavigate();
 	const [formInput, setFormInput] = useState<FormInput>({
 		name: {
@@ -263,7 +265,12 @@ const LegacyRegister: React.FC<LegacyRegisterProps> = ({
 								Sign in
 							</Link>
 						) : (
-							<Link href="/login" variant="body2" sx={{ alignSelf: 'center' }}>
+							<Link
+								component="button"
+								variant="body2"
+								onClick={() => openAuthModal('login')}
+								sx={{ alignSelf: 'center' }}
+							>
 								Sign in
 							</Link>
 						)}

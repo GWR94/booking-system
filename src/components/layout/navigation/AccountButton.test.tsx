@@ -82,10 +82,106 @@ describe('AccountButton', () => {
 		expect(await screen.findByText('Logout')).toBeInTheDocument();
 	});
 
+	it('should call onMobileClick when clicked on mobile', () => {
+		const onMobileClick = vi.fn();
+		render(
+			<ThemeProvider>
+				<BrowserRouter>
+					<AccountButton isMobile onMobileClick={onMobileClick} />
+				</BrowserRouter>
+			</ThemeProvider>,
+		);
+
+		fireEvent.click(screen.getByRole('button'));
+		expect(onMobileClick).toHaveBeenCalled();
+	});
+
+	it('should call openAuthModal("login") when login is clicked', async () => {
+		render(
+			<ThemeProvider>
+				<BrowserRouter>
+					<AccountButton />
+				</BrowserRouter>
+			</ThemeProvider>,
+		);
+
+		fireEvent.click(screen.getByRole('button'));
+		const loginItem = await screen.findByText('Login');
+		fireEvent.click(loginItem);
+
+		expect(mockOpenAuthModal).toHaveBeenCalledWith('login');
+	});
+
+	it('should call openAuthModal("register") when register is clicked', async () => {
+		render(
+			<ThemeProvider>
+				<BrowserRouter>
+					<AccountButton />
+				</BrowserRouter>
+			</ThemeProvider>,
+		);
+
+		fireEvent.click(screen.getByRole('button'));
+		const registerItem = await screen.findByText('Register');
+		fireEvent.click(registerItem);
+
+		expect(mockOpenAuthModal).toHaveBeenCalledWith('register');
+	});
+
+	it('should show "My Bookings" only if user has bookings', async () => {
+		const { rerender } = render(
+			<ThemeProvider>
+				<BrowserRouter>
+					<AccountButton />
+				</BrowserRouter>
+			</ThemeProvider>,
+		);
+
+		// Authenticated but no bookings
+		(useAuth as any).mockReturnValue({
+			isAuthenticated: true,
+			user: { name: 'John Doe', bookings: [] },
+			logout: mockLogout,
+		});
+
+		rerender(
+			<ThemeProvider>
+				<BrowserRouter>
+					<AccountButton />
+				</BrowserRouter>
+			</ThemeProvider>,
+		);
+
+		fireEvent.click(screen.getByRole('button'));
+		expect(await screen.findByText('John Doe')).toBeInTheDocument();
+		expect(screen.queryByText('My Bookings')).not.toBeInTheDocument();
+
+		// Close menu
+		fireEvent.click(screen.getByRole('presentation').firstChild as HTMLElement);
+
+		// With bookings
+		(useAuth as any).mockReturnValue({
+			isAuthenticated: true,
+			user: { name: 'John Doe', bookings: [{ id: 1 }] },
+			logout: mockLogout,
+		});
+
+		rerender(
+			<ThemeProvider>
+				<BrowserRouter>
+					<AccountButton />
+				</BrowserRouter>
+			</ThemeProvider>,
+		);
+
+		fireEvent.click(screen.getByRole('button'));
+		expect(await screen.findByText('My Bookings')).toBeInTheDocument();
+	});
+
 	it('should call logout when Logout item is clicked', async () => {
 		(useAuth as any).mockReturnValue({
 			isAuthenticated: true,
-			user: { name: 'John Doe' },
+			user: { name: 'John Doe', bookings: [] },
 			logout: mockLogout,
 		});
 

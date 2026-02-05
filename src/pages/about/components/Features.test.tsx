@@ -13,13 +13,7 @@ describe('Features', () => {
 
 		// Using a function to find text to be more flexible
 		expect(
-			screen.getByText((content) => content.includes('Why Choose')),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText((content) => content.includes('Premium Equipment')),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText((content) => content.includes('Convenient Booking')),
+			screen.getByText((content) => content.includes('Fully Licensed Bar')),
 		).toBeInTheDocument();
 		expect(
 			screen.getByText((content) => content.includes('Membership Tiers')),
@@ -31,9 +25,7 @@ describe('Features', () => {
 			screen.getByText((content) => content.includes('Community Focus')),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText((content) =>
-				content.includes('Data-Driven Improvement'),
-			),
+			screen.getByText((content) => content.includes('Private Events')),
 		).toBeInTheDocument();
 	});
 

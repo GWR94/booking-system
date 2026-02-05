@@ -6,7 +6,6 @@ import { axios } from '@utils';
 import createWrapper from '@utils/test-utils';
 import { useBasket, useBookingManager, useSession } from '@hooks';
 
-// Mock dependencies
 vi.mock('@stripe/react-stripe-js', () => ({
 	useStripe: vi.fn(),
 }));

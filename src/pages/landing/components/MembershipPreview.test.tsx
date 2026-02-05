@@ -17,6 +17,44 @@ vi.mock('@ui', () => ({
 	AnimateIn: ({ children }: { children: React.ReactNode }) => (
 		<div data-testid="animate-in">{children}</div>
 	),
+	SectionHeader: ({ title, description }: any) => (
+		<div>
+			<h1>{title}</h1>
+			<p>{description}</p>
+		</div>
+	),
+}));
+
+vi.mock('@mui/icons-material', () => ({
+	Check: () => <div data-testid="CheckIcon" />,
+	Star: () => <div data-testid="StarIcon" />,
+}));
+
+vi.mock('@constants/memberships', () => ({
+	__esModule: true,
+	default: [
+		{
+			title: 'Par',
+			price: '£199.99',
+			period: '/month',
+			features: ['Feature 1'],
+			recommended: false,
+		},
+		{
+			title: 'Birdie',
+			price: '£299.99',
+			period: '/month',
+			features: ['Feature 1'],
+			recommended: true,
+		},
+		{
+			title: 'Hole-In-One',
+			price: '£399.99',
+			period: '/month',
+			features: ['Feature 1'],
+			recommended: false,
+		},
+	],
 }));
 
 describe('MembershipPreview', () => {
@@ -30,9 +68,6 @@ describe('MembershipPreview', () => {
 		);
 
 		expect(screen.getByText(/Flexible Membership Plans/i)).toBeInTheDocument();
-		expect(
-			screen.getByText(/Join The Short Grass community/i),
-		).toBeInTheDocument();
 	});
 
 	it('should render all three membership tiers', () => {
@@ -72,7 +107,7 @@ describe('MembershipPreview', () => {
 			</ThemeProvider>,
 		);
 
-		const viewDetailsBtns = screen.getAllByText(/View Details/i);
+		const viewDetailsBtns = screen.getAllByText(/Choose/i);
 		fireEvent.click(viewDetailsBtns[0]);
 		expect(mockNavigate).toHaveBeenCalledWith('/membership');
 	});

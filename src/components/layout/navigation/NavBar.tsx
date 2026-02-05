@@ -20,6 +20,7 @@ import AdminMenuButton from './AdminMenuButton';
 import { Logo } from '@ui';
 import { NAV_ITEMS } from './menuItems';
 import { useAuth } from '@hooks';
+import ThemeSwitcher from './ThemeSwitcher';
 
 interface NavBarProps {
 	threshold?: number;
@@ -119,6 +120,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 										setMenuContent('nav');
 										setIsMenuOpen(!isMenuOpen);
 									}}
+									aria-label="Toggle menu"
 									color="inherit"
 									edge="start"
 									sx={{
@@ -150,6 +152,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 									gap: { xs: 0, sm: 1, md: 2 },
 								}}
 							>
+								<ThemeSwitcher isMobile={isMobile} />
 								<Basket
 									isMobile={isMobile}
 									onMobileBasketClick={setMobileNavBarToBasket}

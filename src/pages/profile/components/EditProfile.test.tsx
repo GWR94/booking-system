@@ -48,6 +48,7 @@ describe('EditProfile', () => {
 		name: 'John Doe',
 		email: 'john@example.com',
 		passwordHash: 'hashed',
+		hasPassword: true,
 		googleId: 'g123',
 	};
 

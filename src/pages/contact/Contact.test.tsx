@@ -54,7 +54,7 @@ describe('Contact Page', () => {
 		expect(screen.getByText('Getting Here')).toBeInTheDocument();
 		expect(screen.getByText('Public Transport')).toBeInTheDocument();
 		expect(
-			screen.getByText(/Located just 5 minutes from Central Station/i),
+			screen.getByText(/Located in the heart of Maidstone Town Centre/i),
 		).toBeInTheDocument();
 		expect(
 			screen.getByText(/Free parking available for all customers/i),
@@ -66,7 +66,7 @@ describe('Contact Page', () => {
 
 		expect(screen.getByText(/Bus Routes: 14, 36, 42/i)).toBeInTheDocument();
 		expect(
-			screen.getByText(/Underground: Central Line to Green Park/i),
+			screen.getByText(/Train: Maidstone East or Maidstone West/i),
 		).toBeInTheDocument();
 	});
 });

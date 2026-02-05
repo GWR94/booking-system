@@ -3,10 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import LegacyRegister from './LegacyRegister';
 import { useAuth } from '@hooks';
+import { useUI } from '@context';
 import createWrapper from '@utils/test-utils';
 
 vi.mock('@hooks', () => ({
 	useAuth: vi.fn(),
+}));
+
+vi.mock('@context', () => ({
+	useUI: vi.fn(),
 }));
 
 const renderLegacyRegister = () => {
@@ -22,6 +27,7 @@ describe('LegacyRegister', () => {
 			register: mockRegister,
 			isLoading: false,
 		});
+		(useUI as any).mockReturnValue({ openAuthModal: vi.fn() });
 	});
 
 	it('should render registration form fields', () => {
@@ -118,5 +124,15 @@ describe('LegacyRegister', () => {
 
 		renderLegacyRegister();
 		expect(screen.getByRole('progressbar')).toBeInTheDocument();
+	});
+
+	it('should open auth modal when sign in link is clicked', () => {
+		const mockOpenAuthModal = vi.fn();
+		(useUI as any).mockReturnValue({ openAuthModal: mockOpenAuthModal });
+
+		renderLegacyRegister();
+
+		fireEvent.click(screen.getByText(/Sign in/i));
+		expect(mockOpenAuthModal).toHaveBeenCalledWith('login');
 	});
 });

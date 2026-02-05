@@ -22,6 +22,11 @@ vi.mock('@ui', () => ({
 	LoadingSpinner: ({ sx }: any) => (
 		<div data-testid="loading-spinner">Loading...</div>
 	),
+	SectionHeader: ({ title, subtitle }: any) => (
+		<div data-testid="section-header">
+			{title} {subtitle}
+		</div>
+	),
 }));
 
 describe('Booking Page', () => {
@@ -34,12 +39,9 @@ describe('Booking Page', () => {
 
 		render(<Booking />);
 
-		expect(
-			screen.getByRole('heading', { name: /Book Your Session/i }),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText(/Choose your preferred time and bay to get started/i),
-		).toBeInTheDocument();
+		expect(screen.getByTestId('section-header')).toHaveTextContent(
+			'Book Your Session Instant Reservations',
+		);
 	});
 
 	it('renders SessionPicker component', () => {

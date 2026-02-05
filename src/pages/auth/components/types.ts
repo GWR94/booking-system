@@ -20,6 +20,7 @@ export interface User {
 	} | null;
 	cancelAtPeriodEnd?: boolean;
 	passwordHash?: string | boolean;
+	hasPassword?: boolean;
 	bookings?: any[];
 }
 

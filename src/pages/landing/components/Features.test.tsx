@@ -17,7 +17,6 @@ describe('Landing Features', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/Premium Features/i)).toBeInTheDocument();
 		expect(screen.getByText(/Trackman 4 Technology/i)).toBeInTheDocument();
 		expect(screen.getByText(/Group & Private Bookings/i)).toBeInTheDocument();
 		expect(screen.getByText(/Flexible Scheduling/i)).toBeInTheDocument();

@@ -24,7 +24,9 @@ import {
 } from '@mui/icons-material';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import UserBookingDetailsDialog from '../../profile/components/UserBookingDetailsDialog';
+import UserBookingDetailsDialog from '@pages/profile/components/UserBookingDetailsDialog';
+import { adminDeleteBooking } from '@api';
+import { useSnackbar } from '@context';
 
 type UserBookingsModalProps = {
 	user: any;
@@ -38,6 +40,7 @@ const UserBookingsModal = ({ user, open, onClose }: UserBookingsModalProps) => {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(5);
+	const { showSnackbar } = useSnackbar();
 
 	const handleChangePage = (event: unknown, newPage: number) => {
 		setPage(newPage);
@@ -71,12 +74,16 @@ const UserBookingsModal = ({ user, open, onClose }: UserBookingsModalProps) => {
 		setDetailsOpen(true);
 	};
 
-	// We don't implement cancellation here as it reused the UserBookingDetailsDialog which has a cancel callback.
-	// For admin view only, we might just pass a dummy cancel or implement admin cancellation if needed.
-	// For now, let's keep it read-only or basic.
-	const handleCancelBooking = () => {
-		// Placeholder: Admins might need a different flow or use the existing AdminBookings page logic
-		console.log('Cancel requested from modal');
+	const handleCancelBooking = async (bookingId: number) => {
+		try {
+			await adminDeleteBooking(bookingId);
+			showSnackbar('Booking cancelled successfully', 'success');
+			setDetailsOpen(false);
+			onClose();
+		} catch (error) {
+			console.error(error);
+			showSnackbar('Failed to cancel booking', 'error');
+		}
 	};
 
 	if (!user) return null;
@@ -103,7 +110,7 @@ const UserBookingsModal = ({ user, open, onClose }: UserBookingsModalProps) => {
 						<Typography variant="h6" fontWeight={700}>
 							{user.name}'s Bookings
 						</Typography>
-						<IconButton onClick={onClose} size="small">
+						<IconButton onClick={onClose} size="small" aria-label="close">
 							<CloseIcon />
 						</IconButton>
 					</Box>
@@ -148,14 +155,11 @@ const UserBookingsModal = ({ user, open, onClose }: UserBookingsModalProps) => {
 											const firstSlot = booking.slots?.[0];
 											const lastSlot =
 												booking.slots?.[booking.slots.length - 1];
-											// We might need to fetch bay names if they are not in the user object yet.
-											// Assuming verifyUser includes slots, but admin getAllUsers might not include deep nested bays unless updated.
-											// Let's assume slots are there.
+
 											const bayNames = Array.from(
 												new Set(
-													booking.slots?.map(
-														(s: any) => s.bay?.name || `Bay ${s.bayId}`,
-													) || [],
+													booking.slots?.map((s: any) => `Bay ${s.bayId}`) ||
+														[],
 												),
 											).join(', ');
 
@@ -235,7 +239,7 @@ const UserBookingsModal = ({ user, open, onClose }: UserBookingsModalProps) => {
 				booking={selectedBooking}
 				open={detailsOpen}
 				onClose={() => setDetailsOpen(false)}
-				onCancelBooking={handleCancelBooking} // Read-only mostly
+				onCancelBooking={handleCancelBooking}
 				getStatusColor={getStatusColor}
 			/>
 		</>

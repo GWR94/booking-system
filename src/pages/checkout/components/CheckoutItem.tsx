@@ -5,13 +5,22 @@ import {
 	CardContent,
 	Grid2 as Grid,
 	IconButton,
+	Stack,
+	Chip,
+	Divider,
 } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import {
+	CalendarMonth,
+	AccessTime,
+	Timer,
+	SportsGolf,
+} from '@mui/icons-material';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useBasket, useAuth } from '@hooks';
 import { calculateSlotPrice } from '@utils';
-import { GroupedSlot } from '../../booking/components';
+import type { GroupedSlot } from '../../booking/components/types';
 
 type CheckoutItemProps = {
 	slot: GroupedSlot;
@@ -46,84 +55,123 @@ const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 
 	return (
 		<Card
+			elevation={0}
 			sx={{
 				mb: 2,
+				borderRadius: 2,
+				border: '1px solid',
+				borderColor: 'divider',
+				transition: 'all 0.2s ease-in-out',
 				'&:hover': {
-					boxShadow: 3,
-					transition: '0.3s',
+					borderColor: 'primary.main',
+					bgcolor: 'background.paper',
+					boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
 				},
 			}}
 		>
-			<CardContent>
+			<CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
 				<Grid container spacing={2} alignItems="center">
-					<Grid size={{ xs: 12, sm: 10 }}>
-						<Box>
-							<Grid container spacing={2}>
-								<Grid size={{ xs: 6 }}>
+					{/* Bay Info */}
+					<Grid size={{ xs: 12, sm: 3 }}>
+						<Stack direction="row" spacing={1.5} alignItems="center">
+							<Box
+								sx={{
+									bgcolor: 'primary.50',
+									color: 'primary.main',
+									p: 1,
+									borderRadius: 1.5,
+									display: 'flex',
+								}}
+							>
+								<SportsGolf fontSize="small" />
+							</Box>
+							<Box>
+								<Typography variant="subtitle2" color="text.secondary">
+									Simulator
+								</Typography>
+								<Typography variant="subtitle1" fontWeight="700">
+									Bay {slot.bayId}
+								</Typography>
+							</Box>
+						</Stack>
+					</Grid>
+
+					{/* Date & Time */}
+					<Grid size={{ xs: 6, sm: 4 }}>
+						<Stack spacing={0.5}>
+							<Stack direction="row" spacing={1} alignItems="center">
+								<CalendarMonth
+									fontSize="inherit"
+									color="action"
+									sx={{ fontSize: 16 }}
+								/>
+								<Typography variant="body2" fontWeight="500">
+									{dayjs(slot.startTime).format('ddd Do MMM')}
+								</Typography>
+							</Stack>
+							<Stack direction="row" spacing={1} alignItems="center">
+								<AccessTime
+									fontSize="inherit"
+									color="action"
+									sx={{ fontSize: 16 }}
+								/>
+								<Typography variant="body2" color="text.secondary">
+									{dayjs(slot.startTime).format('HH:mm')} -{' '}
+									{dayjs(slot.endTime).format('HH:mm')}
+								</Typography>
+							</Stack>
+						</Stack>
+					</Grid>
+
+					{/* Duration & Price */}
+					<Grid size={{ xs: 6, sm: 4 }}>
+						<Stack
+							direction="row"
+							justifyContent="space-between"
+							alignItems="center"
+							height="100%"
+						>
+							<Stack spacing={0.5}>
+								<Stack direction="row" spacing={1} alignItems="center">
+									<Timer
+										fontSize="inherit"
+										color="action"
+										sx={{ fontSize: 16 }}
+									/>
 									<Typography variant="body2" color="text.secondary">
-										Date
-									</Typography>
-									<Typography variant="body1" fontWeight="medium">
-										{dayjs(slot.startTime).format('dddd Do MMM YYYY')}
-									</Typography>
-								</Grid>
-								<Grid size={{ xs: 6 }}>
-									<Typography variant="body2" color="text.secondary">
-										Time
-									</Typography>
-									<Typography variant="body1" fontWeight="medium">
-										{dayjs(slot.startTime).format('h:mma')} -{' '}
-										{dayjs(slot.endTime).format('h:mma')}
-									</Typography>
-								</Grid>
-								<Grid size={{ xs: 6 }}>
-									<Typography variant="body2" color="text.secondary">
-										Bay Number
-									</Typography>
-									<Typography variant="body1" fontWeight="medium">
-										Bay {slot.bayId}
-									</Typography>
-								</Grid>
-								<Grid size={{ xs: 6 }}>
-									<Typography variant="body2" color="text.secondary">
-										Duration
-									</Typography>
-									<Typography variant="body1" fontWeight="medium">
 										{durationString}
 									</Typography>
-								</Grid>
-							</Grid>
-						</Box>
-					</Grid>
-					<Grid size={{ xs: 12, sm: 2 }}>
-						<Box
-							sx={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: { xs: 'flex-start', sm: 'flex-end' },
-								height: '100%',
-								justifyContent: 'space-between',
-							}}
-						>
-							<Typography
-								variant="h6"
-								color="primary"
-								sx={{ fontWeight: 'bold' }}
-							>
+								</Stack>
+							</Stack>
+							<Typography variant="h6" color="primary.main" fontWeight="700">
 								£{totalPrice}
 							</Typography>
-							{!isCompleted && (
-								<IconButton
-									onClick={() => removeFromBasket(slot)}
-									color="error"
-									sx={{ mt: 1 }}
-									aria-label="remove item"
-								>
-									<DeleteOutlineIcon />
-								</IconButton>
-							)}
-						</Box>
+						</Stack>
 					</Grid>
+
+					{/* Remove Action */}
+					{!isCompleted && (
+						<Grid
+							size={{ xs: 12, sm: 1 }}
+							display="flex"
+							justifyContent="flex-end"
+						>
+							<IconButton
+								size="small"
+								onClick={() => removeFromBasket(slot)}
+								sx={{
+									color: 'text.disabled',
+									'&:hover': {
+										color: 'error.main',
+										bgcolor: 'error.50',
+									},
+								}}
+								aria-label="remove item"
+							>
+								<DeleteOutlineIcon fontSize="small" />
+							</IconButton>
+						</Grid>
+					)}
 				</Grid>
 			</CardContent>
 		</Card>

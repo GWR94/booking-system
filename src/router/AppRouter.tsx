@@ -1,45 +1,44 @@
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, Suspense, lazy } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '@hooks';
-import GoogleAnalytics from '../components/layout/GoogleAnalytics';
-import CookieConsentBanner from '../components/layout/CookieConsentBanner';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useUI, AuthModalView } from '@context';
+import { GoogleAnalytics, CookieConsentBanner, NavBar, Footer } from '@layout';
+import { LoadingSpinner } from '@ui';
 import { Box } from '@mui/material';
-// MainLayout is eager for landing page
-import MainLayout from '../layouts/MainLayout';
+import { MainLayout } from '@layouts';
 import { ScrollToTop } from '@utils';
 import AdminRoute from './AdminRoute';
+import { Landing } from '@pages';
 
-// Landing is eagerly loaded for speed
-import Landing from '../pages/landing/Landing';
+const AdminLayout = lazy(() =>
+	import('@layouts').then((m) => ({ default: m.AdminLayout })),
+);
+const AuthLayout = lazy(() =>
+	import('@layouts').then((m) => ({ default: m.AuthLayout })),
+);
+const ProfileLayout = lazy(() =>
+	import('@layouts').then((m) => ({ default: m.ProfileLayout })),
+);
 
-// Lazy load layouts to reduce initial bundle size
-const AdminLayout = lazy(() => import('../layouts/AdminLayout'));
-const AuthLayout = lazy(() => import('../layouts/AuthLayout'));
-const ProfileLayout = lazy(() => import('../layouts/ProfileLayout'));
-
-// All other pages are lazily loaded
-const About = lazy(() => import('../pages/about/About'));
-const Membership = lazy(() => import('../pages/membership/Membership'));
-const NotFound = lazy(() => import('../pages/not-found/NotFound'));
-const RegisterUser = lazy(() => import('../pages/auth/RegisterUser'));
-const Checkout = lazy(() => import('../pages/checkout/Checkout'));
-const Login = lazy(() => import('../pages/auth/Login'));
-const Booking = lazy(() => import('../pages/booking/Booking'));
-const Contact = lazy(() => import('../pages/contact/Contact'));
-const Terms = lazy(() => import('../pages/legal/Terms'));
-const PrivacyPolicy = lazy(() => import('../pages/legal/PrivacyPolicy'));
-const HelpCenter = lazy(() => import('../pages/help-center/HelpCenter'));
-const CookiesPolicy = lazy(() => import('../pages/legal/CookiesPolicy'));
-const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
-const AdminBookings = lazy(() => import('../pages/admin/AdminBookings'));
-const AdminBlockOuts = lazy(() => import('../pages/admin/AdminBlockOuts'));
-const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
-const Overview = lazy(() => import('../pages/profile/Overview'));
-const MyBookings = lazy(() => import('../pages/profile/MyBookings'));
-const Settings = lazy(() => import('../pages/profile/Settings'));
-const ResetPassword = lazy(() => import('../pages/auth/ResetPassword'));
+const About = lazy(() => import('@pages/about/About'));
+const Membership = lazy(() => import('@pages/membership/Membership'));
+const NotFound = lazy(() => import('@pages/not-found/NotFound'));
+const Checkout = lazy(() => import('@pages/checkout/Checkout'));
+const Booking = lazy(() => import('@pages/booking/Booking'));
+const Contact = lazy(() => import('@pages/contact/Contact'));
+const Terms = lazy(() => import('@pages/legal/Terms'));
+const PrivacyPolicy = lazy(() => import('@pages/legal/PrivacyPolicy'));
+const HelpCenter = lazy(() => import('@pages/help-center/HelpCenter'));
+const CookiesPolicy = lazy(() => import('@pages/legal/CookiesPolicy'));
+const AdminDashboard = lazy(() => import('@pages/admin/AdminDashboard'));
+const AdminBookings = lazy(() => import('@pages/admin/AdminBookings'));
+const AdminBlockOuts = lazy(() => import('@pages/admin/AdminBlockOuts'));
+const AdminUsers = lazy(() => import('@pages/admin/AdminUsers'));
+const Overview = lazy(() => import('@pages/profile/Overview'));
+const MyBookings = lazy(() => import('@pages/profile/MyBookings'));
+const Settings = lazy(() => import('@pages/profile/Settings'));
+const ResetPassword = lazy(() => import('@pages/auth/ResetPassword'));
 
 const PageLoader = () => (
 	<Box
@@ -53,6 +52,18 @@ const PageLoader = () => (
 		<LoadingSpinner />
 	</Box>
 );
+
+const RedirectToAuth = ({ mode }: { mode: AuthModalView }) => {
+	const { openAuthModal } = useUI();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		navigate('/', { replace: true });
+		openAuthModal(mode);
+	}, [mode, openAuthModal, navigate]);
+
+	return <PageLoader />;
+};
 
 const AppRouter = () => {
 	const { isAuthenticated } = useAuth();
@@ -83,9 +94,14 @@ const AppRouter = () => {
 					<Route element={<AuthLayout />}>
 						<Route
 							path="/login"
-							element={isAuthenticated ? <Landing /> : <Login />}
+							element={
+								isAuthenticated ? <Landing /> : <RedirectToAuth mode="login" />
+							}
 						/>
-						<Route path="/register" element={<RegisterUser />} />
+						<Route
+							path="/register"
+							element={<RedirectToAuth mode="register" />}
+						/>
 						<Route path="/reset-password" element={<ResetPassword />} />
 					</Route>
 

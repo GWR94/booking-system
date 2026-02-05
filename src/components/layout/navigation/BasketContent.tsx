@@ -2,6 +2,7 @@ import { ShoppingCart } from '@mui/icons-material';
 import { Typography, Button, Box, Badge, useTheme, List } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useBasket, useAuth } from '@hooks';
+import { useUI } from '@context';
 import EmptyBasket from './EmptyBasket';
 import BasketItem from './BasketItem';
 
@@ -13,40 +14,17 @@ interface BasketContentProps {
 const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 	const navigate = useNavigate();
 	const { isAuthenticated } = useAuth();
+	const { openAuthModal } = useUI();
 	const { basket, basketPrice, clearBasket } = useBasket();
 	const theme = useTheme();
+
 	return (
 		<Box
 			sx={{
 				borderRadius: 2,
-				p: 3,
+				p: 2,
 			}}
 		>
-			<Box
-				sx={{
-					display: 'flex',
-					alignItems: 'center',
-					borderBottom: `1px solid ${theme.palette.divider}`,
-					mb: 1,
-				}}
-			>
-				<Badge badgeContent={basket.length} color="accent" sx={{ mr: 1.5 }}>
-					<ShoppingCart
-						sx={{ color: isMobile ? 'rgba(255,255,255,0.8)' : 'text.primary' }}
-					/>
-				</Badge>
-				<Typography
-					variant="h6"
-					component="h2"
-					sx={{
-						fontWeight: 'bold',
-						color: isMobile ? 'white' : 'text.primary',
-					}}
-				>
-					Your Basket
-				</Typography>
-			</Box>
-
 			{/* Empty basket state */}
 			{basket.length === 0 ? (
 				<EmptyBasket isMobile={isMobile} onClose={onClose} />
@@ -142,7 +120,6 @@ const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 								sx={{
 									mt: 2,
 									mb: 1,
-									// py: 1,
 									borderRadius: 2,
 									fontWeight: 'bold',
 									boxShadow: 3,
@@ -152,7 +129,11 @@ const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 									}),
 								}}
 								onClick={() => {
-									navigate(isAuthenticated ? '/checkout' : '/login');
+									if (isAuthenticated) {
+										navigate('/checkout');
+									} else {
+										openAuthModal('login');
+									}
 									onClose && onClose();
 								}}
 							>
@@ -162,18 +143,19 @@ const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 							</Button>
 							{!isAuthenticated && (
 								<Button
-									variant="text"
-									color="inherit"
+									variant="outlined"
+									color="secondary"
 									size="small"
+									fullWidth
 									onClick={() => navigate('/checkout')}
 									sx={{
 										fontSize: '0.8rem',
 										color: isMobile
 											? 'rgba(255,255,255,0.7)'
-											: 'text.secondary',
+											: 'theme.secondary',
 										'&:hover': {
 											backgroundColor: 'transparent',
-											color: isMobile ? 'white' : 'text.primary',
+											color: isMobile ? 'white' : 'theme.secondary',
 										},
 									}}
 								>

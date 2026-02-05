@@ -12,7 +12,6 @@ import {
 import App from './App';
 import { HelmetProvider } from 'react-helmet-async';
 
-// Define Mock Types if needed for TypeScript intelligence, or rely on loose mocking
 type AuthMock = {
 	isAuthenticated: boolean;
 	user: any;
@@ -20,11 +19,8 @@ type AuthMock = {
 };
 
 describe('App Integration', () => {
-	// Define top-level test variables here if needed
 
 	beforeAll(async () => {
-		// One-time initialization logic
-		// Mocking modules that are constant across tests
 		vi.mock('framer-motion', () => ({
 			motion: {
 				div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -55,8 +51,6 @@ describe('App Integration', () => {
 	});
 
 	beforeEach(async () => {
-		// Logic that must be started before every test
-		// Reset mocks to default states
 		vi.resetModules();
 		vi.clearAllMocks();
 
@@ -85,44 +79,34 @@ describe('App Integration', () => {
 	});
 
 	afterAll(async () => {
-		// Logic that must be started after all tests
 		vi.restoreAllMocks();
 	});
 
 	describe('#render', () => {
 		it('should render the application and display key elements', async () => {
-			// Arrange
-			// (No specific arrangement needed beyond beforeEach mocks)
 
-			// Act
 			render(
 				<HelmetProvider>
 					<App />
 				</HelmetProvider>,
 			);
 
-			// Assert
-			// Check for the main hero text presence
 			const heroText = await screen.findByRole('heading', {
-				name: /The Short Grass/i,
+				name: /Play. Practice. Perform./i,
 			});
 			expect(heroText).toBeInTheDocument();
 		});
 
 		it('should render the navigation bar', async () => {
-			// Arrange
 			render(
 				<HelmetProvider>
 					<App />
 				</HelmetProvider>,
 			);
 
-			// Act
-			// Attempt to find a known nav element, e.g., 'Home' link or logo text if pertinent
 			// Assuming "Book Now" or similar exists in standard nav
 			const homeLink = await screen.findByRole('banner');
 
-			// Assert
 			expect(homeLink).toBeInTheDocument();
 		});
 	});

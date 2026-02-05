@@ -16,6 +16,7 @@ vi.mock('@utils', () => ({
 		get: vi.fn(),
 		post: vi.fn(),
 		put: vi.fn(),
+		patch: vi.fn(),
 		delete: vi.fn(),
 	},
 }));
@@ -84,11 +85,11 @@ describe('auth api', () => {
 	it('updateProfile should call PUT /api/user/profile', async () => {
 		const userUpdate = { name: 'New Name' };
 		const mockResponse = { success: true };
-		(axios.put as any).mockResolvedValue({ data: mockResponse });
+		(axios.patch as any).mockResolvedValue({ data: mockResponse });
 
 		const result = await updateProfile(userUpdate);
 
-		expect(axios.put).toHaveBeenCalledWith('/api/user/profile', userUpdate);
+		expect(axios.patch).toHaveBeenCalledWith('/api/user/profile', userUpdate);
 		expect(result).toEqual(mockResponse);
 	});
 

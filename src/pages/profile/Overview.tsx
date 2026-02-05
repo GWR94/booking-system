@@ -1,12 +1,15 @@
 import { UserProfile } from './components';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import { SectionHeader } from '@ui';
 
 const Overview = () => {
 	return (
 		<Box>
-			<Typography variant="h5" fontWeight="bold" sx={{ mb: 4 }}>
-				Profile Overview
-			</Typography>
+			<SectionHeader
+				subtitle="PROFILE"
+				title="Overview"
+				description="View and edit your personal information"
+			/>
 			<UserProfile />
 		</Box>
 	);

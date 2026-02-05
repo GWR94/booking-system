@@ -1,5 +1,4 @@
 import {
-	Avatar,
 	Box,
 	Container,
 	Grid2 as Grid,
@@ -39,89 +38,66 @@ const simulatorFeatures = [
 	},
 ];
 
-const Features = ({ background }: { background?: string }) => {
+const Features = () => {
 	const theme = useTheme();
 
 	return (
 		<Box
 			sx={{
-				py: 10,
-				background,
+				py: 8,
+				bgcolor: theme.palette.primary.main,
+				color: 'common.white',
 			}}
 		>
-			<Container maxWidth="lg" sx={{ mb: 4 }}>
-				<Box sx={{ textAlign: 'center', mb: 6 }}>
-					<Typography
-						variant="title"
-						sx={{
-							fontWeight: 700,
-							color: theme.palette.primary.main,
-							mb: 4,
-						}}
-					>
-						Premium Features
-					</Typography>
-					<Typography
-						variant="h6"
-						color="text.secondary"
-						sx={{
-							maxWidth: 700,
-							mx: 'auto',
-							fontWeight: 400,
-						}}
-					>
-						Experience golf like never before with our cutting-edge technology
-						and premium amenities
-					</Typography>
-				</Box>
-				<Grid container spacing={4} sx={{ mt: 4 }}>
+			<Container maxWidth="xl">
+				<Grid
+					container
+					spacing={4}
+					justifyContent="space-around"
+					alignItems="center"
+				>
 					{simulatorFeatures.map((feature, index) => (
-						<Grid size={{ xs: 12, md: 3 }} key={index}>
-							<AnimateIn delay={index * 0.1} type="zoom-in">
+						<Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+							<AnimateIn delay={index * 0.1} type="fade-up">
 								<Box
-									textAlign="center"
 									sx={{
 										display: 'flex',
 										flexDirection: 'column',
-										justifyContent: 'space-around',
-										height: '100%',
+										alignItems: 'center',
+										textAlign: 'center',
+										p: 2,
 									}}
 								>
-									<Avatar
+									<Box
 										sx={{
-											width: 80,
-											height: 80,
-											margin: 'auto',
-											bgcolor: 'primary.dark',
-											color: 'secondary.light',
+											color: theme.palette.accent.main,
+											mb: 2,
+											transform: 'scale(1.2)',
 										}}
 									>
 										{feature.icon}
-									</Avatar>
-									<Box
+									</Box>
+									<Typography
+										variant="h6"
 										sx={{
-											height: '100%',
-											display: 'flex',
-											flexDirection: 'column',
-											justifyContent: 'center',
+											fontWeight: 700,
+											mb: 1,
+											fontSize: '1.1rem',
+											letterSpacing: 0.5,
 										}}
 									>
-										<Typography
-											variant="h6"
-											sx={{
-												display: 'flex',
-												alignItems: 'center',
-												justifyContent: 'center',
-												mb: 1,
-												height: 60,
-											}}
-										>
-											{feature.title}
-										</Typography>
-										<Typography variant="body2" color="text.secondary">
-											{feature.description}
-										</Typography>
-									</Box>
+										{feature.title}
+									</Typography>
+									<Typography
+										variant="body2"
+										sx={{
+											color: 'rgba(255,255,255,0.7)',
+											maxWidth: 250,
+											mx: 'auto',
+										}}
+									>
+										{feature.description}
+									</Typography>
 								</Box>
 							</AnimateIn>
 						</Grid>

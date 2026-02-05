@@ -11,17 +11,23 @@ import {
 	Grid2 as Grid,
 	Typography,
 	Alert,
+	Card,
+	CardContent,
+	Divider,
+	Stack,
 } from '@mui/material';
+import { Lock } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
 import { useSnackbar } from '@context';
 import CheckoutItem from './CheckoutItem';
 import TestPaymentNotice from './TestPaymentNotice';
 import { GuestUser } from './types';
-import { useBasket, useAuth } from '@hooks';
+import { useBasket, useAuth, useBookingManager } from '@hooks';
 import { useNavigate } from 'react-router-dom';
 import { confirmFreeBooking } from '@api';
-import { Booking } from '../../booking/components';
+import { Booking } from '@pages/booking/components';
+import MembershipUsageSummary from './MembershipUsageSummary';
 
 interface CheckoutFormProps {
 	guest: GuestUser | null;
@@ -38,7 +44,8 @@ const CheckoutForm = ({
 	const elements = useElements();
 	const { user, isAuthenticated } = useAuth();
 	const { showSnackbar } = useSnackbar();
-	const { basket, basketPrice } = useBasket();
+	const { setBooking } = useBookingManager();
+	const { basket, basketPrice, clearBasket } = useBasket();
 	const navigate = useNavigate();
 
 	const [message, setMessage] = useState('');
@@ -68,30 +75,24 @@ const CheckoutForm = ({
 	const hoursToDeduct = Math.min(remainingIncluded, basketEligibleHours);
 	const remainingAfter = Math.max(0, remainingIncluded - hoursToDeduct);
 
-	useEffect(() => {
-		if (basket.length === 0) {
-			setLoading(false);
-			showSnackbar('Add an item to the basket to checkout', 'info');
-			navigate('/basket');
-			return;
-		}
-	}, [basket]);
-
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+
+		const slotIds = basket.flatMap((slot) => slot.slotIds);
 
 		if (isFree) {
 			setLoading(true);
 			setMessage('');
 			try {
-				const slotIds = basket.map((b) => b.slotIds).flat();
+				const response = await confirmFreeBooking(slotIds, guest);
 
-				await confirmFreeBooking(slotIds, guest);
+				if (response.booking) {
+					setBooking(response.booking);
+				}
 
-				// Redirect to completion
-				window.location.href = `${
-					import.meta.env.VITE_FRONT_END
-				}/checkout/complete`;
+				clearBasket();
+				// Redirect to completion with success flag
+				navigate('/checkout/complete?success=true');
 			} catch (err) {
 				console.error(err);
 				setMessage('Failed to confirm free booking.');
@@ -138,175 +139,175 @@ const CheckoutForm = ({
 
 	return (
 		<Box>
-			<Typography
-				variant="h4"
-				fontWeight="400"
-				sx={{ mb: 2, borderBottom: '1px solid #1976D2' }}
-			>
-				Checkout
-			</Typography>
-			<Typography
-				variant="subtitle2"
-				fontWeight="300"
-				textAlign="justify"
-				sx={{ mb: 2 }}
-			>
-				Please check that all of the below details are correct, and continue
-				with payment.
-			</Typography>
+			<Grid container spacing={4}>
+				{/* Left Column: Items, Membership, Payment */}
+				<Grid size={{ xs: 12, md: 8 }}>
+					{isAuthenticated &&
+						user?.membershipTier === 'PAR' &&
+						basket.some((slot) => {
+							const day = dayjs(slot.startTime).day();
+							return day === 0 || day === 6;
+						}) && (
+							<Alert severity="warning" sx={{ mb: 3 }}>
+								Note: Weekend slots are excluded from Par membership included
+								hours. Your 10% discount has still been applied.
+							</Alert>
+						)}
 
-			{isAuthenticated &&
-				user?.membershipTier === 'PAR' &&
-				basket.some((slot) => {
-					const day = dayjs(slot.startTime).day();
-					return day === 0 || day === 6;
-				}) && (
-					<Alert severity="warning" sx={{ mb: 2 }}>
-						Note: Weekend slots are excluded from Par membership included hours.
-						Your 10% discount has still been applied.
-					</Alert>
-				)}
+					<Stack spacing={2} sx={{ mb: 4 }}>
+						{basket.map((slot) => (
+							<CheckoutItem slot={slot} key={slot.id} />
+						))}
+					</Stack>
 
-			{basket.map((slot) => (
-				<CheckoutItem slot={slot} key={slot.id} />
-			))}
+					<Card
+						variant="outlined"
+						sx={{ borderRadius: 2, bgcolor: 'background.paper', mb: 4 }}
+					>
+						<CardContent sx={{ p: 3 }}>
+							<Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+								Payment Details
+							</Typography>
 
-			{includedHours > 0 && (
-				<Box
-					sx={{
-						my: 3,
-						p: 2,
-						bgcolor: 'background.paper',
-						borderRadius: 1,
-						border: '1px solid #e0e0e0',
-					}}
-				>
-					<Typography variant="h6" gutterBottom>
-						Membership Allowance
-					</Typography>
-					<Grid container spacing={2}>
-						<Grid size={{ xs: 6, sm: 3 }}>
-							<Typography variant="caption" color="text.secondary">
-								Included
-							</Typography>
-							<Typography variant="body1" fontWeight="bold">
-								{includedHours} hrs
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6, sm: 3 }}>
-							<Typography variant="caption" color="text.secondary">
-								Used
-							</Typography>
-							<Typography variant="body1">{usedHours} hrs</Typography>
-						</Grid>
-						<Grid size={{ xs: 6, sm: 3 }}>
-							<Typography variant="caption" color="text.secondary">
-								Using Now
-							</Typography>
-							<Typography
-								variant="body1"
-								color="primary.main"
-								fontWeight="bold"
-							>
-								{hoursToDeduct > 0 ? `-${hoursToDeduct} hrs` : '0 hrs'}
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6, sm: 3 }}>
-							<Typography variant="caption" color="text.secondary">
-								Remaining
-							</Typography>
-							<Typography
-								variant="body1"
-								color={remainingAfter === 0 ? 'error.main' : 'success.main'}
-							>
-								{remainingAfter} hrs
-							</Typography>
-						</Grid>
-					</Grid>
-				</Box>
-			)}
+							<form id="payment-form" onSubmit={handleSubmit}>
+								{!isFree && (
+									<>
+										<TestPaymentNotice />
+										<Box sx={{ mb: 3 }}>
+											<PaymentElement
+												id="payment-element"
+												options={paymentElementOptions}
+											/>
+										</Box>
+									</>
+								)}
+								<Button
+									disabled={
+										isLoading ||
+										(!isFree && (!stripe || !elements)) ||
+										(!isAuthenticated && !recaptchaToken)
+									}
+									fullWidth
+									type="submit"
+									variant="contained"
+									color="primary"
+									sx={{
+										mt: 1,
+										height: '56px',
+										fontSize: '1.1rem',
+									}}
+								>
+									{isLoading ? (
+										<Box
+											sx={{
+												m: 'auto',
+												display: 'flex',
+												justifyContent: 'center',
+												alignItems: 'center',
+											}}
+										>
+											<CircularProgress sx={{ color: 'white' }} size={24} />
+										</Box>
+									) : (
+										`Pay £${parseFloat(basketPrice).toFixed(2)}`
+									)}
+								</Button>
 
-			<Grid container alignItems="center" sx={{ my: 2 }}>
-				<Grid size={{ xs: 12, sm: 6 }} />
-				<Grid size={{ xs: 12, sm: 6 }}>
-					<Grid container spacing={1} alignItems="center">
-						<Grid size={{ xs: 6 }}>
-							<Typography variant="body1" fontWeight="bold" textAlign="right">
-								Subtotal:
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6 }}>
-							<Typography variant="body1" textAlign="right">
-								£{(parseFloat(basketPrice) - parseFloat(VAT)).toFixed(2)}
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6 }}>
-							<Typography variant="body1" fontWeight="bold" textAlign="right">
-								VAT:
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6 }}>
-							<Typography variant="body1" textAlign="right">
-								£{VAT}
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6 }}>
-							<Typography variant="h6" fontWeight="bold" textAlign="right">
-								Total:
-							</Typography>
-						</Grid>
-						<Grid size={{ xs: 6 }}>
-							<Typography variant="h6" textAlign="right">
-								£{parseFloat(basketPrice).toFixed(2)}
-							</Typography>
-						</Grid>
-					</Grid>
+								<Stack
+									direction="row"
+									alignItems="center"
+									justifyContent="center"
+									spacing={1}
+									sx={{ mt: 2, color: 'text.secondary' }}
+								>
+									<Lock fontSize="small" sx={{ fontSize: 16 }} />
+									<Typography variant="caption" align="center">
+										Payments are secure and encrypted
+									</Typography>
+								</Stack>
+
+								{message && (
+									<Typography
+										id="payment-message"
+										color="error"
+										sx={{ mt: 2, textAlign: 'center' }}
+									>
+										{message}
+									</Typography>
+								)}
+							</form>
+						</CardContent>
+					</Card>
 				</Grid>
-			</Grid>
 
-			<form id="payment-form" onSubmit={handleSubmit}>
-				{!isFree && (
-					<>
-						<TestPaymentNotice />
-						<PaymentElement
-							id="payment-element"
-							options={paymentElementOptions}
-						/>
-					</>
-				)}
-				<Button
-					disabled={
-						isLoading ||
-						(!isFree && (!stripe || !elements)) ||
-						(!isAuthenticated && !recaptchaToken)
-					}
-					fullWidth
-					type="submit"
-					variant="contained"
-					color="primary"
-					sx={{ mt: 1, height: '40px' }}
-				>
-					{isLoading ? (
-						<Box
+				{/* Right Column: Order Summary */}
+				<Grid size={{ xs: 12, md: 4 }}>
+					<Box sx={{ position: 'sticky', top: 24 }}>
+						{includedHours > 0 && (
+							<Box sx={{ mb: 3 }}>
+								<MembershipUsageSummary
+									remainingAfter={remainingAfter}
+									usedHours={usedHours}
+									includedHours={includedHours}
+									hoursToDeduct={hoursToDeduct}
+								/>
+							</Box>
+						)}
+
+						<Card
+							variant="outlined"
 							sx={{
-								m: 'auto',
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
+								borderRadius: 2,
+								bgcolor: 'background.paper',
+								boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+								border: '1px solid',
+								borderColor: 'divider',
 							}}
 						>
-							<CircularProgress sx={{ color: 'white' }} size={20} />
-						</Box>
-					) : (
-						`Pay £${parseFloat(basketPrice).toFixed(2)} with Stripe`
-					)}
-				</Button>
-				{message && (
-					<Typography id="payment-message" color="error" sx={{ mt: 1 }}>
-						{message}
-					</Typography>
-				)}
-			</form>
+							<CardContent sx={{ p: 2.5 }}>
+								<Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+									Order Summary
+								</Typography>
+								<Stack spacing={1.5}>
+									<Box display="flex" justifyContent="space-between">
+										<Typography variant="body2" color="text.secondary">
+											Subtotal
+										</Typography>
+										<Typography variant="body2" fontWeight="500">
+											£{(parseFloat(basketPrice) - parseFloat(VAT)).toFixed(2)}
+										</Typography>
+									</Box>
+									<Box display="flex" justifyContent="space-between">
+										<Typography variant="body2" color="text.secondary">
+											VAT (20%)
+										</Typography>
+										<Typography variant="body2" fontWeight="500">
+											£{VAT}
+										</Typography>
+									</Box>
+									<Divider sx={{ my: 1 }} />
+									<Box
+										display="flex"
+										justifyContent="space-between"
+										alignItems="center"
+									>
+										<Typography variant="subtitle1" fontWeight="bold">
+											Total
+										</Typography>
+										<Typography
+											variant="h5"
+											color="primary.main"
+											fontWeight="800"
+										>
+											£{parseFloat(basketPrice).toFixed(2)}
+										</Typography>
+									</Box>
+								</Stack>
+							</CardContent>
+						</Card>
+					</Box>
+				</Grid>
+			</Grid>
 		</Box>
 	);
 };

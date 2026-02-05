@@ -8,6 +8,7 @@ import { ThemeProvider } from '@context/ThemeContext';
 import { UIProvider, CookieProvider, SnackbarProvider } from '@context';
 import { AuthModal } from './pages/auth/components';
 import { CssBaseline } from '@mui/material';
+import { ErrorBoundary } from '@layout';
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -30,10 +31,12 @@ const App = () => (
 				<LocalizationProvider dateAdapter={AdapterDayjs}>
 					<CookieProvider>
 						<SnackbarProvider>
-							<UIProvider>
-								<AuthModal />
-								<AppRouter />
-							</UIProvider>
+							<ErrorBoundary>
+								<UIProvider>
+									<AuthModal />
+									<AppRouter />
+								</UIProvider>
+							</ErrorBoundary>
 							<ReactQueryDevtools initialIsOpen={false} />
 						</SnackbarProvider>
 					</CookieProvider>
