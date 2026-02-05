@@ -228,7 +228,7 @@ const CompletePage = () => {
 				gap={4}
 				sx={{ py: 8 }}
 			>
-				<AnimateIn type="scale-up">
+				<AnimateIn type="zoom-in">
 					<Box
 						sx={{
 							backgroundColor: STATUS_CONTENT_MAP[status].iconColor,

@@ -78,7 +78,7 @@ export const getGroupedTimeSlots = (
 	return groupedSlots;
 };
 
-export const groupSlotsByBay = (slots: iSlot[]): GroupedSlot[] => {
+export const groupSlotsByBay = (slots: TimeSlot[]): GroupedSlot[] => {
 	if (!slots || slots.length === 0) return [];
 
 	const grouped: GroupedSlot[] = [];
@@ -86,7 +86,7 @@ export const groupSlotsByBay = (slots: iSlot[]): GroupedSlot[] => {
 		(a, b) => dayjs(a.startTime).valueOf() - dayjs(b.startTime).valueOf(),
 	);
 
-	const bayGroups: { [key: number]: iSlot[] } = {};
+	const bayGroups: { [key: number]: TimeSlot[] } = {};
 	sortedSlots.forEach((slot) => {
 		if (!bayGroups[slot.bayId]) {
 			bayGroups[slot.bayId] = [];
@@ -95,7 +95,7 @@ export const groupSlotsByBay = (slots: iSlot[]): GroupedSlot[] => {
 	});
 
 	Object.values(bayGroups).forEach((baySlots) => {
-		let currentGroup: iSlot[] = [];
+		let currentGroup: TimeSlot[] = [];
 
 		baySlots.forEach((slot, index) => {
 			if (index === 0) {

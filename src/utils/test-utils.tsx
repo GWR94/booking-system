@@ -24,6 +24,7 @@ const createWrapper = () => {
 					value={{
 						showSnackbar: mockShowSnackbar,
 						hideSnackbar: mockHideSnackbar,
+						setBottomOffset: vi.fn(),
 					}}
 				>
 					<MemoryRouter>{children}</MemoryRouter>

@@ -60,8 +60,8 @@ describe('MobileSlot Component', () => {
 			borderColor: 'red',
 			bgColor: 'blue',
 		},
+		sx: {},
 		basketCount: 0,
-		slotInBasket: undefined,
 		handleSlotClick: mockHandleSlotClick,
 		handleRemoveOne: vi.fn(),
 		setAdminDialogOpen: mockSetAdminDialogOpen,
@@ -86,41 +86,26 @@ describe('MobileSlot Component', () => {
 	});
 
 	it('displays checkmark and count when in basket', () => {
-		render(
-			<MobileSlot
-				{...defaultProps}
-				basketCount={2}
-				slotInBasket={mockSlot as any}
-			/>,
-			{ wrapper: createWrapper() },
-		);
+		render(<MobileSlot {...defaultProps} basketCount={2} />, {
+			wrapper: createWrapper(),
+		});
 		// CheckCircle icon is rendered
 		expect(screen.getByTestId('CheckCircleIcon')).toBeInTheDocument();
 		expect(screen.getByText('2x')).toBeInTheDocument();
 	});
 
 	it('displays REMOVE ONE button when in basket', () => {
-		render(
-			<MobileSlot
-				{...defaultProps}
-				basketCount={1}
-				slotInBasket={mockSlot as any}
-			/>,
-			{ wrapper: createWrapper() },
-		);
+		render(<MobileSlot {...defaultProps} basketCount={1} />, {
+			wrapper: createWrapper(),
+		});
 		expect(screen.getByText('Remove')).toBeInTheDocument();
 		expect(screen.queryByText('CHECKOUT')).not.toBeInTheDocument();
 	});
 
 	it('calls handleRemoveOne when REMOVE ONE is clicked', () => {
-		render(
-			<MobileSlot
-				{...defaultProps}
-				basketCount={1}
-				slotInBasket={mockSlot as any}
-			/>,
-			{ wrapper: createWrapper() },
-		);
+		render(<MobileSlot {...defaultProps} basketCount={1} />, {
+			wrapper: createWrapper(),
+		});
 		fireEvent.click(screen.getByText('Remove'));
 		expect(defaultProps.handleRemoveOne).toHaveBeenCalled();
 	});

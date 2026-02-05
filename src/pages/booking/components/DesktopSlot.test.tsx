@@ -59,6 +59,7 @@ describe('DesktopSlot Component', () => {
 			borderColor: 'red',
 			bgColor: 'blue',
 		},
+		sx: {},
 		slotInBasket: undefined,
 		basketCount: 0,
 		handleSlotClick: mockHandleSlotClick,

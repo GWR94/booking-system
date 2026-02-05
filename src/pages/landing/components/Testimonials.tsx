@@ -134,7 +134,7 @@ const Testimonials = () => {
 								clickable: true,
 								dynamicBullets: true,
 							}}
-							onBeforeInit={(swiper) => {
+							onBeforeInit={(swiper: any) => {
 								swiperRef.current = swiper;
 							}}
 							breakpoints={{
