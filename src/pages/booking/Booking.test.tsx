@@ -1,7 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import Booking from './Booking';
+import createWrapper from '@utils/test-utils';
+import { ThemeProvider, createTheme } from '@mui/material';
 
+const theme = createTheme();
 const mockUseSlots = vi.fn();
 
 vi.mock('@hooks', () => ({
@@ -19,9 +22,7 @@ vi.mock('./components', () => ({
 }));
 
 vi.mock('@ui', () => ({
-	LoadingSpinner: ({ sx }: any) => (
-		<div data-testid="loading-spinner">Loading...</div>
-	),
+	LoadingSpinner: () => <div data-testid="loading-spinner">Loading...</div>,
 	SectionHeader: ({ title, subtitle }: any) => (
 		<div data-testid="section-header">
 			{title} {subtitle}
@@ -37,7 +38,12 @@ describe('Booking Page', () => {
 	it('renders page title and subtitle', () => {
 		mockUseSlots.mockReturnValue({ isLoading: false });
 
-		render(<Booking />);
+		render(
+			<ThemeProvider theme={theme}>
+				<Booking />
+			</ThemeProvider>,
+			{ wrapper: createWrapper() },
+		);
 
 		expect(screen.getByTestId('section-header')).toHaveTextContent(
 			'Book Your Session Instant Reservations',
@@ -47,7 +53,12 @@ describe('Booking Page', () => {
 	it('renders SessionPicker component', () => {
 		mockUseSlots.mockReturnValue({ isLoading: false });
 
-		render(<Booking />);
+		render(
+			<ThemeProvider theme={theme}>
+				<Booking />
+			</ThemeProvider>,
+			{ wrapper: createWrapper() },
+		);
 
 		expect(screen.getByText('Session Picker Component')).toBeInTheDocument();
 	});
@@ -55,7 +66,12 @@ describe('Booking Page', () => {
 	it('shows loading spinner when isLoading is true', () => {
 		mockUseSlots.mockReturnValue({ isLoading: true });
 
-		render(<Booking />);
+		render(
+			<ThemeProvider theme={theme}>
+				<Booking />
+			</ThemeProvider>,
+			{ wrapper: createWrapper() },
+		);
 
 		expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
 		expect(
@@ -69,7 +85,12 @@ describe('Booking Page', () => {
 	it('shows GenerateSlots and NextPreviousButtons when loaded', () => {
 		mockUseSlots.mockReturnValue({ isLoading: false });
 
-		render(<Booking />);
+		render(
+			<ThemeProvider theme={theme}>
+				<Booking />
+			</ThemeProvider>,
+			{ wrapper: createWrapper() },
+		);
 
 		expect(screen.getByText('Generate Slots Component')).toBeInTheDocument();
 		expect(

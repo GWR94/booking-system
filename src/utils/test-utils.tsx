@@ -16,6 +16,7 @@ const createWrapper = () => {
 
 	const mockShowSnackbar = vi.fn();
 	const mockHideSnackbar = vi.fn();
+	const mockSetBottomOffset = vi.fn();
 
 	return ({ children }: { children: ReactNode }) => (
 		<HelmetProvider>
@@ -24,7 +25,7 @@ const createWrapper = () => {
 					value={{
 						showSnackbar: mockShowSnackbar,
 						hideSnackbar: mockHideSnackbar,
-						setBottomOffset: vi.fn(),
+						setBottomOffset: mockSetBottomOffset,
 					}}
 				>
 					<MemoryRouter>{children}</MemoryRouter>

@@ -5,6 +5,7 @@ import {
 	Grid2 as Grid,
 	useTheme,
 	Stack,
+	alpha,
 } from '@mui/material';
 import { AnimateIn } from '@ui';
 import { COMPANY_INFO } from '@constants/company';
@@ -13,7 +14,13 @@ const AboutHero = () => {
 	const theme = useTheme();
 
 	return (
-		<Box sx={{ bgcolor: 'common.white', pt: { xs: 12, md: 16 }, pb: 8 }}>
+		<Box
+			sx={{
+				background: `linear-gradient(180deg, ${theme.palette.common.white} 0%, ${theme.palette.grey[100]} 100%)`,
+				pt: { xs: 12, md: 16 },
+				pb: 8,
+			}}
+		>
 			<Container maxWidth="lg">
 				<Grid container spacing={6} alignItems="center">
 					{/* Text Section */}

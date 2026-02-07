@@ -1,4 +1,4 @@
-import { alpha, useTheme, useMediaQuery } from '@mui/material';
+import { useTheme, useMediaQuery } from '@mui/material';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useBasket, useAuth, useSession } from '@hooks';
@@ -26,11 +26,15 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 
 	const hourlySlots = timeSlots[timeRange];
 
-	const slotsInBasket = basket.filter((basketSlot) =>
-		hourlySlots.some((slot) =>
-			slot.slotIds.some((id) => basketSlot.slotIds.includes(id)),
-		),
-	);
+	const slotsInBasket = basket.filter((basketSlot) => {
+		// Only show as "in basket" if this slot block matches the START time of the basket item
+		// This prevents multi-hour bookings from showing "in basket" on subsequent hours
+		const slotStartTime = timeRange.split('-')[0];
+		const isStartTimeCheck =
+			dayjs(basketSlot.startTime).format('HH:mm') === slotStartTime;
+
+		return isStartTimeCheck;
+	});
 	const basketCount = slotsInBasket.length;
 	const isInBasket = basketCount > 0;
 	const slotInBasket = slotsInBasket[0];
@@ -44,11 +48,11 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 
 	const availability =
 		selectedBay === 5
-			? availableSlots.length === 4
+			? availableSlots.length === 3 || availableSlots.length === 4
 				? 'good'
-				: availableSlots.length === 3
+				: availableSlots.length === 2
 					? 'fair'
-					: availableSlots.length === 1 || availableSlots.length === 2
+					: availableSlots.length === 1
 						? 'limited'
 						: 'unavailable'
 			: undefined;
@@ -60,12 +64,10 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 		}
 
 		if (selectedBay === 5) {
-			// In Any Bay mode, always try to add another if available
 			if (availableSlots.length > 0) {
 				addToBasket(availableSlots[0]);
 			}
 		} else {
-			// Toggle behavior for specific bay
 			if (slotInBasket) {
 				removeFromBasket(slotInBasket, {
 					onSuccess: () => {
@@ -108,6 +110,10 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 	);
 
 	const borderColor = isInBasket ? theme.palette.primary.main : 'divider';
+
+	if (availableSlots.length === 0 && !isInBasket) {
+		return null;
+	}
 
 	return (
 		<>

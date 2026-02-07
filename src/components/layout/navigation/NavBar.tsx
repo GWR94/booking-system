@@ -31,7 +31,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	const location = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [menuContent, setMenuContent] = useState<
-		'nav' | 'basket' | 'account' | 'admin'
+		'nav' | 'basket' | 'account' | 'admin' | 'theme'
 	>('nav');
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -60,6 +60,11 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 
 	const setMobileNavBarToAdmin = () => {
 		setMenuContent('admin');
+		setIsMenuOpen(!isMenuOpen);
+	};
+
+	const setMobileNavBarToTheme = () => {
+		setMenuContent('theme');
 		setIsMenuOpen(!isMenuOpen);
 	};
 
@@ -152,7 +157,10 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 									gap: { xs: 0, sm: 1, md: 2 },
 								}}
 							>
-								<ThemeSwitcher isMobile={isMobile} />
+								<ThemeSwitcher
+									isMobile={isMobile}
+									onMobileClick={setMobileNavBarToTheme}
+								/>
 								<Basket
 									isMobile={isMobile}
 									onMobileBasketClick={setMobileNavBarToBasket}

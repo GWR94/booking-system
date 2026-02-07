@@ -15,9 +15,10 @@ import { useState } from 'react';
 
 type ThemeSwitcherProps = {
 	isMobile: boolean;
+	onMobileClick?: () => void;
 };
 
-const ThemeSwitcher = ({ isMobile }: ThemeSwitcherProps) => {
+const ThemeSwitcher = ({ isMobile, onMobileClick }: ThemeSwitcherProps) => {
 	const [themeAnchorEl, setThemeAnchorEl] = useState<null | HTMLElement>(null);
 	const { currentThemeId, setThemeId } = useAppTheme();
 	const theme = useTheme();
@@ -25,7 +26,11 @@ const ThemeSwitcher = ({ isMobile }: ThemeSwitcherProps) => {
 	const isThemeMenuOpen = Boolean(themeAnchorEl);
 
 	const handleThemeMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-		setThemeAnchorEl(event.currentTarget);
+		if (isMobile && onMobileClick) {
+			onMobileClick();
+		} else {
+			setThemeAnchorEl(event.currentTarget);
+		}
 	};
 
 	const handleThemeMenuClose = () => {
@@ -97,7 +102,7 @@ const ThemeSwitcher = ({ isMobile }: ThemeSwitcherProps) => {
 						onClick={() => handleThemeSelect(t.id)}
 						selected={t.id === currentThemeId}
 					>
-						<Box sx={{ display: 'flex', gap: 1, mr: 3 }}>
+						<Box sx={{ display: 'flex', mr: 3 }}>
 							{[
 								t.palette.primary?.main,
 								t.palette.secondary?.main,
@@ -106,13 +111,19 @@ const ThemeSwitcher = ({ isMobile }: ThemeSwitcherProps) => {
 								<Box
 									key={index}
 									sx={{
-										mr: -1.5,
-										width: 16,
-										height: 16,
+										mr: -1,
+										width: 20,
+										height: 20,
 										borderRadius: '50%',
 										backgroundColor: color,
-										border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+										border: `2px solid ${theme.palette.background.paper}`,
 										boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+										zIndex: 5 - index,
+										transition: 'transform 0.2s',
+										'&:hover': {
+											transform: 'scale(1.2) translateY(-2px)',
+											zIndex: 10,
+										},
 									}}
 								/>
 							))}

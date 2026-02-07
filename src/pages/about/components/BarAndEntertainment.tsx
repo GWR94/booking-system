@@ -7,16 +7,34 @@ import {
 	Stack,
 	useTheme,
 	Button,
+	alpha,
 } from '@mui/material';
-import { LocalBar, LiveTv, SportsBar, Weekend } from '@mui/icons-material';
+import {
+	LocalBar,
+	LiveTv,
+	SportsBar,
+	Weekend,
+	ArrowRight,
+	ArrowForward,
+} from '@mui/icons-material';
 
 const BarAndEntertainment = () => {
 	const theme = useTheme();
 
 	return (
-		<Box sx={{ py: 8 }}>
+		<Box
+			sx={{
+				py: 10,
+				background: `linear-gradient(180deg, ${theme.palette.grey[200]} 0%, ${theme.palette.grey[100]} 100%)`,
+			}}
+		>
 			<Container maxWidth="lg">
-				<Grid container spacing={6} alignItems="center">
+				<Grid
+					container
+					spacing={6}
+					alignItems="center"
+					direction={{ xs: 'column-reverse', md: 'row' }}
+				>
 					<Grid size={{ xs: 12, md: 6 }}>
 						<AnimateIn type="fade-right">
 							<Box
@@ -54,7 +72,7 @@ const BarAndEntertainment = () => {
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',
-											color: theme.palette.primary.main,
+											color: theme.palette.accent.main,
 											flexShrink: 0,
 										}}
 									>
@@ -82,7 +100,7 @@ const BarAndEntertainment = () => {
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',
-											color: theme.palette.primary.main,
+											color: theme.palette.accent.main,
 											flexShrink: 0,
 										}}
 									>
@@ -102,9 +120,15 @@ const BarAndEntertainment = () => {
 
 							<Box>
 								<Button
-									variant="outlined"
+									variant="text"
 									color="primary"
 									size="large"
+									endIcon={
+										<ArrowForward
+											className="learn-more-btn"
+											sx={{ transition: 'transform 0.2s ease' }}
+										/>
+									}
 									onClick={() => (window.location.href = '/contact')}
 									sx={{ borderRadius: 2, px: 4 }}
 								>

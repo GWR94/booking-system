@@ -48,7 +48,7 @@ const Testimonials = () => {
 				py: { xs: 8, md: 12 },
 				position: 'relative',
 				overflow: 'hidden',
-				background: `linear-gradient(to bottom, ${theme.palette.background.default} 0%, ${theme.palette.grey[100]} 100%)`,
+				background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.common.white} 100%)`,
 			}}
 		>
 			<style>{swiperStyles}</style>

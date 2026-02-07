@@ -32,7 +32,7 @@ const LandingHero = () => {
 			<Container maxWidth="lg">
 				<Grid container spacing={6} alignItems="center">
 					<Grid size={{ xs: 12, md: 6 }}>
-						<AnimateIn type="fade-right">
+						<AnimateIn type="fade-right" style={{ width: '100%' }}>
 							<Typography
 								variant="overline"
 								sx={{
@@ -74,15 +74,20 @@ const LandingHero = () => {
 								Experience pure golf on world-class courses, rain or shine.
 							</Typography>
 
-							<Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+							<Stack
+								direction={{ xs: 'column', sm: 'row' }}
+								spacing={2}
+								alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+								sx={{ width: '100%' }}
+							>
 								<Button
 									variant="contained"
 									color="secondary"
-									size="large"
 									onClick={() => navigate('/book')}
 									sx={{
 										px: 4,
 										py: 1.5,
+										width: { xs: '100%', sm: 'auto' },
 									}}
 								>
 									Book a Session Now
@@ -90,7 +95,6 @@ const LandingHero = () => {
 								<Button
 									variant="outlined"
 									color="accent"
-									size="large"
 									onClick={() => navigate('/membership')}
 									startIcon={<Diamond />}
 									sx={{
@@ -99,6 +103,7 @@ const LandingHero = () => {
 										borderWidth: 2,
 										background: 'rgba(255, 215, 0, 0.1)',
 										borderColor: theme.palette.accent.main,
+										width: { xs: '100%', sm: 'auto' },
 										'&:hover': {
 											background: 'rgba(255, 215, 0, 0.2)',
 											borderWidth: 2,
@@ -111,8 +116,11 @@ const LandingHero = () => {
 						</AnimateIn>
 					</Grid>
 
-					<Grid size={{ xs: 12, md: 6 }}>
-						<HeroMedia sx={{ display: 'block' }} />
+					<Grid
+						size={{ xs: 12, md: 6 }}
+						sx={{ display: { xs: 'none', md: 'block' } }}
+					>
+						<HeroMedia />
 					</Grid>
 				</Grid>
 			</Container>

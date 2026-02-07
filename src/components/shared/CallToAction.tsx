@@ -73,9 +73,9 @@ const CallToAction = () => {
 							<Box
 								sx={{
 									display: 'flex',
-									alignItems: 'center',
+									alignItems: { xs: 'stretch', sm: 'center' },
 									flexDirection: { xs: 'column', sm: 'row' },
-									gap: 4,
+									gap: 2,
 								}}
 							>
 								<Button
@@ -88,6 +88,7 @@ const CallToAction = () => {
 										fontWeight: 600,
 										borderRadius: 2,
 										boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+										width: { xs: '100%', sm: 'auto' },
 									}}
 								>
 									Book a Session Now
@@ -103,6 +104,7 @@ const CallToAction = () => {
 										fontWeight: 600,
 										borderRadius: 2,
 										boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+										width: { xs: '100%', sm: 'auto' },
 									}}
 								>
 									Browse Memberships

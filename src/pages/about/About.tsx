@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, useTheme } from '@mui/material';
+import { Box, useTheme, alpha } from '@mui/material';
 import { SEO } from '@layout';
 import { CallToAction } from '@shared';
 import {
@@ -20,17 +20,14 @@ const About: React.FC = () => {
 			/>
 			<AboutHero />
 
-			<Box sx={{ bgcolor: theme.palette.grey[50] }}>
-				<ServicesOverview />
-			</Box>
+			{/* Services Section - Flowing Gradient */}
+			<ServicesOverview />
 
-			<Box sx={{ bgcolor: 'background.paper' }}>
-				<BarAndEntertainment />
-			</Box>
+			{/* Bar & Entertainment - Flowing Gradient */}
+			<BarAndEntertainment />
 
-			<Box sx={{ bgcolor: theme.palette.grey[50] }}>
-				<Team />
-			</Box>
+			{/* Team Section - Flowing Gradient */}
+			<Team />
 
 			<CallToAction />
 		</Box>

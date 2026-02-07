@@ -1,5 +1,5 @@
 import { Button, useTheme } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Check, Delete } from '@mui/icons-material';
 import { GroupedSlot } from './types';
 
 type UserSlotControlsProps = {
@@ -54,9 +54,10 @@ const UserSlotControls = ({
 							sx={{
 								minWidth: 0,
 								borderRadius: 2,
-								borderColor: 'divider',
+								borderColor: 'error.main',
 								py: 1,
 								px: 2,
+								height: '100%',
 							}}
 						>
 							<Delete fontSize="small" />
@@ -64,10 +65,16 @@ const UserSlotControls = ({
 					)}
 					<Button
 						fullWidth
-						variant={isInBasket ? 'outlined' : 'contained'}
-						color="secondary"
+						variant="contained"
+						color="primary"
 						onClick={handleSlotClick}
-						startIcon={isInBasket ? undefined : <Add />}
+						startIcon={
+							availability === 'unavailable' && basketCount > 0 ? (
+								<Check />
+							) : (
+								<Add />
+							)
+						}
 						disabled={availability === 'unavailable'}
 						sx={{
 							borderRadius: 2,
@@ -76,7 +83,11 @@ const UserSlotControls = ({
 							flex: 1,
 						}}
 					>
-						Add Bay {slot.bayId}
+						{availability === 'unavailable'
+							? basketCount > 0
+								? 'Added'
+								: 'Unavailable'
+							: `Add Bay ${slot.bayId}`}
 					</Button>
 				</>
 			)}

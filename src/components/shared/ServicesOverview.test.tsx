@@ -43,11 +43,13 @@ describe('ServicesOverview', () => {
 		expect(screen.getByText('Enquire Now')).toBeInTheDocument();
 		expect(screen.getByText('Plan an Event')).toBeInTheDocument();
 
-		// The Clubhouse Vibe doesn't have a link
-		expect(screen.queryByText('The Clubhouse Vibe')).toBeInTheDocument();
-		const clubhouseOffer = screen
-			.getByText('The Clubhouse Vibe')
-			.closest('.MuiCard-root');
-		expect(clubhouseOffer?.querySelector('a')).toBeNull();
+		// The Clubhouse Vibe now has a link
+		expect(screen.getByText('Request a Table')).toBeInTheDocument();
+		expect(
+			screen
+				.getByText('The Clubhouse Vibe')
+				.closest('.MuiCard-root')
+				?.querySelector('a'),
+		).not.toBeNull();
 	});
 });

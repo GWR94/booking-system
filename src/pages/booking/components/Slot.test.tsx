@@ -180,7 +180,11 @@ describe('Slot Container', () => {
 
 	it('calls removeFromBasket and showSnackbar when removing from basket', () => {
 		// Setup basket with item
-		const basketItem = { slotIds: [1], id: 1 };
+		const basketItem = {
+			slotIds: [1],
+			id: 1,
+			startTime: dayjs().add(1, 'day').hour(10).minute(0).format(),
+		};
 		(useBasket as any).mockReturnValue({
 			addToBasket: mockAddToBasket,
 			removeFromBasket: mockRemoveFromBasket,
@@ -224,5 +228,53 @@ describe('Slot Container', () => {
 
 		expect(screen.getByTestId('admin-dialog')).toBeInTheDocument();
 		expect(mockAddToBasket).not.toHaveBeenCalled();
+	});
+
+	it('renders nothing when no slots are available and not in basket', () => {
+		// Mock empty available slots by ensuring checked slots don't match
+		const unavailableSlots = {
+			'10:00': [
+				{
+					...mockTimeSlots['10:00'][0],
+					slotIds: [999], // Different ID to simulate unavailability if we were filtering...
+					// A better way is to mock useBasket to return all slots as taken?
+					// Or just modifying the input mockTimeSlots?
+					// In Slot.tsx: availableSlots = hourlySlots.filter(...)
+					// So if we make sure the filter returns empty.
+					// We can do this by putting the slot in the basket but NOT matching the start time (so not "in basket" for this view, but "taken")
+					// Wait, if it's in the basket it's "taken".
+					// But we need "isInBasket" to be false.
+					// isInBasket is true if basketSlot.startTime matches timeRange.
+				},
+			],
+		};
+
+		// Actually, let's just use the existing logic.
+		// If I put a slot in the basket that overlaps with this slot's IDs, but has a DIFFERENT start time.
+		// e.g. basket has a slot starting at 09:00 with duration 2 hours, covering 10:00.
+		// Then for 10:00 view:
+		// isInBasket = false (start time 09:00 != 10:00)
+		// availableSlots = empty (filtered out because ID is in basket)
+
+		const interferingBasketSlot = {
+			slotIds: [1], // Same ID as our mock slot
+			startTime: dayjs().add(1, 'day').hour(9).minute(0).format(), // Starts earlier
+			id: 2,
+		};
+
+		(useBasket as any).mockReturnValue({
+			addToBasket: mockAddToBasket,
+			removeFromBasket: mockRemoveFromBasket,
+			basket: [interferingBasketSlot],
+		});
+
+		const { container } = render(
+			<Slot timeSlots={mockTimeSlots as any} timeRange="10:00" />,
+			{
+				wrapper: createWrapper(),
+			},
+		);
+
+		expect(container).toBeEmptyDOMElement();
 	});
 });

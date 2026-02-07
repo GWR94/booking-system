@@ -15,8 +15,7 @@ import { Link as RouterLink } from 'react-router-dom';
 const featuredCourses = [
 	{
 		name: 'St. Andrews Links',
-		image:
-			'https://s7d9.scene7.com/is/image/kohlerhospitality/aae41028_rgb?wid=360&fmt=webp',
+		image: '/courses/st-andrews.webp',
 		location: 'Scotland, UK',
 		description:
 			'Experience the historic home of golf with our highly accurate simulation of the famous Old Course at St. Andrews.',
@@ -43,7 +42,7 @@ const FeaturedCourses = () => {
 		<Box
 			sx={{
 				py: 10,
-				background: `linear-gradient(to top, ${theme.palette.grey[200]}, ${theme.palette.grey[50]})`,
+				background: `linear-gradient(180deg, ${theme.palette.grey[200]} 0%, ${theme.palette.grey[100]} 100%)`,
 			}}
 		>
 			<Container sx={{ textAlign: 'center', px: 4 }} maxWidth="xl">

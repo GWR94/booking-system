@@ -5,6 +5,8 @@ import React, {
 	ReactNode,
 	useCallback,
 	useMemo,
+	SyntheticEvent,
+	FC,
 } from 'react';
 import { Snackbar, Alert, AlertProps } from '@mui/material';
 
@@ -18,9 +20,7 @@ export const SnackbarContext = createContext<SnackbarContextType | undefined>(
 	undefined,
 );
 
-export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
-	children,
-}) => {
+export const SnackbarProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const [snackbar, setSnackbar] = useState<{
 		message: string;
 		severity: AlertProps['severity'];
@@ -41,10 +41,19 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
 		[],
 	);
 
-	const hideSnackbar = useCallback(
-		() => setSnackbar((prev) => ({ ...prev, open: false })),
+	const handleClose = useCallback(
+		(event?: SyntheticEvent | Event, reason?: string) => {
+			if (reason === 'clickaway') {
+				return;
+			}
+			setSnackbar((prev) => ({ ...prev, open: false }));
+		},
 		[],
 	);
+
+	const hideSnackbar = useCallback(() => {
+		setSnackbar((prev) => ({ ...prev, open: false }));
+	}, []);
 
 	const value: SnackbarContextType = useMemo(
 		() => ({
@@ -62,12 +71,12 @@ export const SnackbarProvider: React.FC<{ children: ReactNode }> = ({
 				key={snackbar.key}
 				open={snackbar.open}
 				autoHideDuration={3000}
-				onClose={hideSnackbar}
+				onClose={handleClose}
 				anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
 				sx={{ mb: bottomOffset }}
 			>
 				<Alert
-					onClose={hideSnackbar}
+					onClose={handleClose}
 					severity={snackbar.severity}
 					sx={{ width: '100%', background: '#fff' }}
 					variant="outlined"

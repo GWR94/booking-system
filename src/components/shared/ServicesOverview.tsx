@@ -36,7 +36,8 @@ const offers = [
 		description:
 			'Relax in our contemporary lounge with a selection of premium drinks and snacks. The perfect atmosphere for post-round analysis.',
 		image: '/services/clubhouse.webp',
-		// No link, scrolls to bar section or just informational
+		linkText: 'Request a Table',
+		link: '/contact',
 	},
 	{
 		title: 'Private Events',
@@ -54,16 +55,27 @@ const ServicesOverview = () => {
 		<Box
 			sx={{
 				py: 10,
-				background: `linear-gradient(to bottom, ${theme.palette.grey[50]}, ${theme.palette.grey[100]})`,
+				background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[200]} 100%)`,
 			}}
 		>
 			<Container maxWidth="lg">
-				<SectionHeader
-					subtitle="OVERVIEW"
-					title="Everything You Need"
-					description="The Short Grass is Maidstone's ultimate indoor golf destination. We combine state-of-the-art TrackMan technology with a premium lounge atmosphere, offering professional coaching, casual play, and private events for golfers of all levels."
-				/>
-
+				<SectionHeader subtitle="OVERVIEW" title="Everything You Need" />
+				<Typography
+					variant="body1"
+					sx={{
+						color: theme.palette.text.secondary,
+						lineHeight: 1.8,
+						mb: 4,
+						maxWidth: 800,
+						mx: 'auto',
+						textAlign: 'center',
+					}}
+				>
+					The Short Grass is Maidstone's ultimate indoor golf destination. We
+					combine state-of-the-art TrackMan technology with a premium lounge
+					atmosphere, offering professional coaching, casual play, and private
+					events for golfers of all levels.
+				</Typography>
 				<Grid container spacing={4}>
 					{offers.map((offer, index) => (
 						<Grid key={offer.title} size={{ xs: 12, md: 6 }}>

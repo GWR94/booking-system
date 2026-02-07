@@ -60,34 +60,33 @@ const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 					mode: 'light',
 					...currentTheme.palette,
 				},
-				// ... existing typography ...
 				typography: {
 					fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
 					h1: {
-						fontSize: 'clamp(2.2rem, 5vw, 3rem)',
+						fontSize: 'clamp(2.5rem, 4vw, 3rem)',
 						fontWeight: 700,
 						lineHeight: 1.2,
 					},
 					h2: {
-						fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+						fontSize: 'clamp(2rem, 3.5vw, 2.75rem)',
 						fontWeight: 700,
 						lineHeight: 1.3,
 					},
 					h3: {
-						fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
+						fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
 						fontWeight: 600,
 						lineHeight: 1.4,
 					},
 					h4: {
-						fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+						fontSize: 'clamp(1.5rem, 2.5vw, 1.85rem)',
 						fontWeight: 600,
 					},
 					h5: {
-						fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+						fontSize: 'clamp(1.25rem, 2vw, 1.6rem)',
 						fontWeight: 600,
 					},
 					h6: {
-						fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+						fontSize: 'clamp(1.1rem, 1.5vw, 1.35rem)',
 						fontWeight: 600,
 					},
 					subtitle1: {
@@ -110,28 +109,6 @@ const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 					},
 					overline: {
 						fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
-					},
-					title: {
-						fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-						fontWeight: 700,
-						color: currentTheme.palette.primary?.main,
-						position: 'relative',
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						textAlign: 'center',
-						marginBottom: '1rem',
-						'&:after': {
-							content: '""',
-							position: 'absolute',
-							bottom: -10,
-							left: '50%',
-							transform: 'translateX(-50%)',
-							width: '60px',
-							height: 4,
-							backgroundColor: currentTheme.palette.secondary?.main,
-							borderRadius: 2,
-						},
 					},
 				},
 				components: {

@@ -30,16 +30,40 @@ const MembershipPreview = () => {
 		flexDirection: 'column',
 		position: 'relative',
 		borderRadius: 4,
-		border: '1px solid',
-		bgcolor: 'background.paper',
-		transition: 'all 0.3s ease',
+		background: alpha(theme.palette.background.paper, 0.6),
+		backdropFilter: 'blur(12px)',
+		border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+		transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+		overflow: 'hidden',
 		'&:hover': {
 			transform: 'translateY(-8px)',
+			boxShadow: `0 12px 24px -10px ${alpha(theme.palette.primary.main, 0.3)}`,
+			border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+		},
+		'&::before': {
+			content: '""',
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			height: '4px',
+			background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+			opacity: 0,
+			transition: 'opacity 0.3s ease',
+		},
+		'&:hover::before': {
+			opacity: 1,
 		},
 	};
 
 	return (
-		<Box sx={{ py: 8, bgcolor: 'grey.50' }}>
+		<Box
+			sx={{
+				py: 10,
+				background: `linear-gradient(180deg, ${theme.palette.common.white} 0%, ${theme.palette.grey[100]} 100%)`,
+				position: 'relative',
+			}}
+		>
 			<Container maxWidth="lg">
 				<SectionHeader
 					subtitle="MEMBERSHIP"
@@ -64,32 +88,34 @@ const MembershipPreview = () => {
 									elevation={0}
 									sx={{
 										...cardStyles,
-										borderColor: tier.recommended
-											? 'primary.main'
-											: theme.palette.divider,
-										boxShadow: tier.recommended
-											? `0 8px 40px ${alpha(theme.palette.primary.main, 0.12)}`
-											: '0 4px 20px rgba(0,0,0,0.04)',
-										transition: 'all 0.3s ease',
-										'&:hover': {
-											transform: 'translateY(-8px)',
-											boxShadow: tier.recommended
-												? `0 12px 48px ${alpha(theme.palette.primary.main, 0.2)}`
-												: '0 8px 30px rgba(0,0,0,0.08)',
-										},
+										border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+
+										...(tier.recommended && {
+											background: alpha(theme.palette.background.paper, 0.8),
+											boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.15)}`,
+										}),
 									}}
 								>
 									{tier.recommended && (
 										<Chip
 											label="Most Popular"
-											color="secondary"
+											color="primary"
 											size="small"
-											icon={<Star fontSize="small" />}
+											icon={
+												<Star
+													fontSize="small"
+													sx={{ color: 'white !important' }}
+												/>
+											}
 											sx={{
 												position: 'absolute',
 												top: 16,
 												right: 16,
-												fontWeight: 600,
+												fontWeight: 700,
+												background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+												color: 'white',
+												border: 'none',
+												boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
 											}}
 										/>
 									)}
@@ -103,17 +129,32 @@ const MembershipPreview = () => {
 											{tier.title}
 										</Typography>
 										<Box
-											sx={{ display: 'flex', alignItems: 'baseline', mb: 2 }}
+											sx={{
+												display: 'flex',
+												alignItems: 'baseline',
+												mb: 3,
+												pb: 3,
+												borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+											}}
 										>
 											<Typography
 												variant="h3"
 												component="span"
 												color="primary"
-												sx={{ fontWeight: 800 }}
+												sx={{
+													fontWeight: 900,
+													background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+													WebkitBackgroundClip: 'text',
+													WebkitTextFillColor: 'transparent',
+												}}
 											>
 												{tier.price}
 											</Typography>
-											<Typography variant="subtitle1" color="text.secondary">
+											<Typography
+												variant="subtitle1"
+												color="text.secondary"
+												sx={{ ml: 1, fontWeight: 500 }}
+											>
 												{tier.period}
 											</Typography>
 										</Box>
@@ -139,7 +180,32 @@ const MembershipPreview = () => {
 											fullWidth
 											color="primary"
 											size="large"
-											sx={{ borderRadius: 3, py: 1.5 }}
+											sx={{
+												borderRadius: 3,
+												py: 1.5,
+												textTransform: 'none',
+												fontSize: '1rem',
+												fontWeight: 700,
+												...(tier.recommended
+													? {
+															background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+															boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+															'&:hover': {
+																background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+																boxShadow: `0 12px 24px ${alpha(theme.palette.primary.main, 0.5)}`,
+															},
+														}
+													: {
+															borderWidth: 2,
+															'&:hover': {
+																borderWidth: 2,
+																bgcolor: alpha(
+																	theme.palette.primary.main,
+																	0.04,
+																),
+															},
+														}),
+											}}
 											onClick={() => navigate('/membership')}
 										>
 											Choose {tier.title}

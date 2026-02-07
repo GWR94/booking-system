@@ -8,6 +8,7 @@ import {
 	Container,
 	useTheme,
 	Box,
+	alpha,
 } from '@mui/material';
 
 const teamMembers = [
@@ -33,8 +34,44 @@ const teamMembers = [
 
 const Team = () => {
 	const theme = useTheme();
+
+	const cardStyles = {
+		height: '100%',
+		borderRadius: 4,
+		// Glassmorphism
+		background: alpha(theme.palette.background.paper, 0.7),
+		backdropFilter: 'blur(12px)',
+		border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+		transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+		overflow: 'hidden',
+		position: 'relative',
+		'&:hover': {
+			transform: 'translateY(-8px)',
+			boxShadow: `0 12px 24px -10px ${alpha(theme.palette.primary.main, 0.3)}`,
+		},
+		'&::after': {
+			content: '""',
+			position: 'absolute',
+			bottom: 0,
+			left: 0,
+			right: 0,
+			height: '0px',
+			background: theme.palette.secondary.main, // Solid accent color
+			transition: 'height 0.3s ease',
+		},
+		'&:hover::after': {
+			height: '4px',
+		},
+	};
+
 	return (
-		<Box sx={{ py: 8 }}>
+		<Box
+			sx={{
+				py: 10,
+				background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.common.white} 100%)`,
+				position: 'relative',
+			}}
+		>
 			<Container maxWidth="lg">
 				<SectionHeader
 					subtitle="EXPERTS"
@@ -55,53 +92,72 @@ const Team = () => {
 								delay={index * 0.2}
 								style={{ height: '100%' }}
 							>
-								<Card
-									elevation={0}
-									sx={{
-										height: '100%',
-										border: `1px solid ${theme.palette.divider}`,
-										borderRadius: 2,
-										transition: 'all 0.3s ease',
-										'&:hover': {
-											boxShadow: 3,
-											transform: 'translateY(-4px)',
-											borderColor: theme.palette.primary.main,
-										},
-									}}
-								>
-									<CardContent sx={{ p: 4, textAlign: 'center' }}>
-										<Avatar
-											src={member.image}
-											alt={member.name}
+								<Card elevation={0} sx={cardStyles}>
+									<CardContent
+										sx={{
+											p: 4,
+											textAlign: 'center',
+											position: 'relative',
+											zIndex: 1,
+										}}
+									>
+										<Box
 											sx={{
-												width: 120,
-												height: 120,
-												mx: 'auto',
+												position: 'relative',
+												display: 'inline-block',
 												mb: 3,
-												border: `3px solid ${theme.palette.secondary.main}`,
-												boxShadow: 2,
 											}}
-										/>
+										>
+											<Box
+												sx={{
+													position: 'absolute',
+													inset: -4,
+													borderRadius: '50%',
+													background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+													opacity: 0.8,
+													filter: 'blur(8px)',
+												}}
+											/>
+											<Avatar
+												src={member.image}
+												alt={member.name}
+												sx={{
+													width: 120,
+													height: 120,
+													border: `3px solid ${theme.palette.background.paper}`,
+													boxShadow: 3,
+													position: 'relative',
+												}}
+											/>
+										</Box>
+
 										<Typography
 											variant="h5"
 											component="h3"
 											gutterBottom
-											sx={{ fontWeight: 600 }}
+											sx={{ fontWeight: 800 }}
 										>
 											{member.name}
 										</Typography>
 										<Typography
 											variant="subtitle1"
-											color="primary"
+											color="secondary"
 											gutterBottom
-											sx={{ fontWeight: 600, mb: 2 }}
+											sx={{
+												fontWeight: 700,
+												mb: 2,
+												display: 'inline-block',
+											}}
 										>
 											{member.position}
 										</Typography>
 										<Typography
-											variant="body2"
+											variant="body1"
 											color="text.secondary"
-											sx={{ lineHeight: 1.6 }}
+											sx={{
+												lineHeight: 1.7,
+												color: alpha(theme.palette.text.primary, 0.7),
+											}}
 										>
 											{member.bio}
 										</Typography>

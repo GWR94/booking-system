@@ -38,7 +38,7 @@ const DesktopSlot = ({
 }: DesktopSlotProps) => {
 	const theme = useTheme();
 	const { user } = useAuth();
-	const { selectedBay } = useSession();
+	const { selectedBay, selectedSession } = useSession();
 
 	const { startTime, endTime } = slot;
 	const { originalPrice, discountedPrice, hasDiscount } = price;
@@ -132,7 +132,7 @@ const DesktopSlot = ({
 							color={isInBasket ? 'primary.main' : 'text.primary'}
 							sx={{ fontWeight: 800 }}
 						>
-							£{discountedPrice.toFixed(2)}
+							£{(discountedPrice * selectedSession).toFixed(2)}
 						</Typography>
 						{hasDiscount && (
 							<Typography
@@ -142,7 +142,7 @@ const DesktopSlot = ({
 									color: 'text.disabled',
 								}}
 							>
-								£{originalPrice.toFixed(2)}
+								£{(originalPrice * selectedSession).toFixed(2)}
 							</Typography>
 						)}
 					</Box>
