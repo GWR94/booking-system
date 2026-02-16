@@ -1,6 +1,8 @@
+'use client';
+
 import { ShoppingCart } from '@mui/icons-material';
 import { Typography, Button, Box, Badge, useTheme, List } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useBasket, useAuth } from '@hooks';
 import { useUI } from '@context';
 import EmptyBasket from './EmptyBasket';
@@ -12,7 +14,7 @@ interface BasketContentProps {
 }
 
 const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { isAuthenticated } = useAuth();
 	const { openAuthModal } = useUI();
 	const { basket, basketPrice, clearBasket } = useBasket();
@@ -130,7 +132,7 @@ const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 								}}
 								onClick={() => {
 									if (isAuthenticated) {
-										navigate('/checkout');
+										router.push('/checkout');
 									} else {
 										openAuthModal('login');
 									}
@@ -147,7 +149,7 @@ const BasketContent = ({ onClose, isMobile }: BasketContentProps) => {
 									color="secondary"
 									size="small"
 									fullWidth
-									onClick={() => navigate('/checkout')}
+									onClick={() => router.push('/checkout')}
 									sx={{
 										fontSize: '0.8rem',
 										color: isMobile

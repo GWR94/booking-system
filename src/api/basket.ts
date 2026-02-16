@@ -1,5 +1,5 @@
-import { GroupedSlot, TimeSlot } from '@pages/booking/components';
-import { axios } from '@utils';
+import { GroupedSlot, TimeSlot } from '@features/booking/components';
+import { axios } from '@api/client';
 import { Dayjs } from 'dayjs';
 
 // Constants

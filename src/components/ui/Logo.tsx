@@ -1,5 +1,7 @@
+'use client';
+
 import { Box, SxProps } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 interface LogoProps {
 	logoOnly?: boolean;
@@ -10,10 +12,10 @@ interface LogoProps {
 const Logo = (
 	{ logoOnly, dark, sx }: LogoProps = { logoOnly: false, dark: false },
 ) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	return (
 		<Box
-			onClick={() => navigate('/')}
+			onClick={() => router.push('/')}
 			sx={{
 				display: 'flex',
 				alignItems: 'center',

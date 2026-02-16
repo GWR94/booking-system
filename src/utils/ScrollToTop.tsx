@@ -1,8 +1,10 @@
+'use client';
+
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 
 const ScrollToTop = () => {
-	const { pathname } = useLocation();
+	const pathname = usePathname();
 
 	useEffect(() => {
 		// Decouple scroll from the render cycle to avoid forced reflows
@@ -15,4 +17,5 @@ const ScrollToTop = () => {
 	return null; // This component doesn't render anything
 };
 
+export { ScrollToTop };
 export default ScrollToTop;

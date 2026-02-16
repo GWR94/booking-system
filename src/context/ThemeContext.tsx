@@ -1,7 +1,11 @@
+'use client';
+
+'use client';
+
 import React, { ReactNode } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material';
 import { CSSObject } from '@mui/system';
-import { themes } from '@styles/themes';
+import { themes } from '@config/theme.config';
 
 // Extend MUI's Typography types to include custom 'title' variant
 declare module '@mui/material/styles' {

@@ -1,3 +1,5 @@
+'use client';
+
 import { Delete } from '@mui/icons-material';
 import {
 	Box,
@@ -9,7 +11,7 @@ import {
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { useBasket, useAuth } from '@hooks';
-import { GroupedSlot } from '@pages/booking/components';
+import { GroupedSlot } from '@features/booking/components';
 import { calculateSlotPrice } from '@utils';
 
 type Props = {

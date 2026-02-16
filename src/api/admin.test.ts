@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { axios } from '@utils';
+import { axios } from '@api/client';
 import {
 	getAllUsers,
 	getAllBookings,
@@ -7,11 +7,9 @@ import {
 	createSlot,
 	updateSlot,
 	deleteSlot,
-	getAdminSettings,
-	updateAdminSettings,
 } from './admin';
 
-vi.mock('@utils', () => ({
+vi.mock('@api/client', () => ({
 	axios: {
 		get: vi.fn(),
 		post: vi.fn(),
@@ -92,27 +90,6 @@ describe('admin api', () => {
 		const result = await deleteSlot(id);
 
 		expect(axios.delete).toHaveBeenCalledWith(`/api/admin/slots/${id}`);
-		expect(result).toEqual(mockResponse);
-	});
-
-	it('getAdminSettings should call GET /api/admin/settings', async () => {
-		const mockSettings = { price: 4500 };
-		(axios.get as any).mockResolvedValue({ data: mockSettings });
-
-		const result = await getAdminSettings();
-
-		expect(axios.get).toHaveBeenCalledWith('/api/admin/settings');
-		expect(result).toEqual(mockSettings);
-	});
-
-	it('updateAdminSettings should call PATCH /api/admin/settings', async () => {
-		const settings = { price: 5000 };
-		const mockResponse = { success: true };
-		(axios.patch as any).mockResolvedValue({ data: mockResponse });
-
-		const result = await updateAdminSettings(settings);
-
-		expect(axios.patch).toHaveBeenCalledWith('/api/admin/settings', settings);
 		expect(result).toEqual(mockResponse);
 	});
 });

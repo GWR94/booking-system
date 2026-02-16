@@ -1,3 +1,5 @@
+'use client';
+
 import { AdminPanelSettings } from '@mui/icons-material';
 import {
 	Box,
@@ -10,7 +12,7 @@ import {
 	useTheme,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { ADMIN_MENU_ITEMS } from './menuItems';
 
 type AdminMenuButtonProps = {
@@ -19,7 +21,7 @@ type AdminMenuButtonProps = {
 };
 
 const AdminMenuButton = ({ isMobile, onMobileClick }: AdminMenuButtonProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const theme = useTheme();
 	const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
 
@@ -85,8 +87,8 @@ const AdminMenuButton = ({ isMobile, onMobileClick }: AdminMenuButtonProps) => {
 						vertical: 'top',
 						horizontal: 'right',
 					}}
-					TransitionProps={{ timeout: 0 }}
 					slotProps={{
+						transition: { timeout: 0 },
 						paper: {
 							elevation: 4,
 							sx: {
@@ -129,7 +131,7 @@ const AdminMenuButton = ({ isMobile, onMobileClick }: AdminMenuButtonProps) => {
 						<MenuItem
 							key={item.path}
 							onClick={() => {
-								navigate(item.path);
+								router.push(item.path);
 								setAnchorElMenu(null);
 							}}
 							sx={{ py: 1.5 }}

@@ -1,3 +1,5 @@
+'use client';
+
 import { AnimateIn } from '@ui';
 import {
 	Container,
@@ -10,12 +12,12 @@ import {
 	alpha,
 	Divider,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { SportsGolf, EventAvailable, PhoneInTalk } from '@mui/icons-material';
 
 const CallToAction = () => {
 	const theme = useTheme();
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	return (
 		<Box
@@ -81,7 +83,7 @@ const CallToAction = () => {
 								<Button
 									variant="contained"
 									color="secondary"
-									onClick={() => navigate('/book')}
+									onClick={() => router.push('/book')}
 									sx={{
 										px: 4,
 										py: 1.5,
@@ -96,7 +98,7 @@ const CallToAction = () => {
 								<Button
 									variant="outlined"
 									color="accent"
-									onClick={() => navigate('/membership')}
+									onClick={() => router.push('/membership')}
 									sx={{
 										display: { xs: 'block', md: 'none' },
 										px: 4,
@@ -203,7 +205,7 @@ const CallToAction = () => {
 									variant="outlined"
 									color="accent"
 									fullWidth
-									onClick={() => navigate('/membership')}
+									onClick={() => router.push('/membership')}
 									sx={{
 										mt: 3,
 									}}

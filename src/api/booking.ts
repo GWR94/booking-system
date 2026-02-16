@@ -1,6 +1,6 @@
-import { axios } from '@utils';
-import type { GuestUser } from '@pages/checkout/components';
-import type { Booking, GroupedSlot } from '@pages/booking/components';
+import { axios } from '@api/client';
+import type { GuestUser } from '@features/checkout/components';
+import type { Booking, GroupedSlot } from '@features/booking/components';
 
 const BOOKING_STORAGE_KEY = 'booking-data';
 
@@ -10,12 +10,12 @@ export const createBooking = async (slotIds: number[]) => {
 };
 
 export const deleteBooking = async (bookingId: number) => {
-	const response = await axios.delete(`/api/bookings/${bookingId}`);
+	const response = await axios.post(`/api/bookings/${bookingId}/cancel`);
 	return response.data;
 };
 
 export const createPaymentIntent = async (items: GroupedSlot[]) => {
-	const response = await axios.post('/api/bookings/create-payment-intent', {
+	const response = await axios.post('/api/bookings/payment-intent', {
 		items,
 	});
 	return response.data;
@@ -26,14 +26,11 @@ export const createGuestPaymentIntent = async (
 	guestInfo: GuestUser,
 	recaptchaToken: string,
 ) => {
-	const response = await axios.post(
-		'/api/bookings/guest/create-payment-intent',
-		{
-			items,
-			guestInfo,
-			recaptchaToken,
-		},
-	);
+	const response = await axios.post('/api/bookings/payment-intent', {
+		items,
+		guestInfo,
+		recaptchaToken,
+	});
 	return response.data;
 };
 
@@ -46,8 +43,7 @@ export const confirmFreeBooking = async (
 	slotIds: number[],
 	guestInfo?: GuestUser | null,
 ) => {
-	const endpoint = guestInfo ? '/api/bookings/guest' : '/api/bookings';
-	const response = await axios.post(endpoint, {
+	const response = await axios.post('/api/bookings', {
 		slotIds,
 		paymentId: 'FREE_MEMBERSHIP',
 		paymentStatus: 'succeeded',

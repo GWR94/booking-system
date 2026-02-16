@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
 	Box,
@@ -18,13 +20,15 @@ import {
 	Phone,
 	LocationOn,
 } from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
+
 import { Logo } from '@ui';
 import { COMPANY_INFO } from '@constants/company';
+import { useRouter } from 'next/navigation';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
-
+  const router = useRouter();
+  
 	return (
 		<Box
 			sx={{
@@ -129,8 +133,7 @@ const Footer: React.FC = () => {
 						</Typography>
 						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 							<Link
-								component={RouterLink}
-								to="/"
+								onClick={() => router.push('/')}
 								color="inherit"
 								underline="hover"
 								sx={{ mb: 1, opacity: 0.85, '&:hover': { opacity: 1 } }}
@@ -138,8 +141,7 @@ const Footer: React.FC = () => {
 								Home
 							</Link>
 							<Link
-								component={RouterLink}
-								to="/about"
+								onClick={() => router.push('/about')}
 								color="inherit"
 								underline="hover"
 								sx={{ mb: 1 }}
@@ -147,8 +149,7 @@ const Footer: React.FC = () => {
 								About Us
 							</Link>
 							<Link
-								component={RouterLink}
-								to="/book"
+								onClick={() => router.push('/book')}
 								color="inherit"
 								underline="hover"
 								sx={{ mb: 1 }}
@@ -156,8 +157,7 @@ const Footer: React.FC = () => {
 								Bookings
 							</Link>
 							<Link
-								component={RouterLink}
-								to="/membership"
+								onClick={() => router.push('/membership')}
 								color="inherit"
 								underline="hover"
 								sx={{ mb: 1 }}
@@ -176,8 +176,7 @@ const Footer: React.FC = () => {
 						</Typography>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 							<Link
-								component={RouterLink}
-								to="/terms"
+								onClick={() => router.push('/terms')}
 								color="inherit"
 								underline="hover"
 								sx={{ opacity: 0.85, '&:hover': { opacity: 1 } }}
@@ -185,24 +184,21 @@ const Footer: React.FC = () => {
 								Terms & Conditions
 							</Link>
 							<Link
-								component={RouterLink}
-								to="/privacy"
+								onClick={() => router.push('/privacy')}
 								color="inherit"
 								underline="hover"
 							>
 								Privacy Policy
 							</Link>
 							<Link
-								component={RouterLink}
-								to="/help"
+								onClick={() => router.push('/help')}
 								color="inherit"
 								underline="hover"
 							>
 								Help Center
 							</Link>
 							<Link
-								component={RouterLink}
-								to="/cookies"
+								onClick={() => router.push('/cookies')}
 								color="inherit"
 								underline="hover"
 							>

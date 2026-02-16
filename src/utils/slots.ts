@@ -3,8 +3,29 @@ import {
 	TimeSlot,
 	GroupedTimeSlots,
 	GroupedSlot,
-} from '../pages/booking/components';
+} from '../features/booking/components';
 
+/**
+ * Groups time slots into available booking windows based on session duration and bay selection
+ *
+ * This function:
+ * - Filters slots by selected bay (bay 5 = all bays)
+ * - Finds consecutive time slots that match the session duration
+ * - Groups available slots by time range
+ * - Marks slots that are already in the basket
+ *
+ * @param slots - Array of available time slots
+ * @param sessionDuration - Number of consecutive hours needed (default: 1)
+ * @param selectedBay - Bay number to filter (5 = show all bays)
+ * @param basket - Current basket contents to mark slots as unavailable
+ * @returns Object with time ranges as keys and available bay slots as values
+ * @example
+ * const grouped = getGroupedTimeSlots(slots, 2, 1, basket);
+ * // Returns: {
+ * //   "10:00-12:00": [{ bayId: 1, slotIds: [1, 2], inBasket: false }],
+ * //   "14:00-16:00": [{ bayId: 1, slotIds: [3, 4], inBasket: true }]
+ * // }
+ */
 export const getGroupedTimeSlots = (
 	slots: TimeSlot[],
 	sessionDuration = 1,
@@ -78,6 +99,27 @@ export const getGroupedTimeSlots = (
 	return groupedSlots;
 };
 
+/**
+ * Groups consecutive time slots by bay for booking confirmation and display
+ *
+ * Takes a flat array of time slots and groups consecutive slots together
+ * (slots where end time + 5 minutes = next start time) by bay.
+ * Useful for displaying booked sessions and calculating totals.
+ *
+ * @param slots - Array of time slots to group
+ * @returns Array of grouped slots with combined start/end times and slot IDs
+ * @example
+ * const slots = [
+ *   { id: 1, bayId: 1, startTime: '10:00', endTime: '11:00' },
+ *   { id: 2, bayId: 1, startTime: '11:05', endTime: '12:05' },
+ *   { id: 3, bayId: 2, startTime: '10:00', endTime: '11:00' }
+ * ];
+ * groupSlotsByBay(slots);
+ * // Returns: [
+ * //   { id: 1, bayId: 1, startTime: dayjs('10:00'), endTime: dayjs('12:05'), slotIds: [1, 2] },
+ * //   { id: 3, bayId: 2, startTime: dayjs('10:00'), endTime: dayjs('11:00'), slotIds: [3] }
+ * // ]
+ */
 export const groupSlotsByBay = (slots: TimeSlot[]): GroupedSlot[] => {
 	if (!slots || slots.length === 0) return [];
 

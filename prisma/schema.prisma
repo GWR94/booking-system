@@ -1,0 +1,71 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum MembershipTier {
+  PAR
+  BIRDIE
+  HOLEINONE
+}
+
+enum MembershipStatus {
+  ACTIVE
+  CANCELLED
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  name             String
+  email            String?   @unique
+  phone            String?
+  passwordHash     String?
+  role             String    @default("user")
+  bookings         Booking[]
+  googleId         String?   @unique
+  facebookId       String?   @unique
+  twitterId        String?   @unique
+  allowMarketing   Boolean?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  stripeCustomerId   String?   @unique
+  membershipTier     MembershipTier?
+  membershipStatus   MembershipStatus?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean?  @default(false)
+}
+
+model Bay {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  capacity Int    @default(1)
+  slots    Slot[]
+}
+
+model Slot {
+  id        Int       @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  status    String    @default("available")
+  bookings  Booking[] @relation("BookingSlots")
+  bay       Bay?      @relation(fields: [bayId], references: [id])
+  bayId     Int?
+  @@unique([startTime, endTime, bayId]) // Ensure no overlapping slots
+}
+
+model Booking {
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  slots           Slot[]   @relation("BookingSlots")
+  bookingTime     DateTime @default(now())
+  status          String   @default("confirmed")
+  user            User     @relation(fields: [userId], references: [id])
+  paymentId       String?
+  paymentStatus   String?
+}

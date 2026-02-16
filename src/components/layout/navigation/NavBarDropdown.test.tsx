@@ -1,31 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import NavBarDropdown from './NavBarDropdown';
 import { useAuth } from '@hooks';
 import { ThemeProvider } from '@context';
 import { Home } from '@mui/icons-material';
 
-const mockNavigate = vi.fn();
+const mockPush = vi.fn();
 const mockLogout = vi.fn();
 const mockOpenAuthModal = vi.fn();
 
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
-
-// Mock react-router for its location
-vi.mock('react-router', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+	usePathname: () => '/',
+}));
 
 vi.mock('@hooks', () => ({
 	useAuth: vi.fn(),
@@ -59,14 +48,12 @@ describe('NavBarDropdown', () => {
 	it('should render navigation items when content is nav', () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<NavBarDropdown
-						menuContent="nav"
-						isMenuOpen={true}
-						setIsMenuOpen={vi.fn()}
-						navItems={mockNavItems}
-					/>
-				</BrowserRouter>
+				<NavBarDropdown
+					menuContent="nav"
+					isMenuOpen={true}
+					setIsMenuOpen={vi.fn()}
+					navItems={mockNavItems}
+				/>
 			</ThemeProvider>,
 		);
 
@@ -76,14 +63,12 @@ describe('NavBarDropdown', () => {
 	it('should render basket content when content is basket', () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<NavBarDropdown
-						menuContent="basket"
-						isMenuOpen={true}
-						setIsMenuOpen={vi.fn()}
-						navItems={mockNavItems}
-					/>
-				</BrowserRouter>
+				<NavBarDropdown
+					menuContent="basket"
+					isMenuOpen={true}
+					setIsMenuOpen={vi.fn()}
+					navItems={mockNavItems}
+				/>
 			</ThemeProvider>,
 		);
 
@@ -99,14 +84,12 @@ describe('NavBarDropdown', () => {
 
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<NavBarDropdown
-						menuContent="account"
-						isMenuOpen={true}
-						setIsMenuOpen={vi.fn()}
-						navItems={mockNavItems}
-					/>
-				</BrowserRouter>
+				<NavBarDropdown
+					menuContent="account"
+					isMenuOpen={true}
+					setIsMenuOpen={vi.fn()}
+					navItems={mockNavItems}
+				/>
 			</ThemeProvider>,
 		);
 
@@ -123,14 +106,12 @@ describe('NavBarDropdown', () => {
 
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<NavBarDropdown
-						menuContent="account"
-						isMenuOpen={true}
-						setIsMenuOpen={vi.fn()}
-						navItems={mockNavItems}
-					/>
-				</BrowserRouter>
+				<NavBarDropdown
+					menuContent="account"
+					isMenuOpen={true}
+					setIsMenuOpen={vi.fn()}
+					navItems={mockNavItems}
+				/>
 			</ThemeProvider>,
 		);
 

@@ -1,4 +1,4 @@
-import { axios } from '@utils';
+import { axios } from '@api/client';
 
 export interface ContactData {
 	name: string;

@@ -6,14 +6,14 @@ import createWrapper from '@utils/test-utils';
 import { useBasket, useAuth } from '@hooks';
 import { useUI, ThemeProvider } from '@context';
 
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+	usePathname: () => '/',
+	useSearchParams: () => ({ get: vi.fn() }),
+}));
 
 vi.mock('@hooks', () => ({
 	useBasket: vi.fn(),
@@ -113,7 +113,7 @@ describe('BasketContent', () => {
 		);
 
 		fireEvent.click(screen.getByText(/Continue to Checkout/i));
-		expect(mockNavigate).toHaveBeenCalledWith('/checkout');
+		expect(mockPush).toHaveBeenCalledWith('/checkout');
 	});
 
 	it('should open auth modal when Continue button is clicked (unauthenticated)', () => {
@@ -153,6 +153,6 @@ describe('BasketContent', () => {
 		);
 
 		fireEvent.click(screen.getByText(/Guest Checkout/i));
-		expect(mockNavigate).toHaveBeenCalledWith('/checkout');
+		expect(mockPush).toHaveBeenCalledWith('/checkout');
 	});
 });

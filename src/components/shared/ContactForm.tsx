@@ -1,3 +1,7 @@
+'use client';
+
+'use client';
+
 import React, { useState } from 'react';
 import {
 	Box,
@@ -11,7 +15,6 @@ import {
 	MenuItem,
 	InputAdornment,
 } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
 import {
 	Email,
 	Phone,
@@ -407,12 +410,11 @@ const ContactForm: React.FC<ContactFormProps> = ({
 											/>
 										</Grid>
 										<Grid size={{ xs: 12 }}>
-											<LoadingButton
+											<Button
 												type="submit"
 												variant="contained"
 												color="secondary"
 												size="large"
-												loading={loading}
 												disabled={loading}
 												sx={{
 													mt: 2,
@@ -421,8 +423,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
 													fontWeight: 500,
 												}}
 											>
-												Send Message
-											</LoadingButton>
+												{loading ? 'Sending...' : 'Send Message'}
+											</Button>
 										</Grid>
 									</Grid>
 								</form>

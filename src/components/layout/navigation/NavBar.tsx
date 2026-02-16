@@ -1,3 +1,7 @@
+'use client';
+
+'use client';
+
 import { useMotionValueEvent, useScroll, motion } from 'framer-motion';
 import { Close, Menu } from '@mui/icons-material';
 import {
@@ -11,7 +15,7 @@ import {
 	IconButton,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 import Basket from './Basket';
 import DesktopNavigation from './DesktopNavigation';
 import AccountButton from './AccountButton';
@@ -28,7 +32,7 @@ interface NavBarProps {
 
 const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	const theme = useTheme();
-	const location = useLocation();
+	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [menuContent, setMenuContent] = useState<
 		'nav' | 'basket' | 'account' | 'admin' | 'theme'
@@ -71,7 +75,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	// Close menu when route changes
 	useEffect(() => {
 		setIsMenuOpen(false);
-	}, [location.pathname]);
+	}, [pathname]);
 
 	return (
 		<Box

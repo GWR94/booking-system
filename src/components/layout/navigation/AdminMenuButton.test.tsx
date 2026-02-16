@@ -1,6 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import AdminMenuButton from './AdminMenuButton';
 import { ThemeProvider, createTheme } from '@mui/material';
 
@@ -14,15 +13,13 @@ const theme = createTheme({
 		},
 	},
 });
-const mockNavigate = vi.fn();
+const mockPush = vi.fn();
 
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+}));
 
 describe('AdminMenuButton', () => {
 	beforeEach(() => {
@@ -32,9 +29,7 @@ describe('AdminMenuButton', () => {
 	const renderAdminMenuButton = (props = {}) => {
 		return render(
 			<ThemeProvider theme={theme}>
-				<BrowserRouter>
-					<AdminMenuButton {...props} />
-				</BrowserRouter>
+				<AdminMenuButton {...props} />
 			</ThemeProvider>,
 		);
 	};
@@ -60,7 +55,7 @@ describe('AdminMenuButton', () => {
 		const bookingsItem = await screen.findByText(/Bookings/i);
 		fireEvent.click(bookingsItem);
 
-		expect(mockNavigate).toHaveBeenCalled();
+		expect(mockPush).toHaveBeenCalled();
 		await waitFor(() => {
 			expect(screen.queryByText('Admin')).not.toBeInTheDocument();
 		});

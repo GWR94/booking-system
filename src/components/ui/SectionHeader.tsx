@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Typography, useTheme, SxProps, Theme } from '@mui/material';
 import { AnimateIn } from '@ui';
 

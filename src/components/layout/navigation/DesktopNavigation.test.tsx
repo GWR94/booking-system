@@ -1,18 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import DesktopNavigation from './DesktopNavigation';
 import { ThemeProvider } from '@context';
 import { Home } from '@mui/icons-material';
 
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+	usePathname: () => '/',
+}));
 
 describe('DesktopNavigation', () => {
 	const mockNavItems = [
@@ -23,9 +21,7 @@ describe('DesktopNavigation', () => {
 	it('should render navigation items', () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<DesktopNavigation navItems={mockNavItems} />
-				</BrowserRouter>
+				<DesktopNavigation navItems={mockNavItems} />
 			</ThemeProvider>,
 		);
 
@@ -36,13 +32,11 @@ describe('DesktopNavigation', () => {
 	it('should navigate to path when item is clicked', () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<DesktopNavigation navItems={mockNavItems} />
-				</BrowserRouter>
+				<DesktopNavigation navItems={mockNavItems} />
 			</ThemeProvider>,
 		);
 
 		fireEvent.click(screen.getByText('About'));
-		expect(mockNavigate).toHaveBeenCalledWith('/about');
+		expect(mockPush).toHaveBeenCalledWith('/about');
 	});
 });

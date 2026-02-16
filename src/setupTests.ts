@@ -132,3 +132,62 @@ vi.mock('swiper/modules', () => ({
 	Navigation: () => null,
 	Pagination: () => null,
 }));
+
+// Mock Next.js Navigation
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: vi.fn(),
+		replace: vi.fn(),
+		prefetch: vi.fn(),
+		back: vi.fn(),
+		forward: vi.fn(),
+		refresh: vi.fn(),
+	}),
+	useSearchParams: () => ({
+		get: vi.fn(),
+		getAll: vi.fn(),
+		has: vi.fn(),
+		forEach: vi.fn(),
+		entries: vi.fn(),
+		keys: vi.fn(),
+		values: vi.fn(),
+		toString: vi.fn(),
+	}),
+	usePathname: () => '/',
+	useSegments: () => [],
+	useParams: () => ({}),
+}));
+
+// Mock NextAuth
+vi.mock('next-auth/react', () => {
+	const React = require('react');
+	const SessionContext = React.createContext({
+		data: null,
+		status: 'unauthenticated',
+		update: vi.fn(),
+	});
+	
+	// Default mock implementation
+	const mockUseSession = vi.fn(() => ({
+		data: null,
+		status: 'unauthenticated',
+		update: vi.fn(),
+	}));
+	
+	return {
+		SessionProvider: ({ children }: any) =>
+			React.createElement(SessionContext.Provider, {
+				value: {
+					data: null,
+					status: 'unauthenticated',
+					update: vi.fn(),
+				},
+			}, children),
+		useSession: mockUseSession,
+		signIn: vi.fn(),
+		signOut: vi.fn(),
+		getCsrfToken: vi.fn(),
+		getProviders: vi.fn(),
+		getSession: vi.fn(),
+	};
+});

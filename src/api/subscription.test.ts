@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { axios } from '@utils';
+import { axios } from '@api/client';
 import { createSubscriptionSession, createPortalSession } from './subscription';
 
-vi.mock('@utils', () => ({
+vi.mock('@api/client', () => ({
 	axios: {
 		post: vi.fn(),
 	},

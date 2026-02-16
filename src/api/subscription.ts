@@ -1,4 +1,4 @@
-import { axios } from '@utils';
+import { axios } from '@api/client';
 
 export const createSubscriptionSession = async (tier: string) => {
 	const response = await axios.post('/api/user/subscription/create-session', {

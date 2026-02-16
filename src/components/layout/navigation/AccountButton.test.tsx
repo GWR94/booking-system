@@ -1,21 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import AccountButton from './AccountButton';
 import { useAuth } from '@hooks';
 import { ThemeProvider } from '@context';
 
-const mockNavigate = vi.fn();
+const mockPush = vi.fn();
 const mockLogout = vi.fn();
 const mockOpenAuthModal = vi.fn();
 
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+	usePathname: () => '/',
+}));
 
 vi.mock('@hooks', () => ({
 	useAuth: vi.fn(),
@@ -44,9 +42,7 @@ describe('AccountButton', () => {
 	it('should render login/register options when unauthenticated', async () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -66,9 +62,7 @@ describe('AccountButton', () => {
 
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -86,9 +80,7 @@ describe('AccountButton', () => {
 		const onMobileClick = vi.fn();
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton isMobile onMobileClick={onMobileClick} />
-				</BrowserRouter>
+				<AccountButton isMobile onMobileClick={onMobileClick} />
 			</ThemeProvider>,
 		);
 
@@ -99,9 +91,7 @@ describe('AccountButton', () => {
 	it('should call openAuthModal("login") when login is clicked', async () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -115,9 +105,7 @@ describe('AccountButton', () => {
 	it('should call openAuthModal("register") when register is clicked', async () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -131,9 +119,7 @@ describe('AccountButton', () => {
 	it('should show "My Bookings" only if user has bookings', async () => {
 		const { rerender } = render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -146,9 +132,7 @@ describe('AccountButton', () => {
 
 		rerender(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -168,9 +152,7 @@ describe('AccountButton', () => {
 
 		rerender(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 
@@ -187,9 +169,7 @@ describe('AccountButton', () => {
 
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<AccountButton />
-				</BrowserRouter>
+				<AccountButton />
 			</ThemeProvider>,
 		);
 

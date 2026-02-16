@@ -1,9 +1,8 @@
 import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SessionProvider } from 'next-auth/react';
 import { SnackbarContext } from '../context/SnackbarContext';
-import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
-import { HelmetProvider } from 'react-helmet-async';
 
 const createWrapper = () => {
 	const queryClient = new QueryClient({
@@ -18,8 +17,9 @@ const createWrapper = () => {
 	const mockHideSnackbar = vi.fn();
 	const mockSetBottomOffset = vi.fn();
 
+	// Wrapper includes all providers needed for testing
 	return ({ children }: { children: ReactNode }) => (
-		<HelmetProvider>
+		<SessionProvider session={null}>
 			<QueryClientProvider client={queryClient}>
 				<SnackbarContext.Provider
 					value={{
@@ -28,10 +28,10 @@ const createWrapper = () => {
 						setBottomOffset: mockSetBottomOffset,
 					}}
 				>
-					<MemoryRouter>{children}</MemoryRouter>
+					{children}
 				</SnackbarContext.Provider>
 			</QueryClientProvider>
-		</HelmetProvider>
+		</SessionProvider>
 	);
 };
 

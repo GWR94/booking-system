@@ -1,25 +1,21 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import EmptyBasket from './EmptyBasket';
 import { ThemeProvider } from '@context';
 
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
-	const actual = (await importOriginal()) as any;
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+const mockPush = vi.fn();
+
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+}));
 
 describe('EmptyBasket', () => {
 	it('should render empty basket message', () => {
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<EmptyBasket isMobile={false} />
-				</BrowserRouter>
+				<EmptyBasket isMobile={false} />
 			</ThemeProvider>,
 		);
 
@@ -30,14 +26,12 @@ describe('EmptyBasket', () => {
 		const mockClose = vi.fn();
 		render(
 			<ThemeProvider>
-				<BrowserRouter>
-					<EmptyBasket isMobile={false} onClose={mockClose} />
-				</BrowserRouter>
+				<EmptyBasket isMobile={false} onClose={mockClose} />
 			</ThemeProvider>,
 		);
 
 		fireEvent.click(screen.getByText(/Browse Available Slots/i));
-		expect(mockNavigate).toHaveBeenCalledWith('/book');
+		expect(mockPush).toHaveBeenCalledWith('/book');
 		expect(mockClose).toHaveBeenCalled();
 	});
 });

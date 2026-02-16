@@ -1,3 +1,5 @@
+'use client';
+
 import { ManageAccounts, Logout, Login, HowToReg } from '@mui/icons-material';
 import {
 	Box,
@@ -11,7 +13,7 @@ import {
 	useTheme,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@hooks';
 import { useUI } from '@context';
 import { PROFILE_MENU_ITEMS, ADMIN_MENU_ITEMS } from './menuItems';
@@ -22,7 +24,7 @@ type AccountButtonProps = {
 };
 
 const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const theme = useTheme();
 	const { openAuthModal } = useUI();
 	const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
@@ -92,8 +94,8 @@ const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
 							vertical: 'top',
 							horizontal: 'right',
 						}}
-						TransitionProps={{ timeout: 0 }}
 						slotProps={{
+							transition: { timeout: 0 },
 							paper: {
 								elevation: 4,
 								sx: {
@@ -137,16 +139,15 @@ const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
 						)}
 
 						{isAuthenticated &&
-							PROFILE_MENU_ITEMS.filter((item) => {
-								if (item.label === 'My Bookings') {
-									return (user?.bookings?.length ?? 0) > 0;
-								}
-								return true;
-							}).map((item) => (
+							PROFILE_MENU_ITEMS.filter(
+								(item) =>
+									item.label !== 'My Bookings' ||
+									(user?.bookings?.length ?? 0) > 0,
+							).map((item) => (
 								<MenuItem
 									key={item.path}
 									onClick={() => {
-										navigate(item.path);
+										router.push(item.path);
 										setAnchorElMenu(null);
 									}}
 									sx={{ py: 1.5 }}

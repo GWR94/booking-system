@@ -1,3 +1,7 @@
+'use client';
+
+'use client';
+
 import { AnimateIn, SectionHeader } from '@ui';
 import { ArrowForward } from '@mui/icons-material';
 import {
@@ -12,7 +16,7 @@ import {
 	Button,
 	alpha,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import Link from 'next/link';
 
 const offers = [
 	{
@@ -148,8 +152,8 @@ const ServicesOverview = () => {
 										</Typography>
 										{offer.link && (
 											<Button
-												component={RouterLink}
-												to={offer.link}
+												component={Link}
+												href={offer.link}
 												variant="text"
 												color="primary"
 												endIcon={

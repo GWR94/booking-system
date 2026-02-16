@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { axios } from '@utils';
+import { axios } from '@api/client';
 import { sendContactMessage } from './common';
 
-vi.mock('@utils', () => ({
+vi.mock('@api/client', () => ({
 	axios: {
 		post: vi.fn(),
 	},

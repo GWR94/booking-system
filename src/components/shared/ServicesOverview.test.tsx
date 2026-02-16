@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import ServicesOverview from './ServicesOverview';
 import { ThemeProvider, createTheme } from '@mui/material';
-import { BrowserRouter } from 'react-router-dom';
 
 const theme = createTheme();
 
@@ -17,11 +16,9 @@ vi.mock('@ui', () => ({
 describe('ServicesOverview', () => {
 	it('should render all service offers', () => {
 		render(
-			<BrowserRouter>
-				<ThemeProvider theme={theme}>
-					<ServicesOverview />
-				</ThemeProvider>
-			</BrowserRouter>,
+			<ThemeProvider theme={theme}>
+				<ServicesOverview />
+			</ThemeProvider>,
 		);
 
 		expect(screen.getByText('Precision Simulation')).toBeInTheDocument();
@@ -32,11 +29,9 @@ describe('ServicesOverview', () => {
 
 	it('should render links for offers that have them', () => {
 		render(
-			<BrowserRouter>
-				<ThemeProvider theme={theme}>
-					<ServicesOverview />
-				</ThemeProvider>
-			</BrowserRouter>,
+			<ThemeProvider theme={theme}>
+				<ServicesOverview />
+			</ThemeProvider>,
 		);
 
 		expect(screen.getByText('Book a Bay')).toBeInTheDocument();

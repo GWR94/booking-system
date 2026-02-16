@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname, useSearchParams } from 'next/navigation';
 import ReactGA from 'react-ga4';
 import { useCookie } from '@context';
 
@@ -14,12 +16,13 @@ declare global {
 }
 
 const GoogleAnalytics = () => {
-	const location = useLocation();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const { preferences } = useCookie();
 	const [initialized, setInitialized] = useState(false);
 
 	useEffect(() => {
-		const gaId = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
+		const gaId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 		// Map our internal state to GA consent strings
 		const consentState = preferences.analytics ? 'granted' : 'denied';
@@ -50,10 +53,12 @@ const GoogleAnalytics = () => {
 		if (initialized && preferences.analytics) {
 			ReactGA.send({
 				hitType: 'pageview',
-				page: location.pathname + location.search,
+				page:
+					pathname +
+					(searchParams?.toString() ? `?${searchParams.toString()}` : ''),
 			});
 		}
-	}, [location, initialized, preferences.analytics]);
+	}, [pathname, searchParams, initialized, preferences.analytics]);
 
 	return null;
 };

@@ -1,12 +1,18 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import GoogleAnalytics from './GoogleAnalytics';
 import { useCookie } from '@context';
 import ReactGA from 'react-ga4';
 
 vi.mock('@context', () => ({
 	useCookie: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+	usePathname: () => '/',
+	useSearchParams: () => ({
+		toString: () => '',
+	}),
 }));
 
 // Mock react-ga4 as a module with a default export
@@ -23,6 +29,7 @@ vi.mock('react-ga4', () => {
 describe('GoogleAnalytics', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID = 'G-TEST';
 		// Reset isInitialized via the mock implementation if needed,
 		// but here we just want to avoid the TypeError
 		(window as any).gtag = vi.fn();
@@ -33,11 +40,7 @@ describe('GoogleAnalytics', () => {
 			preferences: { analytics: true },
 		});
 
-		render(
-			<BrowserRouter>
-				<GoogleAnalytics />
-			</BrowserRouter>,
-		);
+		render(<GoogleAnalytics />);
 
 		expect(window.gtag).toHaveBeenCalledWith(
 			'consent',
@@ -55,11 +58,7 @@ describe('GoogleAnalytics', () => {
 			preferences: { analytics: false },
 		});
 
-		render(
-			<BrowserRouter>
-				<GoogleAnalytics />
-			</BrowserRouter>,
-		);
+		render(<GoogleAnalytics />);
 
 		expect(window.gtag).toHaveBeenCalledWith(
 			'consent',

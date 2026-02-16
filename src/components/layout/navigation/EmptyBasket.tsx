@@ -1,6 +1,8 @@
+'use client';
+
 import { ShoppingBag } from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 type Props = {
 	isMobile: boolean;
@@ -8,7 +10,7 @@ type Props = {
 };
 
 const EmptyBasket = ({ isMobile = false, onClose }: Props) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	return (
 		<Box
 			sx={{
@@ -52,7 +54,7 @@ const EmptyBasket = ({ isMobile = false, onClose }: Props) => {
 					}),
 				}}
 				onClick={() => {
-					navigate('/book');
+					router.push('/book');
 					onClose && onClose();
 				}}
 			>

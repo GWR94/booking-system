@@ -1,5 +1,5 @@
-import { Helmet } from 'react-helmet-async';
 import { COMPANY_INFO } from '@constants/company';
+import { Metadata } from 'next';
 
 interface SEOProps {
 	title: string;
@@ -9,6 +9,8 @@ interface SEOProps {
 	keywords?: string[];
 }
 
+// Metadata is defined via layout/page exports in App Router.
+// This component is kept for call-site compatibility and returns null.
 export const SEO = ({
 	title,
 	description,
@@ -16,29 +18,5 @@ export const SEO = ({
 	type = 'website',
 	keywords = [],
 }: SEOProps) => {
-	return (
-		<Helmet>
-			{/* Standard metadata tags */}
-			<title>
-				{title} | {COMPANY_INFO.name}
-			</title>
-			<meta name="description" content={description} />
-			{keywords.length > 0 && (
-				<meta name="keywords" content={keywords.join(', ')} />
-			)}
-
-			{/* Facebook tags */}
-			<meta property="og:type" content={type} />
-			<meta property="og:title" content={title} />
-			<meta property="og:description" content={description} />
-			{/* End Facebook tags */}
-
-			{/* Twitter tags */}
-			<meta name="twitter:creator" content={name} />
-			<meta name="twitter:card" content="summary_large_image" />
-			<meta name="twitter:title" content={title} />
-			<meta name="twitter:description" content={description} />
-			{/* End Twitter tags */}
-		</Helmet>
-	);
+	return null;
 };

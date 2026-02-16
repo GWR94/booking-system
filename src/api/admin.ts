@@ -1,6 +1,6 @@
-import { axios } from '@utils';
-import type { Booking } from '@pages/booking/components';
-import type { User } from '@pages/auth/components/types';
+import { axios } from '@api/client';
+import type { Booking } from '@features/booking/components';
+import type { User } from '@features/auth/components/types';
 
 export const getAllUsers = async (): Promise<User[]> => {
 	const response = await axios.get('/api/admin/users');
@@ -35,16 +35,6 @@ export const updateSlot = async (id: number, slotData: any) => {
 
 export const deleteSlot = async (id: number) => {
 	const response = await axios.delete(`/api/admin/slots/${id}`);
-	return response.data;
-};
-
-export const getAdminSettings = async () => {
-	const response = await axios.get('/api/admin/settings');
-	return response.data;
-};
-
-export const updateAdminSettings = async (settings: any) => {
-	const response = await axios.patch('/api/admin/settings', settings);
 	return response.data;
 };
 

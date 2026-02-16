@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { axios } from '@utils';
+import { axios } from '@api/client';
 import {
 	verifyUser,
-	loginUser,
-	logoutUser,
 	registerUser,
 	unlinkProvider,
 	updateProfile,
@@ -11,7 +9,7 @@ import {
 	checkEmailExists,
 } from './auth';
 
-vi.mock('@utils', () => ({
+vi.mock('@api/client', () => ({
 	axios: {
 		get: vi.fn(),
 		post: vi.fn(),
@@ -26,33 +24,14 @@ describe('auth api', () => {
 		vi.clearAllMocks();
 	});
 
-	it('verifyUser should call GET /api/user/verify', async () => {
+	it('verifyUser should call GET /api/user/me', async () => {
 		const mockUser = { id: 1, name: 'Test' };
 		(axios.get as any).mockResolvedValue({ data: { user: mockUser } });
 
 		const result = await verifyUser();
 
-		expect(axios.get).toHaveBeenCalledWith('/api/user/verify');
+		expect(axios.get).toHaveBeenCalledWith('/api/user/me');
 		expect(result).toEqual(mockUser);
-	});
-
-	it('loginUser should call POST /api/user/login', async () => {
-		const credentials = { email: 'test@test.com', password: 'password' };
-		const mockUser = { id: 1, name: 'Test' };
-		(axios.post as any).mockResolvedValue({ data: { user: mockUser } });
-
-		const result = await loginUser(credentials);
-
-		expect(axios.post).toHaveBeenCalledWith('/api/user/login', credentials);
-		expect(result).toEqual(mockUser);
-	});
-
-	it('logoutUser should call POST /api/user/logout', async () => {
-		(axios.post as any).mockResolvedValue({});
-
-		await logoutUser();
-
-		expect(axios.post).toHaveBeenCalledWith('/api/user/logout');
 	});
 
 	it('registerUser should call POST /api/user/register', async () => {
@@ -82,14 +61,14 @@ describe('auth api', () => {
 		expect(result).toEqual(mockResponse);
 	});
 
-	it('updateProfile should call PUT /api/user/profile', async () => {
+	it('updateProfile should call PATCH /api/user/me', async () => {
 		const userUpdate = { name: 'New Name' };
 		const mockResponse = { success: true };
 		(axios.patch as any).mockResolvedValue({ data: mockResponse });
 
 		const result = await updateProfile(userUpdate);
 
-		expect(axios.patch).toHaveBeenCalledWith('/api/user/profile', userUpdate);
+		expect(axios.patch).toHaveBeenCalledWith('/api/user/me', userUpdate);
 		expect(result).toEqual(mockResponse);
 	});
 

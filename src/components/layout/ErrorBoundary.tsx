@@ -1,3 +1,5 @@
+'use client';
+
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';

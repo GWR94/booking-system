@@ -1,10 +1,12 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Badge, Box, IconButton, Popover, Tooltip } from '@mui/material';
 import { ShoppingCart } from '@mui/icons-material';
 import { useBasket } from '@hooks';
 import BasketContent from './BasketContent';
 import { useTheme, alpha } from '@mui/material/styles';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 
 interface BasketProps {
 	isMobile: boolean;
@@ -13,7 +15,7 @@ interface BasketProps {
 
 const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 	const theme = useTheme();
-	const location = useLocation();
+	const pathname = usePathname();
 	const { basket } = useBasket();
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -47,7 +49,7 @@ const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 
 	useEffect(() => {
 		setAnchorEl(null);
-	}, [location.pathname]);
+	}, [pathname]);
 
 	const basketButton = (
 		<Tooltip title="Your basket" arrow>

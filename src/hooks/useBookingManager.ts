@@ -1,6 +1,10 @@
+'use client';
+
+'use client';
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getStoredBooking, saveStoredBooking } from '@api';
-import { Booking } from '@pages/booking/components';
+import { Booking } from '@features/booking/components';
 import { useSnackbar } from '@context';
 
 export function useBookingManager() {

@@ -1,5 +1,10 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -33,20 +38,30 @@ export default defineConfig(({ mode }) => ({
 	},
 	resolve: {
 		alias: {
-			'@constants': '/src/constants',
-			'@components': '/src/components',
-			'@hooks': '/src/hooks',
-			'@context': '/src/context',
-			'@assets': '/src/assets',
-			'@pages': '/src/pages',
-			'@utils': '/src/utils',
-			'@api': '/src/api',
-			'@layouts': '/src/layouts',
-			'@ui': '/src/components/ui',
-			'@layout': '/src/components/layout',
-			'@shared': '/src/components/shared',
-			'@styles': '/src/styles',
-			'@validation': '/src/validation',
+			'@auth': path.resolve(__dirname, './src/server/auth/auth'),
+			'@db': path.resolve(__dirname, './src/server/db/client'),
+			'@config': path.resolve(__dirname, './src/config'),
+			'@lib': path.resolve(__dirname, './src/server/lib'),
+			'@test': path.resolve(__dirname, './src/__test__'),
+			'@constants': path.resolve(__dirname, './src/constants'),
+			'@components': path.resolve(__dirname, './src/components'),
+			'@hooks': path.resolve(__dirname, './src/hooks'),
+			'@modules': path.resolve(__dirname, './src/server/modules'),
+			'@context': path.resolve(__dirname, './src/context'),
+			'@assets': path.resolve(__dirname, './src/assets'),
+			'@features': path.resolve(__dirname, './src/features'),
+			'@utils': path.resolve(__dirname, './src/utils'),
+			'@api': path.resolve(__dirname, './src/api'),
+			'@ui': path.resolve(__dirname, './src/components/ui'),
+			'@layout': path.resolve(__dirname, './src/components/layout'),
+			'@shared': path.resolve(__dirname, './src/components/shared'),
+			'@styles': path.resolve(__dirname, './src/styles'),
+			'@validation': path.resolve(__dirname, './src/validation'),
+			'src/': path.resolve(__dirname, './src') + '/',
+			'next/server': path.resolve(
+				__dirname,
+				'./src/__test__/mocks/next-server.ts',
+			),
 		},
 	},
 	test: {

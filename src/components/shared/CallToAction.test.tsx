@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import CallToAction from './CallToAction';
 import { ThemeProvider, createTheme } from '@mui/material';
 
@@ -12,14 +11,12 @@ const theme = createTheme({
 	},
 } as any);
 
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-	const actual = await vi.importActual('react-router-dom');
-	return {
-		...actual,
-		useNavigate: () => mockNavigate,
-	};
-});
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
+}));
 
 // Mock AnimateIn to simplify
 vi.mock('framer-motion', () => ({
@@ -38,11 +35,9 @@ vi.mock('@ui', () => ({
 
 const renderCTA = () => {
 	return render(
-		<BrowserRouter>
-			<ThemeProvider theme={theme}>
-				<CallToAction />
-			</ThemeProvider>
-		</BrowserRouter>,
+		<ThemeProvider theme={theme}>
+			<CallToAction />
+		</ThemeProvider>,
 	);
 };
 
@@ -60,12 +55,12 @@ describe('CallToAction', () => {
 	it('should navigate to /book when "Book a Session Now" is clicked', () => {
 		renderCTA();
 		fireEvent.click(screen.getByText(/Book a Session Now/i));
-		expect(mockNavigate).toHaveBeenCalledWith('/book');
+		expect(mockPush).toHaveBeenCalledWith('/book');
 	});
 
 	it('should navigate to /membership when "View Membership Options" is clicked', () => {
 		renderCTA();
 		fireEvent.click(screen.getByText(/View Membership Options/i));
-		expect(mockNavigate).toHaveBeenCalledWith('/membership');
+		expect(mockPush).toHaveBeenCalledWith('/membership');
 	});
 });

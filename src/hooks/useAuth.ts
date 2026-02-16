@@ -1,42 +1,74 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+'use client';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
 import { useSnackbar } from '@context';
-import { verifyUser, loginUser, logoutUser, registerUser } from '@api';
+import { registerUser, verifyUser } from '@api';
+import type { RegisterCredentials, User } from '@features/auth/components';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export function useAuth() {
 	const queryClient = useQueryClient();
 	const { showSnackbar } = useSnackbar();
+	const router = useRouter();
+	const { data: session, status } = useSession();
 
-	const {
-		data: user,
-		isLoading,
-		error,
-	} = useQuery({
-		queryKey: ['auth'],
-		queryFn: verifyUser,
-		retry: false,
-		staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+	const { data: meUser } = useQuery({
+		queryKey: ['user', 'me', session?.user?.id],
+		queryFn: () => verifyUser(),
+		enabled: !!session?.user?.id,
 	});
 
+	const user = session?.user
+		? {
+				id: session.user.id,
+				email: session.user.email,
+				name: session.user.name,
+				role: session.user.role,
+				membershipTier: session.user.membershipTier,
+				membershipStatus: session.user.membershipStatus,
+				membershipUsage: meUser?.membershipUsage ?? undefined,
+				hasPassword: meUser?.hasPassword,
+				googleId: meUser?.googleId,
+				facebookId: meUser?.facebookId,
+				twitterId: meUser?.twitterId,
+				bookings: meUser?.bookings,
+			}
+		: null;
+
 	const loginMutation = useMutation({
-		mutationFn: loginUser,
-		onSuccess: (user) => {
-			queryClient.setQueryData(['auth'], user);
+		mutationFn: async (credentials: { email: string; password: string }) => {
+			const result = await signIn('credentials', {
+				email: credentials.email,
+				password: credentials.password,
+				redirect: false,
+			});
+			if (result?.error) {
+				throw new Error(result.error);
+			}
+			return result;
+		},
+		onSuccess: () => {
 			showSnackbar('Successfully signed in', 'success');
+			router.refresh();
 		},
 		onError: (error: any) => {
 			showSnackbar(
-				error.response?.data?.message ??
-					'Unable to sign in.\nPlease try again.',
+				error.message ?? 'Unable to sign in.\nPlease try again.',
 				'error',
 			);
 		},
 	});
 
 	const logoutMutation = useMutation({
-		mutationFn: logoutUser,
+		mutationFn: async () => {
+			await nextAuthSignOut({ redirect: false });
+		},
 		onSuccess: () => {
-			queryClient.setQueryData(['auth'], null);
+			queryClient.clear();
 			showSnackbar('Successfully logged out', 'success');
+			router.push('/');
 		},
 	});
 
@@ -53,14 +85,31 @@ export function useAuth() {
 		},
 	});
 
-	return {
+	type UseAuthReturnType = {
+		user: User | null;
+		isLoading: boolean;
+		isAuthenticated: boolean;
+		isAdmin: boolean;
+		login: (credentials: { email: string; password: string }) => Promise<void>;
+		logout: () => Promise<void>;
+		register: (credentials: RegisterCredentials) => Promise<void>;
+	};
+
+	const useAuth: UseAuthReturnType = {
 		user,
-		isLoading,
+		isLoading: status === 'loading',
 		isAuthenticated: !!user,
 		isAdmin: user?.role === 'admin',
-		login: loginMutation.mutateAsync,
-		logout: logoutMutation.mutateAsync,
-		register: registerMutation.mutateAsync,
-		error,
+		login: async (credentials) => {
+			await loginMutation.mutateAsync(credentials);
+		},
+		logout: async () => {
+			await logoutMutation.mutateAsync();
+		},
+		register: async (credentials) => {
+			await registerMutation.mutateAsync(credentials);
+		},
 	};
+
+	return useAuth;
 }

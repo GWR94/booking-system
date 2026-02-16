@@ -2,30 +2,39 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@api": ["./src/api"],
+			"@auth": ["./src/server/auth/auth.ts"],
+			"@db": ["./src/server/db/client.ts"],
+			"@config/*": ["./src/config/*"],
+			"@config": ["./src/config/index.ts"],
+			"@lib/*": ["./src/server/lib/*"],
+			"@modules/*": ["./src/server/modules/*"],
+			"@modules": ["./src/server/modules/index.ts"],
+			"@utils/*": ["./src/utils/*"],
+			"@utils": ["./src/utils/index.ts"],
+			"@features": ["./src/features/index.ts"],
+			"@features/*": ["./src/features/*"],
+			"@components/*": ["./src/components/*"],
+			"@hooks/*": ["./src/hooks/*"],
+			"@test/*": ["./src/__test__/*"],
+			"@api": ["./src/api/index.ts"],
+			"@api/*": ["./src/api/*"],
 			"@assets/*": ["./src/assets/*"],
 			"@constants/*": ["./src/constants/*"],
-			"@constants": ["./src/constants"],
-			"@components/*": ["./src/components/*"],
+			"@constants": ["./src/constants/index.ts"],
 			"@context": ["./src/context"],
 			"@context/*": ["./src/context/*"],
-			"@hooks": ["./src/hooks"],
-			"@hooks/*": ["./src/hooks/*"],
-			"@layout": ["./src/components/layout"],
+			"@hooks": ["./src/hooks/index.ts"],
+			"@layout": ["./src/components/layout/index.ts"],
 			"@layout/*": ["./src/components/layout/*"],
-			"@layouts": ["./src/layouts"],
+			"@layouts": ["./src/components/layout/index.ts"],
 			"@shared/*": ["./src/components/shared/*"],
-			"@shared": ["./src/components/shared"],
-			"@utils/*": ["./src/utils/*"],
+			"@shared": ["./src/components/shared/index.ts"],
 			"@ui/*": ["./src/components/ui/*"],
-			"@ui": ["./src/components/ui"],
-			"@utils": ["./src/utils"],
-			"@pages": ["./src/pages"],
-			"@pages/*": ["./src/pages/*"],
+			"@ui": ["./src/components/ui/index.ts"],
 			"@styles/*": ["./src/styles/*"],
-			"@styles": ["./src/styles"],
+			"@styles": ["./src/styles/index.ts"],
 			"@validation/*": ["./src/validation/*"],
-			"@validation": ["./src/validation"]
+			"@validation": ["./src/validation/index.ts"]
 		},
 		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 		"types": ["vitest/globals", "@testing-library/jest-dom", "node"],
@@ -35,21 +44,26 @@
 		"module": "ESNext",
 		"skipLibCheck": true,
 		"esModuleInterop": true,
-
 		/* Bundler mode */
 		"moduleResolution": "node",
 		"isolatedModules": true,
 		"moduleDetection": "force",
 		"noEmit": true,
 		"jsx": "react-jsx",
-
 		/* Linting */
 		"strict": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noFallthroughCasesInSwitch": true,
-		"incremental": true
+		"incremental": true,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"plugins": [
+			{
+				"name": "next"
+			}
+		]
 	},
-	"include": ["src/**/*", "src/**/*.test.tsx", "src/setupTests.ts"],
-	"exclude": ["node_modules"]
+	"include": ["src/**/*", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+	"exclude": ["node_modules", "dist", ".next", "src/router/**/*"]
 }

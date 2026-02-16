@@ -1,5 +1,7 @@
+'use client';
+
 import { alpha, Box, Button, useTheme } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { usePathname, useRouter } from 'next/navigation';
 import { NavItem } from './menuItems';
 
 interface DesktopNavigationProps {
@@ -7,11 +9,11 @@ interface DesktopNavigationProps {
 }
 
 const DesktopNavigation = ({ navItems }: DesktopNavigationProps) => {
-	const navigate = useNavigate();
-	const location = useLocation();
+	const pathname = usePathname();
 	const theme = useTheme();
+	const router = useRouter();
 
-	const isActive = (path: string) => location.pathname === path;
+	const isActive = (path: string) => pathname === path;
 
 	return (
 		<Box
@@ -24,7 +26,7 @@ const DesktopNavigation = ({ navItems }: DesktopNavigationProps) => {
 			{navItems.map((item) => (
 				<Button
 					key={item.name}
-					onClick={() => navigate(item.path)}
+					onClick={() => router.push(item.path)}
 					sx={{
 						px: 2,
 						py: 1,

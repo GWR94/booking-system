@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { axios } from '@utils';
+import { axios } from '@api/client';
 import dayjs from 'dayjs';
 import {
 	fetchSlots,
@@ -9,7 +9,7 @@ import {
 	STORAGE_KEYS,
 } from './basket';
 
-vi.mock('@utils', () => ({
+vi.mock('@api/client', () => ({
 	axios: {
 		get: vi.fn(),
 	},

@@ -19,8 +19,6 @@ export {
 
 export {
 	verifyUser,
-	loginUser,
-	logoutUser,
 	registerUser,
 	unlinkProvider,
 	updateProfile,
@@ -41,8 +39,6 @@ export {
 	createSlot,
 	updateSlot,
 	deleteSlot,
-	getAdminSettings,
-	updateAdminSettings,
 	getDashboardStats,
 	adminUpdateBookingStatus,
 	adminDeleteBooking,

@@ -1,3 +1,5 @@
+'use client';
+
 import { useAppTheme } from '@context';
 import { Brush } from '@mui/icons-material';
 import {
@@ -10,7 +12,7 @@ import {
 	alpha,
 	Menu,
 } from '@mui/material';
-import { themes } from '@styles/themes';
+import { themes } from '@config/theme.config';
 import { useState } from 'react';
 
 type ThemeSwitcherProps = {

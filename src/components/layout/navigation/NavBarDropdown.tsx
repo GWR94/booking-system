@@ -1,3 +1,5 @@
+'use client';
+
 import {
 	Box,
 	alpha,
@@ -7,18 +9,15 @@ import {
 	Collapse,
 	Typography,
 	Divider,
-	MenuItem,
-	ListItemText,
 } from '@mui/material';
 import { Logout, Login, HowToReg } from '@mui/icons-material';
 import { useAuth } from '@hooks';
 import { useUI } from '@context';
 import { PROFILE_MENU_ITEMS, ADMIN_MENU_ITEMS } from './menuItems';
 import BasketContent from './BasketContent';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { usePathname, useRouter } from 'next/navigation';
 import { NavItem } from './menuItems';
-import { themes } from '@styles/themes';
+import { themes } from '@config/theme.config';
 import { useAppTheme } from '@context';
 
 type NavBarDropdownProps = {
@@ -35,12 +34,13 @@ const NavBarDropdown = ({
 	navItems,
 }: NavBarDropdownProps) => {
 	const theme = useTheme();
-	const navigate = useNavigate();
-	const location = useLocation();
+	const pathname = usePathname();
+	const router = useRouter();
 	const { openAuthModal } = useUI();
 	const { isAuthenticated, user, logout } = useAuth();
 	const { currentThemeId, setThemeId } = useAppTheme();
-	const isActive = (path: string) => location.pathname === path;
+
+	const isActive = (path: string) => pathname === path;
 
 	return (
 		<Collapse in={isMenuOpen} timeout="auto" unmountOnExit>
@@ -61,7 +61,10 @@ const NavBarDropdown = ({
 								<Button
 									key={item.name}
 									fullWidth
-									onClick={() => navigate(item.path)}
+									onClick={() => {
+										router.push(item.path);
+										setIsMenuOpen(false);
+									}}
 									startIcon={item.icon}
 									sx={{
 										color: 'white',
@@ -115,7 +118,7 @@ const NavBarDropdown = ({
 										key={item.path}
 										fullWidth
 										onClick={() => {
-											navigate(item.path);
+											router.push(item.path);
 											setIsMenuOpen(false);
 										}}
 										startIcon={<item.Icon />}
@@ -199,7 +202,7 @@ const NavBarDropdown = ({
 									key={item.path}
 									fullWidth
 									onClick={() => {
-										navigate(item.path);
+										router.push(item.path);
 										setIsMenuOpen(false);
 									}}
 									startIcon={<item.Icon />}

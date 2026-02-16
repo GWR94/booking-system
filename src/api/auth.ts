@@ -1,24 +1,9 @@
-import type {
-	LoginCredentials,
-	RegisterCredentials,
-	User,
-} from '@pages/auth/components';
-import { axios } from '@utils';
+import type { RegisterCredentials, User } from '@features/auth/components';
+import { axios } from '@api/client';
 
 export const verifyUser = async (): Promise<User> => {
-	const { data } = await axios.get('/api/user/verify');
+	const { data } = await axios.get('/api/user/me');
 	return data.user;
-};
-
-export const loginUser = async (
-	credentials: LoginCredentials,
-): Promise<User> => {
-	const { data } = await axios.post('/api/user/login', credentials);
-	return data.user;
-};
-
-export const logoutUser = async () => {
-	await axios.post('/api/user/logout');
 };
 
 export const registerUser = async (credentials: RegisterCredentials) => {
@@ -33,7 +18,7 @@ export const unlinkProvider = async (provider: string) => {
 };
 
 export const updateProfile = async (user: Partial<User>) => {
-	const response = await axios.patch('/api/user/profile', user);
+	const response = await axios.patch('/api/user/me', user);
 	return response.data;
 };
 
