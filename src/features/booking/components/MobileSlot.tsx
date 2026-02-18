@@ -39,7 +39,6 @@ const MobileSlot = ({
 }: MobileSlotProps) => {
 	const theme = useTheme();
 	const { isAdmin } = useAuth();
-
 	const { selectedBay, selectedSession } = useSession();
 
 	const { originalPrice, discountedPrice, hasDiscount } = price;
@@ -52,6 +51,7 @@ const MobileSlot = ({
 				sx={{
 					...sx,
 					height: '100%',
+					minHeight: 96,
 					borderRadius: 2,
 					transition: 'all 0.2s ease',
 					borderWidth: 2,

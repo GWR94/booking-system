@@ -12,6 +12,10 @@ import { Slot } from '@prisma/client';
  * with the CRON_SECRET header for authentication.
  */
 export const GET = async (req: NextRequest) => {
+	// Skip work during build (no CRON_SECRET) so "Collecting page data" doesn't fail
+	if (!process.env.CRON_SECRET) {
+		return NextResponse.json({ cleaned: 0, message: 'Cron not configured' });
+	}
 	// Verify cron secret to prevent unauthorized access
 	const authHeader = req.headers.get('authorization');
 	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

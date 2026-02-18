@@ -128,7 +128,7 @@ const GenerateSlots = () => {
 												<Box
 													key={item.label}
 													sx={{
-														display: 'flex',
+														display: 'inline-flex',
 														alignItems: 'center',
 														gap: 0.75,
 														whiteSpace: 'nowrap',
@@ -141,11 +141,13 @@ const GenerateSlots = () => {
 															borderRadius: '50%',
 															bgcolor: item.color,
 															flexShrink: 0,
+															// Align dot with cap height of caption text
+															transform: 'translateY(-0.5px)',
 														}}
 													/>
 													<Typography
 														variant="caption"
-														sx={{ fontWeight: 600, lineHeight: 1 }}
+														sx={{ fontWeight: 600, lineHeight: 1.2 }}
 													>
 														{item.label}
 													</Typography>
