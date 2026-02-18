@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { SessionProvider } from 'next-auth/react';
 import { SnackbarContext } from '../context/SnackbarContext';
 import { vi } from 'vitest';
@@ -17,19 +18,22 @@ const createWrapper = () => {
 	const mockHideSnackbar = vi.fn();
 	const mockSetBottomOffset = vi.fn();
 
-	// Wrapper includes all providers needed for testing
+	const theme = createTheme();
+
 	return ({ children }: { children: ReactNode }) => (
 		<SessionProvider session={null}>
 			<QueryClientProvider client={queryClient}>
-				<SnackbarContext.Provider
-					value={{
-						showSnackbar: mockShowSnackbar,
-						hideSnackbar: mockHideSnackbar,
-						setBottomOffset: mockSetBottomOffset,
-					}}
-				>
-					{children}
-				</SnackbarContext.Provider>
+				<ThemeProvider theme={theme}>
+					<SnackbarContext.Provider
+						value={{
+							showSnackbar: mockShowSnackbar,
+							hideSnackbar: mockHideSnackbar,
+							setBottomOffset: mockSetBottomOffset,
+						}}
+					>
+						{children}
+					</SnackbarContext.Provider>
+				</ThemeProvider>
 			</QueryClientProvider>
 		</SessionProvider>
 	);

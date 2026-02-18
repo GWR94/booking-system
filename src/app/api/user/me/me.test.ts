@@ -20,35 +20,7 @@ const { mockMembershipService } = vi.hoisted(() => ({
 	},
 }));
 
-// Mock Next.js server with proper implementation
-vi.mock('next/server', () => {
-	class MockNextRequest extends Request {
-		public nextUrl: URL;
-		constructor(input: RequestInfo | URL, init?: RequestInit) {
-			super(input, init);
-			const url =
-				typeof input === 'string'
-					? input
-					: input instanceof Request
-						? input.url
-						: input.toString();
-			this.nextUrl = new URL(url);
-		}
-	}
-
-	return {
-		NextResponse: {
-			json: (data: any, init?: ResponseInit) =>
-				new Response(JSON.stringify(data), {
-					...init,
-					headers: { 'Content-Type': 'application/json', ...init?.headers },
-				}),
-		},
-		NextRequest: MockNextRequest,
-	};
-});
-
-// Mock auth so route does not load next-auth (which pulls in next/server and breaks in Vitest)
+// Mock auth so route does not load next-auth
 vi.mock('../../../../auth', () => ({
 	auth: mockAuth,
 }));

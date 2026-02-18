@@ -1,5 +1,4 @@
 import MyBookings from '@features/profile/MyBookings';
 
-export default function ProfileBookingsPage() {
-	return <MyBookings />;
-}
+const ProfileBookingsPage = () => <MyBookings />;
+export default ProfileBookingsPage;

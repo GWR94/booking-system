@@ -13,11 +13,7 @@ export const metadata = {
 		'Book your golf session at The Short Grass. Experience world-class golf simulators with TrackMan technology.',
 };
 
-export default function RootLayout({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<html lang="en">
 			<body id="root">
@@ -33,4 +29,6 @@ export default function RootLayout({
 			</body>
 		</html>
 	);
-}
+};
+
+export default RootLayout;

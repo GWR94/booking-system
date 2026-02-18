@@ -40,7 +40,7 @@ export class MembershipService {
 					membershipStatus:
 						mappedStatus === 'ACTIVE' && !tier
 							? 'CANCELLED'
-							: (mappedStatus as any), // Cast if enum mismatch
+							: (mappedStatus as 'ACTIVE' | 'CANCELLED'),
 				},
 			});
 			console.log(

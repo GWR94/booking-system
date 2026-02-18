@@ -114,7 +114,7 @@ const AbstractBackground: React.FC<AbstractBackgroundProps> = ({
 				<circle cx="15%" cy="20%" r="120" fill={primary} opacity="0.05" />
 				<circle cx="85%" cy="75%" r="150" fill={secondary} opacity="0.07" />
 
-				{/* Golf-themed decorative elements */}
+				{/* Decorative accent circles */}
 				<circle
 					cx="25%"
 					cy="65%"

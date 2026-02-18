@@ -65,6 +65,7 @@ const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
 					<IconButton
 						onClick={handleClick}
 						aria-label="Account options"
+						data-testid="account-button"
 						sx={{
 							borderRadius: 1.5,
 							p: 1,

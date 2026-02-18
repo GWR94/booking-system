@@ -1,25 +1,23 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminSlotsService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminSlotBlockSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
 
 	try {
 		const rawBody = await req.json();
-		const { error, value } = apiAdminSlotBlockSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminSlotBlockSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const { startTime, endTime, bayId } = value;
+		const { startTime, endTime, bayId } = parsed.data;
 
 		const result = await AdminSlotsService.blockSlots({
 			startTime,
@@ -40,4 +38,4 @@ export async function POST(req: NextRequest) {
 			500,
 		);
 	}
-}
+};

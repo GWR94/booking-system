@@ -12,7 +12,7 @@ import { CssBaseline } from '@mui/material';
 import { ErrorBoundary } from '@layout';
 import { AuthModal } from '@features/auth/components';
 
-export default function Providers({ children }: PropsWithChildren) {
+const Providers = ({ children }: PropsWithChildren) => {
 	const [queryClient] = useState(
 		() =>
 			new QueryClient({
@@ -41,9 +41,12 @@ export default function Providers({ children }: PropsWithChildren) {
 							</SnackbarProvider>
 						</CookieProvider>
 					</LocalizationProvider>
-					<ReactQueryDevtools initialIsOpen={false} />
+					{process.env.NODE_ENV === 'development' && (
+						<ReactQueryDevtools initialIsOpen={false} />
+					)}
 				</QueryClientProvider>
 			</ThemeProvider>
 		</SessionProvider>
 	);
-}
+};
+export default Providers;

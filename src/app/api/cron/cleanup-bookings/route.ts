@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
+import { Slot } from '@prisma/client';
 
 /**
  * Booking cleanup cron job.
@@ -10,7 +11,7 @@ import { db } from '@db';
  * Trigger externally via Vercel Cron, GitHub Actions, or cron-job.org
  * with the CRON_SECRET header for authentication.
  */
-export async function GET(req: NextRequest) {
+export const GET = async (req: NextRequest) => {
 	// Verify cron secret to prevent unauthorized access
 	const authHeader = req.headers.get('authorization');
 	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -18,10 +19,8 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
-		// Calculate the threshold date (15 minutes ago)
 		const thresholdDate = new Date(Date.now() - 15 * 60 * 1000);
 
-		// Find bookings still pending that were created before the threshold
 		const staleBookings = await db.booking.findMany({
 			where: {
 				status: 'pending',
@@ -41,14 +40,12 @@ export async function GET(req: NextRequest) {
 		for (const booking of staleBookings) {
 			console.log(`[Cleanup] Cancelling stale booking ${booking.id}`);
 
-			// Update the booking status to "cancelled"
 			await db.booking.update({
 				where: { id: booking.id },
 				data: { status: 'cancelled' },
 			});
 
-			// Revert the associated slots back to "available"
-			const slotIds = booking.slots.map((slot) => slot.id);
+			const slotIds = booking.slots.map((slot: Slot) => slot.id);
 			if (slotIds.length > 0) {
 				console.log(
 					`[Cleanup] Reverting slots ${slotIds.join(', ')} back to available`,
@@ -68,10 +65,9 @@ export async function GET(req: NextRequest) {
 		console.error('[Cleanup] Error cleaning up stale bookings:', error);
 		return NextResponse.json(
 			{
-				error:
-					error instanceof Error ? error.message : 'Internal Server Error',
+				error: error instanceof Error ? error.message : 'Internal Server Error',
 			},
 			{ status: 500 },
 		);
 	}
-}
+};

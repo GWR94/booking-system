@@ -1,94 +1,63 @@
-import Joi from 'joi';
-import { RegistrationForm, LoginForm } from '../features/auth/components/types';
+import { z } from 'zod';
 
 /**
  * Client-side validation schemas for forms
- * These have detailed error messages for better UX
+ * Detailed error messages for better UX
  */
 
-export const registrationSchema = Joi.object<RegistrationForm>({
-	email: Joi.string()
-		.email({
-			tlds: { allow: false },
-		})
-		.required()
-		.messages({
-			'string.email': 'Please enter a valid email address',
-			'string.empty': 'Email is required',
-		}),
-	name: Joi.string()
-		.pattern(/^[A-Za-z\s]+$/)
-		.min(5)
-		.max(50)
-		.required()
-		.messages({
-			'string.empty': 'Name is required',
-			'string.pattern.base': 'Name can only contain letters and spaces.',
-			'string.min': 'Name must be at least 5 characters',
-			'string.max': 'Name must not be more than 50 characters',
-		}),
-	password: Joi.string()
-		.min(8)
-		.pattern(new RegExp('(?=.*[A-Z])(?=.*[!@#$&*])'))
-		.required()
-		.messages({
-			'string.min': 'Password must be at least 8 characters long',
-			'string.pattern.base':
-				'Password must contain an uppercase letter and a special character',
-			'string.empty': 'Password is required',
-		}),
-	confirm: Joi.string().min(1).required().valid(Joi.ref('password')).messages({
-		'any.only': 'Passwords must match',
-		'string.empty': 'Confirm password is required',
-		'string.min': 'Confirm password is required',
-	}),
-});
+const passwordRegex = /(?=.*[A-Z])(?=.*[!@#$&*])/;
+const nameLettersOnly = /^[A-Za-z\s]+$/;
+const fullNamePattern = /^\s*\S+\s+\S+.*$/;
+const phonePattern = /^[0-9]{10,15}$/;
 
-export const loginSchema = Joi.object<LoginForm>({
-	email: Joi.string()
-		.email({
-			tlds: { allow: false },
-		})
-		.required()
-		.messages({
-			'string.email': 'Please enter a valid email address',
-			'string.empty': 'Email is required',
-		}),
-	password: Joi.string()
-		.min(8)
-		.pattern(new RegExp('(?=.*[A-Z])(?=.*[!@#$&*])'))
-		.required()
-		.messages({
-			'string.min': 'Password must be at least 8 characters long',
-			'string.pattern.base':
-				'Password must contain an uppercase letter and a special character',
-			'string.empty': 'Password is required',
+export const registrationSchema = z
+	.object({
+		email: z.email({ error: 'Please enter a valid email address' }),
+		name: z
+			.string()
+			.min(1, 'Name is required')
+			.min(5, 'Name must be at least 5 characters')
+			.max(50, 'Name must not be more than 50 characters')
+			.regex(nameLettersOnly, { error: 'Name can only contain letters and spaces.' }),
+		password: z
+			.string()
+			.min(1, 'Password is required')
+			.min(8, 'Password must be at least 8 characters long')
+			.regex(passwordRegex, {
+				error: 'Password must contain an uppercase letter and a special character',
+			}),
+		confirm: z.string().min(1, 'Confirm password is required'),
+	})
+	.refine((data) => data.password === data.confirm, {
+		message: 'Passwords must match',
+		path: ['confirm'],
+	});
+
+export const loginSchema = z.object({
+	email: z.email({ error: 'Please enter a valid email address' }),
+	password: z
+		.string()
+		.min(1, 'Password is required')
+		.min(8, 'Password must be at least 8 characters long')
+		.regex(passwordRegex, {
+			error: 'Password must contain an uppercase letter and a special character',
 		}),
 });
 
-export const guestSchema = Joi.object({
-	name: Joi.string()
-		.pattern(/^\s*\S+\s+\S+.*$/)
-		.required()
-		.messages({
-			'string.empty': 'Name is required',
-			'string.pattern.base':
-				'Please enter your full name (first and last name)',
-		}),
-	email: Joi.string()
-		.email({
-			tlds: { allow: false },
-		})
-		.required()
-		.messages({
-			'string.email': 'Please enter a valid email address',
-			'string.empty': 'Email is required',
-		}),
-	phone: Joi.string()
-		.pattern(/^[0-9]{10,15}$/) // Basic phone number regex (adjust as needed)
-		.allow('') // Allow empty string for optional
-		.messages({
-			'string.pattern.base': 'Phone number is not valid',
-		})
-		.optional(), // Mark as optional
+export const guestSchema = z.object({
+	name: z
+		.string()
+		.min(1, 'Name is required')
+		.regex(fullNamePattern, { error: 'Please enter your full name (first and last name)' }),
+	email: z.email({ error: 'Please enter a valid email address' }),
+	phone: z
+		.union([
+			z.string().regex(phonePattern, { error: 'Phone number is not valid' }),
+			z.literal(''),
+		])
+		.optional(),
 });
+
+export type RegistrationFormInput = z.infer<typeof registrationSchema>;
+export type LoginFormInput = z.infer<typeof loginSchema>;
+export type GuestFormInput = z.infer<typeof guestSchema>;

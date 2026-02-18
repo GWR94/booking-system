@@ -16,7 +16,6 @@ import {
 import { LoadingSpinner, SectionHeader } from '@ui';
 import { useSlots, useAuth } from '@hooks';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { SEO } from '@components/layout';
 
 const Booking = () => {
 	const { isLoading } = useSlots();
@@ -27,18 +26,6 @@ const Booking = () => {
 
 	return (
 		<>
-			<SEO
-				title="Book"
-				description="Reserve your bay at the premium golf simulation venue. Choose your preferred time and bay for an instant booking."
-				keywords={[
-					'golf simulation',
-					'indoor golf',
-					'booking',
-					'reservation',
-					'premium golf',
-					'trackman',
-				]}
-			/>
 			<Box
 				sx={{
 					minHeight: '100vh',

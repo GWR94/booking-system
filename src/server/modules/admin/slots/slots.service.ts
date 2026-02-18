@@ -1,23 +1,23 @@
 import { db } from '@db';
 import { Prisma } from '@prisma/client';
-import dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 
 export class AdminSlotsService {
 	/**
 	 * Create a new slot
 	 */
 	static async createSlot(data: {
-		startTime: string;
-		endTime: string;
+		startTime: Dayjs;
+		endTime: Dayjs;
 		status: string;
 		bay: number;
 	}) {
 		const slot = await db.slot.create({
 			data: {
-				startTime: new Date(data.startTime),
-				endTime: new Date(data.endTime),
+				startTime: data.startTime.toDate(),
+				endTime: data.endTime.toDate(),
 				status: data.status,
-				bayId: data.bay as number,
+				bayId: data.bay,
 			},
 		});
 
@@ -30,23 +30,19 @@ export class AdminSlotsService {
 	static async updateSlot(
 		slotId: number,
 		data: {
-			startTime?: string;
-			endTime?: string;
-			status?: string;
-			bay?: { id: number };
+			startTime: Dayjs;
+			endTime: Dayjs;
+			status: string;
+			bay: number;
 		},
 	) {
-		if (!data.startTime || !data.endTime || !data.status) {
-			throw new Error('Invalid startTime, endTime or status');
-		}
-
 		const slot = await db.slot.update({
 			where: { id: slotId },
 			data: {
-				startTime: new Date(data.startTime),
-				endTime: new Date(data.endTime),
+				startTime: data.startTime.toDate(),
+				endTime: data.endTime.toDate(),
 				status: data.status,
-				bayId: data.bay?.id,
+				bayId: data.bay,
 			},
 		});
 
@@ -67,24 +63,23 @@ export class AdminSlotsService {
 	 * Block slots within a time range (set to maintenance)
 	 */
 	static async blockSlots(data: {
-		startTime: string;
-		endTime: string;
+		startTime: Dayjs;
+		endTime: Dayjs;
 		bayId?: number;
 	}) {
-		const start = new Date(data.startTime);
-		const end = new Date(data.endTime);
+		const start = data.startTime;
+		const end = data.endTime;
 
-		// Validate dates
-		if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+		if (!start.isValid() || !end.isValid()) {
 			throw new Error('Invalid date format');
 		}
 
 		const whereClause: Prisma.SlotWhereInput = {
 			startTime: {
-				gte: start,
+				gte: start.toDate(),
 			},
 			endTime: {
-				lte: end,
+				lte: end.toDate(),
 			},
 			// Only block available slots to prevent overriding bookings
 			status: 'available',
@@ -111,30 +106,29 @@ export class AdminSlotsService {
 	 * Unblock slots within a time range (set to available)
 	 */
 	static async unblockSlots(data: {
-		startTime: string;
-		endTime: string;
+		startTime: Dayjs;
+		endTime: Dayjs;
 		bayId?: number;
 	}) {
-		const start = new Date(data.startTime);
-		const end = new Date(data.endTime);
+		const start = data.startTime;
+		const end = data.endTime;
 
-		if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+		if (!start.isValid() || !end.isValid()) {
 			throw new Error('Invalid date format');
 		}
 
-		const whereClause: any = {
+		const whereClause: Prisma.SlotWhereInput = {
 			startTime: {
-				gte: start,
+				gte: start.toDate(),
 			},
 			endTime: {
-				lte: end,
+				lte: end.toDate(),
 			},
 			status: 'maintenance',
-			// Only unblock maintenance slots
 		};
 
-		if (data.bayId) {
-			whereClause.bayId = parseInt(data.bayId.toString(), 10);
+		if (data.bayId !== undefined) {
+			whereClause.bayId = data.bayId;
 		}
 
 		const updated = await db.slot.updateMany({
@@ -169,7 +163,7 @@ export class AdminSlotsService {
 		};
 
 		if (params.bayId) {
-			whereClause.bayId = parseInt(params.bayId, 10);
+			whereClause.bayId = Number(params.bayId);
 		}
 
 		const slots = await db.slot.findMany({

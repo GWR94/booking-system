@@ -18,10 +18,6 @@ describe('NotFound Page', () => {
 		vi.clearAllMocks();
 	});
 
-	vi.mock('@layout', () => ({
-		SEO: () => null,
-	}));
-
 	it('renders 404 heading and error message', () => {
 		render(<NotFound />);
 

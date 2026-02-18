@@ -7,6 +7,5 @@ export const metadata: Metadata = {
 		'Learn about The Short Grass, Maidstone’s premier indoor golf simulator venue.',
 };
 
-export default function AboutPage() {
-	return <About />;
-}
+const AboutPage = () => <About />;
+export default AboutPage;

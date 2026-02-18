@@ -9,13 +9,12 @@ export const metadata: Metadata = {
 
 import { Suspense } from 'react';
 
-export default async function CheckoutPage(props: {
+const CheckoutPage = async (props: {
 	params: Promise<{ [key: string]: string | string[] | undefined }>;
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-	return (
-		<Suspense fallback={<div>Loading checkout...</div>}>
-			<Checkout />
-		</Suspense>
-	);
-}
+}) => (
+	<Suspense fallback={<div>Loading checkout...</div>}>
+		<Checkout />
+	</Suspense>
+);
+export default CheckoutPage;

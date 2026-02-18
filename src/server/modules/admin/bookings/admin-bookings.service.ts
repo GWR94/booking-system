@@ -1,5 +1,5 @@
 import { db } from '@db';
-import { Prisma } from '@prisma/client';
+import { Prisma, Slot } from '@prisma/client';
 import dayjs from 'dayjs';
 
 export class AdminBookingsService {
@@ -24,7 +24,7 @@ export class AdminBookingsService {
 				{ user: { email: { contains: search, mode: 'insensitive' } } },
 				{ status: { contains: search, mode: 'insensitive' } },
 			];
-			const searchId = parseInt(search);
+			const searchId = Number(search);
 			if (!isNaN(searchId)) {
 				where.OR.push({ id: searchId });
 			}
@@ -74,7 +74,6 @@ export class AdminBookingsService {
 	 * Delete a booking and free up associated slots
 	 */
 	static async deleteBooking(bookingId: number) {
-		// Get associated slots
 		const booking = await db.booking.findUnique({
 			where: { id: bookingId },
 			include: { slots: true },
@@ -84,8 +83,7 @@ export class AdminBookingsService {
 			throw new Error('Booking not found');
 		}
 
-		// Free up slots
-		const slotIds = booking.slots.map((s) => s.id);
+		const slotIds = booking.slots.map((s: Slot) => s.id);
 		if (slotIds.length > 0) {
 			await db.slot.updateMany({
 				where: { id: { in: slotIds } },
@@ -93,7 +91,6 @@ export class AdminBookingsService {
 			});
 		}
 
-		// Delete booking
 		await db.booking.delete({
 			where: { id: bookingId },
 		});
@@ -105,7 +102,6 @@ export class AdminBookingsService {
 	 * Create an admin booking (local booking without payment)
 	 */
 	static async createAdminBooking(userId: number, slotIds: number[]) {
-		// Verify all slots exist and are available
 		const slots = await db.slot.findMany({
 			where: {
 				id: {
@@ -117,14 +113,13 @@ export class AdminBookingsService {
 
 		if (slots.length !== slotIds.length) {
 			const unavailableSlotIds = slotIds.filter(
-				(id: number) => !slots.some((slot) => slot.id === id),
+				(id: number) => !slots.some((slot: Slot) => slot.id === id),
 			);
 			throw new Error(
 				`The following slots are not available or don't exist: ${unavailableSlotIds.join(', ')}`,
 			);
 		}
 
-		// Create booking with connected slots
 		const booking = await db.booking.create({
 			data: {
 				user: {
@@ -141,7 +136,6 @@ export class AdminBookingsService {
 			},
 		});
 
-		// Update all slots to booked status individually
 		for (const slotId of slotIds) {
 			await db.slot.update({
 				where: { id: slotId },
@@ -159,12 +153,10 @@ export class AdminBookingsService {
 	 * Extend a booking by 1 or 2 hours
 	 */
 	static async extendBooking(bookingId: number, hours: number) {
-		// Validate hours parameter
 		if (hours !== 1 && hours !== 2) {
 			throw new Error('Invalid hours parameter. Must be 1 or 2.');
 		}
 
-		// Get the booking with its slots
 		const booking = await db.booking.findUnique({
 			where: { id: bookingId },
 			include: {
@@ -183,13 +175,11 @@ export class AdminBookingsService {
 			throw new Error('Booking has no slots');
 		}
 
-		// Get the last slot to determine where to extend from
 		const lastSlot = booking.slots[booking.slots.length - 1];
 		const bayId = lastSlot.bayId;
 		// Add 5 minutes to account for the gap between slots
 		const extendFromTime = dayjs(lastSlot.endTime).add(5, 'minutes');
 
-		// Find the next consecutive available slots for the same bay
 		const requiredSlots = await db.slot.findMany({
 			where: {
 				bayId: bayId,
@@ -202,14 +192,12 @@ export class AdminBookingsService {
 			orderBy: { startTime: 'asc' },
 		});
 
-		// Verify we have enough consecutive slots
 		if (requiredSlots.length !== hours) {
 			throw new Error(
 				`Not enough available slots to extend by ${hours} hour(s). Only ${requiredSlots.length} slot(s) available.`,
 			);
 		}
 
-		// Verify slots are consecutive
 		for (let i = 0; i < requiredSlots.length; i++) {
 			const expectedStartTime = extendFromTime.add(i, 'hour');
 			const slotStartTime = dayjs(requiredSlots[i].startTime);
@@ -219,14 +207,13 @@ export class AdminBookingsService {
 			}
 		}
 
-		// Add the new slots to the booking
-		const slotIds = requiredSlots.map((slot) => slot.id);
+		const slotIds = requiredSlots.map((slot: Slot) => slot.id);
 
 		const updatedBooking = await db.booking.update({
 			where: { id: bookingId },
 			data: {
 				slots: {
-					connect: slotIds.map((id) => ({ id })),
+					connect: slotIds.map((id: number) => ({ id })),
 				},
 			},
 			include: {
@@ -238,7 +225,6 @@ export class AdminBookingsService {
 			},
 		});
 
-		// Update the new slots to booked status
 		await db.slot.updateMany({
 			where: { id: { in: slotIds } },
 			data: { status: 'booked' },
@@ -254,7 +240,6 @@ export class AdminBookingsService {
 	 * Check if a booking can be extended by 1 or 2 hours
 	 */
 	static async checkBookingExtendAvailability(bookingId: number) {
-		// Get the booking with its slots
 		const booking = await db.booking.findUnique({
 			where: { id: bookingId },
 			include: {
@@ -273,13 +258,11 @@ export class AdminBookingsService {
 			return { canExtend1Hour: false, canExtend2Hours: false };
 		}
 
-		// Get the last slot to determine where to extend from
 		const lastSlot = booking.slots[booking.slots.length - 1];
 		const bayId = lastSlot.bayId;
 		// Add 5 minutes to account for the gap between slots
 		const extendFromTime = dayjs(lastSlot.endTime).add(5, 'minutes');
 
-		// Check for 1 hour availability
 		const oneHourSlots = await db.slot.findMany({
 			where: {
 				bayId: bayId,
@@ -296,7 +279,6 @@ export class AdminBookingsService {
 			oneHourSlots.length === 1 &&
 			dayjs(oneHourSlots[0].startTime).isSame(extendFromTime);
 
-		// Check for 2 hours availability
 		const twoHourSlots = await db.slot.findMany({
 			where: {
 				bayId: bayId,

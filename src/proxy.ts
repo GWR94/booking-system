@@ -5,10 +5,7 @@ import type { NextRequest } from 'next/server';
  * Rate limit store: IP -> { count, resetAt }
  * In production with multiple instances, use Redis (e.g. @upstash/ratelimit).
  */
-const rateLimitStore = new Map<
-	string,
-	{ count: number; resetAt: number }
->();
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 const WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS_SENSITIVE = 10; // contact, password reset, register
@@ -25,34 +22,32 @@ const SENSITIVE_PATHS = [
 /** Paths that use the booking limit. */
 const BOOKING_PATHS = ['/api/bookings', '/api/bookings/payment-intent'];
 
-function getClientId(request: NextRequest): string {
+const getClientId = (request: NextRequest): string => {
 	const forwarded = request.headers.get('x-forwarded-for');
 	const realIp = request.headers.get('x-real-ip');
-	return (
-		(forwarded?.split(',')[0]?.trim()) ||
-		realIp?.trim() ||
-		'unknown'
-	);
-}
+	return forwarded?.split(',')[0]?.trim() || realIp?.trim() || 'unknown';
+};
 
-function getLimit(pathname: string): number {
-	if (SENSITIVE_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+const getLimit = (pathname: string): number => {
+	if (
+		SENSITIVE_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
+	) {
 		return MAX_REQUESTS_SENSITIVE;
 	}
-	if (BOOKING_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+	if (
+		BOOKING_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
+	) {
 		return MAX_REQUESTS_BOOKING;
 	}
 	return MAX_REQUESTS_SENSITIVE;
-}
+};
 
-function isRateLimitedPath(pathname: string): boolean {
-	return [
-		...SENSITIVE_PATHS,
-		...BOOKING_PATHS,
-	].some((p) => pathname === p || pathname.startsWith(p + '/'));
-}
+const isRateLimitedPath = (pathname: string): boolean =>
+	[...SENSITIVE_PATHS, ...BOOKING_PATHS].some(
+		(p) => pathname === p || pathname.startsWith(p + '/'),
+	);
 
-function rateLimit(request: NextRequest): NextResponse | null {
+const rateLimit = (request: NextRequest): NextResponse | null => {
 	const pathname = request.nextUrl.pathname;
 	if (!isRateLimitedPath(pathname)) {
 		return null;
@@ -83,7 +78,10 @@ function rateLimit(request: NextRequest): NextResponse | null {
 	if (entry.count > limit) {
 		const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
 		return NextResponse.json(
-			{ error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
+			{
+				error: 'Too Many Requests',
+				message: 'Rate limit exceeded. Please try again later.',
+			},
 			{
 				status: 429,
 				headers: {
@@ -96,17 +94,17 @@ function rateLimit(request: NextRequest): NextResponse | null {
 	}
 
 	return null;
-}
+};
 
 /** Apply security headers to API responses. */
-function securityHeaders(response: NextResponse): NextResponse {
+const securityHeaders = (response: NextResponse): NextResponse => {
 	response.headers.set('X-Content-Type-Options', 'nosniff');
 	response.headers.set('X-Frame-Options', 'DENY');
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 	return response;
-}
+};
 
-export function proxy(request: NextRequest) {
+export const proxy = (request: NextRequest) => {
 	// Rate limit sensitive and booking API routes
 	const rateLimitResponse = rateLimit(request);
 	if (rateLimitResponse) {
@@ -115,7 +113,7 @@ export function proxy(request: NextRequest) {
 
 	const response = NextResponse.next();
 	return securityHeaders(response);
-}
+};
 
 export const config = {
 	matcher: [

@@ -1,14 +1,15 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminBookingsService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminBookingStatusSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
 
-export async function PATCH(
+export const PATCH = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
@@ -16,17 +17,14 @@ export async function PATCH(
 	try {
 		const { id } = await params;
 		const rawBody = await req.json();
-		const { error, value } = apiAdminBookingStatusSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminBookingStatusSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const { status } = value;
+		const { status } = parsed.data;
 
 		const result = await AdminBookingsService.updateBookingStatus(
-			parseInt(id, 10),
+			Number(id),
 			status,
 		);
 
@@ -38,19 +36,19 @@ export async function PATCH(
 			500,
 		);
 	}
-}
+};
 
-export async function DELETE(
+export const DELETE = async (
 	_req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
 
 	try {
 		const { id } = await params;
-		const bookingId = parseInt(id, 10);
+		const bookingId = Number(id);
 
 		const result = await AdminBookingsService.deleteBooking(bookingId);
 
@@ -67,4 +65,4 @@ export async function DELETE(
 			500,
 		);
 	}
-}
+};

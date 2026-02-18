@@ -34,7 +34,6 @@ const CookiesPolicy: React.FC = () => {
 		day: 'numeric',
 	});
 
-	// Local state for form editing before save
 	const [localPreferences, setLocalPreferences] = useState(preferences);
 
 	useEffect(() => {

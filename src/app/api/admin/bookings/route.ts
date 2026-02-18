@@ -1,17 +1,17 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminBookingsService } from '@modules';
 
-export async function GET(req: NextRequest) {
+export const GET = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
 	}
 
 	const searchParams = req.nextUrl.searchParams;
-	const page = parseInt(searchParams.get('page') || '1', 10);
-	const limit = parseInt(searchParams.get('limit') || '10', 10);
-	const search = searchParams.get('search') || '';
+	const page = Number(searchParams.get('page') || '1');
+	const limit = Number(searchParams.get('limit') || '10');
+	const search = searchParams.get('search') as string | undefined;
 
 	try {
 		const result = await AdminBookingsService.getAllBookings({
@@ -30,4 +30,4 @@ export async function GET(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};

@@ -1,150 +1,120 @@
-import Joi from 'joi';
+import { z } from 'zod';
+import dayjs from 'dayjs';
 
 /**
  * Server-side validation schemas for API routes
- * These are simpler versions for backend validation
+ * Using Zod for parsing and type inference
  */
 
-// Authentication schemas
-export const apiLoginSchema = Joi.object({
-	email: Joi.string().email().required(),
-	password: Joi.string().required(),
-	rememberMe: Joi.boolean().optional(),
+/** Parses to dayjs so routes/services use one type for slot times */
+const slotTimeSchema = z.coerce.date().transform((d) => dayjs(d));
+
+const email = z.email();
+const optionalEmail = z.email().optional();
+const optionalPhone = z.string().optional();
+
+export const apiLoginSchema = z.object({
+	email: email,
+	password: z.string().min(1),
+	rememberMe: z.boolean().optional(),
 });
 
-export const apiRegisterSchema = Joi.object({
-	name: Joi.string().required(),
-	email: Joi.string().email().required(),
-	password: Joi.string().min(6).required(),
+export const apiRegisterSchema = z.object({
+	name: z.string().min(1),
+	email: email,
+	password: z.string().min(6),
 });
 
-// Contact form schema
-export const apiContactSchema = Joi.object({
-	name: Joi.string().required(),
-	email: Joi.string().email().required(),
-	phone: Joi.string().allow('').optional(),
-	subject: Joi.string().required(),
-	message: Joi.string().required(),
+export const apiContactSchema = z.object({
+	name: z.string().min(1),
+	email: email,
+	phone: optionalPhone,
+	subject: z.string().min(1),
+	message: z.string().min(1),
 });
 
-// Booking schemas
-export const apiBookingCreateSchema = Joi.object({
-	slotIds: Joi.array()
-		.items(Joi.number().integer().positive())
-		.min(1)
-		.required(),
-	paymentId: Joi.string().allow('').optional(),
-	paymentStatus: Joi.string().allow('').optional(),
-	guestInfo: Joi.object({
-		name: Joi.string().min(1).required(),
-		email: Joi.string().email().required(),
-		phone: Joi.string().allow('').optional(),
-	}).optional(),
+const guestInfoSchema = z.object({
+	name: z.string().min(1),
+	email: email,
+	phone: optionalPhone,
 });
 
-export const apiPaymentIntentSchema = Joi.object({
-	items: Joi.array()
-		.items(
-			Joi.object({
-				slotIds: Joi.array()
-					.items(Joi.number().integer().positive())
-					.min(1)
-					.required(),
-			}),
-		)
-		.min(1)
-		.required(),
-	guestInfo: Joi.object({
-		name: Joi.string().min(1).required(),
-		email: Joi.string().email().required(),
-		phone: Joi.string().allow('').optional(),
-	}).optional(),
-	recaptchaToken: Joi.string().allow('').optional(),
+export const apiBookingCreateSchema = z.object({
+	slotIds: z.array(z.number().int().positive()).min(1),
+	paymentId: z.string().optional(),
+	paymentStatus: z.string().optional(),
+	guestInfo: guestInfoSchema.optional(),
 });
 
-// User/profile schemas
-export const apiUserProfileUpdateSchema = Joi.object({
-	name: Joi.string().min(1).optional(),
-	email: Joi.string().email().optional(),
-	phone: Joi.string().allow('').optional(),
-	allowMarketing: Joi.boolean().optional(),
+export const apiPaymentIntentSchema = z.object({
+	items: z.array(
+		z.object({
+			slotIds: z.array(z.number().int().positive()).min(1),
+		}),
+	).min(1),
+	guestInfo: guestInfoSchema.optional(),
+	recaptchaToken: z.string().optional(),
 });
 
-// Admin schemas
-export const apiAdminLocalBookingSchema = Joi.object({
-	slotIds: Joi.array()
-		.items(Joi.number().integer().positive())
-		.min(1)
-		.required(),
+export const apiUserProfileUpdateSchema = z.object({
+	name: z.string().min(1).optional(),
+	email: optionalEmail,
+	phone: optionalPhone,
+	allowMarketing: z.boolean().optional(),
 });
 
-export const apiAdminBookingStatusSchema = Joi.object({
-	status: Joi.string().min(1).required(),
+export const apiAdminLocalBookingSchema = z.object({
+	slotIds: z.array(z.number().int().positive()).min(1),
 });
 
-export const apiAdminBookingExtendSchema = Joi.object({
-	hours: Joi.number().valid(1, 2).required(),
+export const apiAdminBookingStatusSchema = z.object({
+	status: z.string().min(1),
 });
 
-export const apiAdminSlotCreateSchema = Joi.object({
-	startTime: Joi.date().iso().required(),
-	endTime: Joi.date().iso().required(),
-	status: Joi.string().min(1).optional(),
-	bay: Joi.alternatives()
-		.try(
-			Joi.number().integer().positive(),
-			Joi.object({
-				id: Joi.number().integer().positive().required(),
-			}),
-		)
-		.required(),
+export const apiAdminBookingExtendSchema = z.object({
+	hours: z.union([z.literal(1), z.literal(2)]),
 });
 
-export const apiAdminSlotUpdateSchema = Joi.object({
-	startTime: Joi.date().iso().required(),
-	endTime: Joi.date().iso().required(),
-	status: Joi.string().min(1).required(),
-	bay: Joi.alternatives()
-		.try(
-			Joi.number().integer().positive(),
-			Joi.object({
-				id: Joi.number().integer().positive().required(),
-			}),
-		)
-		.optional(),
+const bayIdSchema = z.number().int().positive();
+
+export const apiAdminSlotCreateSchema = z.object({
+	startTime: slotTimeSchema,
+	endTime: slotTimeSchema,
+	status: z.string().min(1).optional(),
+	bay: bayIdSchema,
 });
 
-export const apiAdminSlotBlockSchema = Joi.object({
-	startTime: Joi.date().iso().required(),
-	endTime: Joi.date().iso().required(),
-	bayId: Joi.number().integer().positive().optional(),
+export const apiAdminSlotUpdateSchema = z.object({
+	startTime: slotTimeSchema,
+	endTime: slotTimeSchema,
+	status: z.string().min(1),
+	bay: bayIdSchema,
 });
 
-export const apiAdminUserUpdateSchema = Joi.object({
-	name: Joi.string().min(1).optional(),
-	email: Joi.string().email().optional(),
-	role: Joi.string().valid('admin', 'user', 'guest').optional(),
-	membershipTier: Joi.string()
-		.valid('PAR', 'BIRDIE', 'HOLEINONE')
-		.allow(null)
-		.optional(),
-	membershipStatus: Joi.string()
-		.valid('ACTIVE', 'CANCELLED')
-		.allow(null)
-		.optional(),
+export const apiAdminSlotBlockSchema = z.object({
+	startTime: slotTimeSchema,
+	endTime: slotTimeSchema,
+	bayId: z.number().int().positive().optional(),
 });
 
-// Password reset schemas
-export const apiRequestPasswordResetSchema = Joi.object({
-	email: Joi.string().email().required(),
+export const apiAdminUserUpdateSchema = z.object({
+	name: z.string().min(1).optional(),
+	email: optionalEmail,
+	role: z.enum(['admin', 'user', 'guest']).optional(),
+	// optional = omit key → undefined (don't change). nullable = send null → clear value.
+	membershipTier: z.enum(['PAR', 'BIRDIE', 'HOLEINONE']).nullable().optional(),
+	membershipStatus: z.enum(['ACTIVE', 'CANCELLED']).nullable().optional(),
 });
 
-export const apiResetPasswordSchema = Joi.object({
-	token: Joi.string().min(1).required(),
-	password: Joi.string().min(6).required(),
+export const apiRequestPasswordResetSchema = z.object({
+	email: email,
 });
 
-// Subscription schema
-export const apiSubscriptionTierSchema = Joi.object({
-	tier: Joi.string().valid('PAR', 'BIRDIE', 'HOLEINONE').required(),
+export const apiResetPasswordSchema = z.object({
+	token: z.string().min(1),
+	password: z.string().min(6),
+});
+
+export const apiSubscriptionTierSchema = z.object({
+	tier: z.enum(['PAR', 'BIRDIE', 'HOLEINONE']),
 });

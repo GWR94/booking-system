@@ -220,4 +220,58 @@ describe('useBasket', () => {
 			expect(saveBasket).toHaveBeenCalledWith([futureSlot]);
 		});
 	});
+
+	it('should calculate basketPrice when user has active membership and remaining hours (covers membership path)', async () => {
+		const mockSlot = {
+			id: '1',
+			slotIds: [1],
+			startTime: dayjs().add(1, 'day'),
+			endTime: dayjs().add(1, 'day').add(1, 'hour'),
+			bayId: 1,
+		};
+		(useAuth as any).mockReturnValue({
+			user: {
+				membershipStatus: 'ACTIVE',
+				membershipTier: 'BIRDIE',
+				membershipUsage: { remainingHours: 2 },
+			},
+			isAuthenticated: true,
+		});
+		(getBasket as any).mockReturnValue([mockSlot]);
+
+		const { result } = renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.basket).toHaveLength(1));
+		// Exercises basketPrice with membership (isEligible, remainingIncluded, discountedPrice)
+		expect(result.current.basketPrice).toMatch(/^\d+\.\d{2}$/);
+	});
+
+	it('should calculate basketPrice with active membership but no remaining hours', async () => {
+		const mockSlot = {
+			id: '1',
+			slotIds: [1],
+			startTime: dayjs().add(1, 'day').hour(10).minute(0),
+			endTime: dayjs().add(1, 'day').hour(11).minute(0),
+			bayId: 1,
+		};
+		(useAuth as any).mockReturnValue({
+			user: {
+				membershipStatus: 'ACTIVE',
+				membershipTier: 'BIRDIE',
+				membershipUsage: { remainingHours: 0 },
+			},
+			isAuthenticated: true,
+		});
+		(getBasket as any).mockReturnValue([mockSlot]);
+
+		const { result } = renderHook(() => useBasket(), {
+			wrapper: createWrapper(),
+		});
+
+		await waitFor(() => expect(result.current.basket).toHaveLength(1));
+		expect(result.current.basketPrice).toMatch(/^\d+\.\d{2}$/);
+		expect(result.current.basketPrice).not.toBe('0.00');
+	});
 });

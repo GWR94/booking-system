@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 
-export async function GET(req: NextRequest) {
+export const GET = async (req: NextRequest) => {
 	const searchParams = req.nextUrl.searchParams;
 	const from = searchParams.get('from');
 	const to = searchParams.get('to');
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
 	try {
 		if (ids) {
-			const idsArray = ids.split(',').map((id) => parseInt(id, 10));
+			const idsArray = ids.split(',').map((id) => Number(id));
 			const slots = await db.slot.findMany({
 				where: {
 					id: { in: idsArray },
@@ -53,4 +53,4 @@ export async function GET(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};

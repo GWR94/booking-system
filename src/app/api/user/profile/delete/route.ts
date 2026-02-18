@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
-import { getSessionUser } from 'src/server/auth/auth';
+import { getSessionUser } from '@/server/auth/auth';
 
-export async function DELETE(req: NextRequest) {
+export const DELETE = async (req: NextRequest) => {
 	const user = await getSessionUser();
 
 	if (!user) {
@@ -26,4 +26,4 @@ export async function DELETE(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};

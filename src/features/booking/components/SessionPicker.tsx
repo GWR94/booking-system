@@ -37,7 +37,7 @@ const SessionPicker = () => {
 	};
 
 	return (
-		<Box sx={{ width: '100%', position: 'relative', zIndex: 2 }}>
+		<Box sx={{ width: '100%', position: 'relative', zIndex: 2 }} data-testid="session-picker">
 			<Card
 				elevation={0}
 				sx={{

@@ -1,5 +1,7 @@
-<header
-  style="background-color: #264653; padding: 20px; text-align: center; border-bottom: 3px solid #2a9d8f;"
->
-  <img src="{{logoUrl}}" alt="Booking System Logo" style="max-width: 200px;" />
-</header>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+  <tr>
+    <td style="background-color: #264653; padding: 20px; text-align: center; border-bottom: 3px solid #2a9d8f;">
+      <img src="{{#if logoUrl}}{{logoUrl}}{{else}}{{baseUrl}}/logo.webp{{/if}}" alt="Booking System Logo" width="200" style="max-width: 200px; height: auto; display: block; margin: 0 auto;" />
+    </td>
+  </tr>
+</table>

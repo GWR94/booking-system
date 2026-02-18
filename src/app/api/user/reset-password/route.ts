@@ -2,17 +2,18 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import bcrypt from 'bcryptjs';
+import { parseWithFirstError } from '@lib/zod';
 import { apiResetPasswordSchema } from '@validation/api-schemas';
-import { errorResponse } from 'src/app/api/_utils/responses';
+import { errorResponse } from '@/app/api/_utils/responses';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	try {
 		const body = await req.json();
-		const { error } = apiResetPasswordSchema.validate(body);
-		if (error) {
-			return errorResponse(error.details[0].message, 400);
+		const parsed = parseWithFirstError(apiResetPasswordSchema, body);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400);
 		}
-		const { token, password } = body;
+		const { token, password } = parsed.data;
 
 		const user = await db.user.findFirst({
 			where: {
@@ -41,4 +42,4 @@ export async function POST(req: NextRequest) {
 		console.error('Reset password error:', err);
 		return errorResponse('Internal Server Error', 500);
 	}
-}
+};

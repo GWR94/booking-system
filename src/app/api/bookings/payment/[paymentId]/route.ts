@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import { groupSlotsByBay } from '@utils';
 
-export async function GET(
+export const GET = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ paymentId: string }> },
-) {
+) => {
 	try {
 		const { paymentId } = await params;
 
@@ -41,4 +41,4 @@ export async function GET(
 			{ status: 500 },
 		);
 	}
-}
+};

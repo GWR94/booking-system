@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 
-export async function GET(req: NextRequest) {
+export const GET = async (req: NextRequest) => {
 	const { searchParams } = new URL(req.url);
 	const email = searchParams.get('email');
 
@@ -27,4 +27,4 @@ export async function GET(req: NextRequest) {
 		console.error('Error checking email:', error);
 		return NextResponse.json({ exists: false, error: true });
 	}
-}
+};

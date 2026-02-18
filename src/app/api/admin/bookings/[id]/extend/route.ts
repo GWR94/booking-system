@@ -1,14 +1,15 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminBookingsService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminBookingExtendSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../../_utils/responses';
 
-export async function PATCH(
+export const PATCH = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
@@ -16,19 +17,13 @@ export async function PATCH(
 	try {
 		const { id } = await params;
 		const rawBody = await req.json();
-		const { error, value } = apiAdminBookingExtendSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminBookingExtendSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const { hours } = value;
+		const { hours } = parsed.data;
 
-		const result = await AdminBookingsService.extendBooking(
-			parseInt(id, 10),
-			hours,
-		);
+		const result = await AdminBookingsService.extendBooking(Number(id), hours);
 
 		return NextResponse.json(result);
 	} catch (error) {
@@ -43,4 +38,4 @@ export async function PATCH(
 			500,
 		);
 	}
-}
+};

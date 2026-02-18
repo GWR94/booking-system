@@ -1,42 +1,23 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { BookingService } from 'src/server/modules/bookings/booking.service';
+import { BookingService } from '@/server/modules/bookings/booking.service';
 import { auth } from '../../../auth';
+import { parseWithFirstError } from '@lib/zod';
 import { apiBookingCreateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../_utils/responses';
 
-interface BookingRequest {
-	slotIds: number[];
-	paymentId?: string;
-	paymentStatus?: string;
-	guestInfo?: {
-		name: string;
-		email: string;
-		phone?: string;
-	};
-}
-
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	try {
-		const rawBody: BookingRequest = await req.json();
-		const { error, value } = apiBookingCreateSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const rawBody = await req.json();
+		const parsed = parseWithFirstError(apiBookingCreateSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
+		const { slotIds, paymentId, paymentStatus, guestInfo } = parsed.data;
 
-		const body = value as BookingRequest;
-		const { slotIds, paymentId, paymentStatus, guestInfo } = body;
-
-		// Get authenticated user if available
 		const session = await auth();
-		const userId = session?.user?.id
-			? parseInt(session.user.id, 10)
-			: undefined;
+		const userId = session?.user?.id ? Number(session.user.id) : undefined;
 
-		// Must have either an authenticated user or guest info
 		if (!userId && !guestInfo) {
 			return errorResponse(
 				'Authentication required or guest info must be provided',
@@ -67,4 +48,4 @@ export async function POST(req: NextRequest) {
 			500,
 		);
 	}
-}
+};

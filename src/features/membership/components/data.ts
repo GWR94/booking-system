@@ -1,10 +1,8 @@
-// Interface for FAQ data
 interface FaqItem {
 	question: string;
 	answer: string;
 }
 
-// FAQ data organized by category
 const faqData: Record<string, FaqItem[]> = {
 	booking: [
 		{

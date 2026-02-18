@@ -1,32 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminSlotsService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminSlotUpdateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
 
-export async function PUT(
+export const PUT = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	const { id: idParam } = await params;
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
 
 	try {
-		const id = parseInt(idParam, 10);
+		const id = Number(idParam);
 		if (Number.isNaN(id)) {
 			return errorResponse('Invalid slot id', 400, 'VALIDATION_ERROR');
 		}
 		const rawBody = await req.json();
-		const { error, value } = apiAdminSlotUpdateSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminSlotUpdateSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
+		const value = parsed.data;
 		const { startTime, endTime, status, bay } = value;
 
 		const result = await AdminSlotsService.updateSlot(id, {
@@ -49,19 +48,19 @@ export async function PUT(
 			500,
 		);
 	}
-}
+};
 
-export async function DELETE(
+export const DELETE = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	const { id: idParam } = await params;
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
 
 	try {
-		const id = parseInt(idParam, 10);
+		const id = Number(idParam);
 		if (Number.isNaN(id)) {
 			return errorResponse('Invalid slot id', 400, 'VALIDATION_ERROR');
 		}
@@ -75,4 +74,4 @@ export async function DELETE(
 			500,
 		);
 	}
-}
+};

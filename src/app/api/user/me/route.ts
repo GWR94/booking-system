@@ -2,19 +2,25 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import { auth } from '../../../../auth';
-import { MembershipService } from 'src/server/modules/membership/membership.service';
+import { MembershipService } from '@/server/modules/membership/membership.service';
+import { parseWithFirstError } from '@lib/zod';
 import { apiUserProfileUpdateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../_utils/responses';
 
-export async function GET(req: NextRequest) {
+export const GET = async (req: NextRequest) => {
 	try {
 		const session = await auth();
 		if (!session?.user?.id) {
 			return NextResponse.json({ user: null });
 		}
 
+		const userId = Number(session.user.id);
+		if (!Number.isInteger(userId) || userId < 1) {
+			return NextResponse.json({ user: null });
+		}
+
 		const user = await db.user.findUnique({
-			where: { id: parseInt(session.user.id, 10) },
+			where: { id: userId },
 			include: {
 				bookings: {
 					include: {
@@ -51,25 +57,22 @@ export async function GET(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = async (req: NextRequest) => {
 	try {
 		const session = await auth();
 		if (!session?.user?.id) {
 			return errorResponse('Unauthorized', 401, 'AUTH_REQUIRED');
 		}
 
-		const userId = parseInt(session.user.id, 10);
+		const userId = Number(session.user.id);
 		const rawBody = await req.json();
-		const { error, value } = apiUserProfileUpdateSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiUserProfileUpdateSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const body = value;
+		const body = parsed.data;
 
 		// Mass assignment protection - only allow certain fields
 		const { name, email, phone, allowMarketing } = body;
@@ -104,4 +107,4 @@ export async function PATCH(req: NextRequest) {
 		console.error('Update user profile error:', error);
 		return errorResponse('Internal Server Error', 500);
 	}
-}
+};

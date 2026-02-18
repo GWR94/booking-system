@@ -9,7 +9,7 @@ import { useAuth } from '@hooks';
 import { GroupedSlot } from '@features/booking/components';
 import { calculateSlotPrice } from '@utils';
 
-export function useBasket() {
+export const useBasket = () => {
 	const queryClient = useQueryClient();
 	const { showSnackbar } = useSnackbar();
 
@@ -120,4 +120,4 @@ export function useBasket() {
 		removeFromBasket: removeFromBasketMutation.mutate,
 		clearBasket: clearBasketMutation.mutate,
 	};
-}
+};

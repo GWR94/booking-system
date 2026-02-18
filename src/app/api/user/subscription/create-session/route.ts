@@ -1,15 +1,16 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
-import { getSessionUser } from 'src/server/auth/auth';
+import { getSessionUser } from '@/server/auth/auth';
 import { MEMBERSHIP_TIERS, MembershipTier } from '@config/membership.config';
 import Stripe from 'stripe';
+import { parseWithFirstError } from '@lib/zod';
 import { apiSubscriptionTierSchema } from '@validation/api-schemas';
-import { errorResponse } from 'src/app/api/_utils/responses';
+import { errorResponse } from '@/app/api/_utils/responses';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	const sessionUser = await getSessionUser();
 
 	if (!sessionUser) {
@@ -18,11 +19,11 @@ export async function POST(req: NextRequest) {
 
 	try {
 		const body = await req.json();
-		const { error: validationError } = apiSubscriptionTierSchema.validate(body);
-		if (validationError) {
-			return errorResponse(validationError.details[0].message, 400);
+		const parsed = parseWithFirstError(apiSubscriptionTierSchema, body);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400);
 		}
-		const { tier } = body;
+		const { tier } = parsed.data;
 
 		const selectedTier = MEMBERSHIP_TIERS[tier as MembershipTier];
 
@@ -56,8 +57,7 @@ export async function POST(req: NextRequest) {
 			});
 		}
 
-		const { getAuthBaseUrl } = await import('@lib/app-url');
-		const baseUrl = getAuthBaseUrl();
+		const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 		const session = await stripe.checkout.sessions.create({
 			customer: customerId,
@@ -85,4 +85,4 @@ export async function POST(req: NextRequest) {
 			500,
 		);
 	}
-}
+};

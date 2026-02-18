@@ -1,34 +1,32 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminUsersService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminUserUpdateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
 
-export async function PUT(
+export const PUT = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
 
 	try {
 		const { id } = await params;
-		const userId = parseInt(id, 10);
-		if (Number.isNaN(userId)) {
+		const userId = Number(id);
+		if (isNaN(userId)) {
 			return errorResponse('Invalid user id', 400, 'VALIDATION_ERROR');
 		}
 
 		const rawBody = await req.json();
-		const { error, value } = apiAdminUserUpdateSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminUserUpdateSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const body = value;
+		const body = parsed.data;
 		const { name, email, role, membershipTier, membershipStatus } = body;
 
 		const result = await AdminUsersService.updateUserDetails(userId, {
@@ -52,4 +50,4 @@ export async function PUT(
 			500,
 		);
 	}
-}
+};

@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const SITEVERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
-export async function verifyRecaptcha(token: string): Promise<boolean> {
+export const verifyRecaptcha = async (token: string): Promise<boolean> => {
 	const secret =
 		process.env.RECAPTCHA_SECRET_KEY || process.env.CAPTCHA_SECRET_KEY;
 	if (!secret) {
@@ -38,4 +38,4 @@ export async function verifyRecaptcha(token: string): Promise<boolean> {
 		console.error('Recaptcha verify error:', err);
 		return false;
 	}
-}
+};

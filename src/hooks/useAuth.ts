@@ -8,7 +8,7 @@ import type { RegisterCredentials, User } from '@features/auth/components';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
-export function useAuth() {
+export const useAuth = () => {
 	const queryClient = useQueryClient();
 	const { showSnackbar } = useSnackbar();
 	const router = useRouter();
@@ -112,4 +112,4 @@ export function useAuth() {
 	};
 
 	return useAuth;
-}
+};

@@ -6,7 +6,7 @@ import { BookingService } from '@modules';
 import { MembershipService } from '@modules';
 import { getStripe } from '@lib/stripe';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 	try {
 		const signature = req.headers.get('stripe-signature');
@@ -46,12 +46,12 @@ export async function POST(req: NextRequest) {
 
 				if (bookingId) {
 					const existing = await db.booking.findUnique({
-						where: { id: parseInt(bookingId, 10) },
+						where: { id: Number(bookingId) },
 						select: { status: true },
 					});
 					if (existing?.status !== 'confirmed') {
 						await BookingService.confirmBooking(
-							parseInt(bookingId, 10),
+							Number(bookingId),
 							payment.id,
 							payment.status,
 						);
@@ -77,19 +77,27 @@ export async function POST(req: NextRequest) {
 
 				let booking;
 				if (isGuest === 'true') {
+					const name = typeof guestName === 'string' ? guestName : '';
+					const email = typeof guestEmail === 'string' ? guestEmail : '';
+					if (!name || !email) {
+						console.error(
+							'Guest payment intent missing guestName or guestEmail in metadata',
+						);
+						break;
+					}
 					booking = await BookingService.createBooking({
 						slotIds: JSON.parse(slotIds),
 						paymentId: payment.id,
 						paymentStatus: payment.status,
 						guestInfo: {
-							name: guestName,
-							email: guestEmail,
-							phone: guestPhone,
+							name,
+							email,
+							phone: typeof guestPhone === 'string' ? guestPhone : undefined,
 						},
 					});
 				} else {
 					booking = await BookingService.createBooking({
-						userId: parseInt(userId, 10),
+						userId: Number(userId),
 						slotIds: JSON.parse(slotIds),
 						paymentId: payment.id,
 						paymentStatus: payment.status,
@@ -108,11 +116,11 @@ export async function POST(req: NextRequest) {
 
 				if (bookingId) {
 					const existing = await db.booking.findUnique({
-						where: { id: parseInt(bookingId, 10) },
+						where: { id: Number(bookingId) },
 						select: { status: true },
 					});
 					if (existing?.status !== 'failed') {
-						await BookingService.handleFailedPayment(parseInt(bookingId, 10));
+						await BookingService.handleFailedPayment(Number(bookingId));
 					}
 				}
 				break;
@@ -137,4 +145,4 @@ export async function POST(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};

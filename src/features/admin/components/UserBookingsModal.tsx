@@ -51,7 +51,7 @@ const UserBookingsModal = ({ user, open, onClose }: UserBookingsModalProps) => {
 	const handleChangeRowsPerPage = (
 		event: React.ChangeEvent<HTMLInputElement>,
 	) => {
-		setRowsPerPage(parseInt(event.target.value, 10));
+		setRowsPerPage(Number(event.target.value));
 		setPage(0);
 	};
 

@@ -1,11 +1,12 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminSlotsService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminSlotCreateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../_utils/responses';
 
-export async function GET(req: NextRequest) {
+export const GET = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
@@ -37,29 +38,26 @@ export async function GET(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
 
 	try {
 		const rawBody = await req.json();
-		const { error, value } = apiAdminSlotCreateSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminSlotCreateSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const { startTime, endTime, status = 'available', bay } = value;
+		const { startTime, endTime, status = 'available', bay } = parsed.data;
 
 		const result = await AdminSlotsService.createSlot({
 			startTime,
 			endTime,
 			status,
-			bay: typeof bay === 'object' ? bay.id : Number(bay),
+			bay,
 		});
 
 		return NextResponse.json(result, { status: 201 });
@@ -70,4 +68,4 @@ export async function POST(req: NextRequest) {
 			500,
 		);
 	}
-}
+};

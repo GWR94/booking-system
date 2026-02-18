@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import bcrypt from 'bcryptjs';
+import { parseWithFirstError } from '@lib/zod';
 import { apiRegisterSchema } from '@validation/api-schemas';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	try {
 		const body = await req.json();
-		const { name, email, password } = body;
-
-		const { error } = apiRegisterSchema.validate({ name, email, password });
-		if (error) {
+		const parsed = parseWithFirstError(apiRegisterSchema, body);
+		if (!parsed.success) {
 			return NextResponse.json(
-				{ message: error.details[0].message },
+				{ message: parsed.message },
 				{ status: 400 },
 			);
 		}
+		const { name, email, password } = parsed.data;
 
 		const userExists = await db.user.findUnique({
 			where: { email },
@@ -69,4 +69,4 @@ export async function POST(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};

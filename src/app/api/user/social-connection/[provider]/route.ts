@@ -1,15 +1,15 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
-import { getSessionUser } from 'src/server/auth/auth';
+import { getSessionUser } from '@/server/auth/auth';
 
 const ALLOWED_PROVIDERS = ['google', 'facebook', 'twitter'] as const;
 type Provider = (typeof ALLOWED_PROVIDERS)[number];
 
-export async function DELETE(
+export const DELETE = async (
 	req: NextRequest,
 	{ params }: { params: Promise<{ provider: string }> },
-) {
+) => {
 	const sessionUser = await getSessionUser();
 
 	if (!sessionUser) {
@@ -85,4 +85,4 @@ export async function DELETE(
 			{ status: 500 },
 		);
 	}
-}
+};

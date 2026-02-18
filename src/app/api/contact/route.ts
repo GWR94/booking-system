@@ -1,10 +1,10 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { parseWithFirstError } from '@lib/zod';
 import { apiContactSchema } from '@validation/api-schemas';
-import { errorResponse } from 'src/app/api/_utils/responses';
+import { errorResponse } from '@/app/api/_utils/responses';
 
-// Email transporter (using existing env vars)
 const transporter = nodemailer.createTransport({
 	host: process.env.SMTP_HOST,
 	port: Number(process.env.SMTP_PORT),
@@ -15,22 +15,14 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	try {
 		const body = await req.json();
-		const { name, email, phone, subject, message } = body;
-
-		const { error } = apiContactSchema.validate({
-			name,
-			email,
-			phone,
-			subject,
-			message,
-		});
-
-		if (error) {
-			return errorResponse(error.details[0].message, 400);
+		const parsed = parseWithFirstError(apiContactSchema, body);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400);
 		}
+		const { name, email, phone, subject, message } = parsed.data;
 
 		await transporter.sendMail({
 			from: `"Contact Form" <${process.env.SMTP_USER}>`,
@@ -54,4 +46,4 @@ export async function POST(req: NextRequest) {
 		console.error('Contact form error:', err);
 		return errorResponse('Internal Server Error', 500);
 	}
-}
+};

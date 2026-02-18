@@ -86,14 +86,13 @@ const CheckoutForm = ({
 			setLoading(true);
 			setMessage('');
 			try {
-				const response = await confirmFreeBooking(slotIds, guest);
+				const response = await confirmFreeBooking(slotIds, guest ?? undefined);
 
 				if (response.booking) {
 					setBooking(response.booking);
 				}
 
 				clearBasket();
-				// Redirect to completion with success flag
 				router.push('/checkout/complete?success=true');
 			} catch (err) {
 				console.error(err);
@@ -142,7 +141,6 @@ const CheckoutForm = ({
 	return (
 		<Box>
 			<Grid container spacing={4}>
-				{/* Left Column: Items, Membership, Payment */}
 				<Grid size={{ xs: 12, md: 8 }}>
 					{isAuthenticated &&
 						user?.membershipTier === 'PAR' &&
@@ -242,7 +240,6 @@ const CheckoutForm = ({
 					</Card>
 				</Grid>
 
-				{/* Right Column: Order Summary */}
 				<Grid size={{ xs: 12, md: 4 }}>
 					<Box sx={{ position: 'sticky', top: 24 }}>
 						{includedHours > 0 && (

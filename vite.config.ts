@@ -6,36 +6,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// https://vitejs.dev/config/
+// Vite config used only for Vitest; Next.js handles dev/build.
 export default defineConfig(({ mode }) => ({
 	esbuild: {
 		drop: mode === 'production' ? ['console', 'debugger'] : [],
 	},
-	base: '/',
 	plugins: [react()],
-	server: {
-		port: 3000,
-		host: true,
-		open: true,
-		proxy: {
-			'/api': {
-				target: 'http://localhost:4000',
-				changeOrigin: true,
-				secure: false,
-			},
-		},
-		cors: true,
-	},
-	preview: {
-		port: 3000,
-		proxy: {
-			'/api': {
-				target: 'http://localhost:4000',
-				changeOrigin: true,
-				secure: false,
-			},
-		},
-	},
 	resolve: {
 		alias: {
 			'@auth': path.resolve(__dirname, './src/server/auth/auth'),
@@ -57,38 +33,25 @@ export default defineConfig(({ mode }) => ({
 			'@shared': path.resolve(__dirname, './src/components/shared'),
 			'@styles': path.resolve(__dirname, './src/styles'),
 			'@validation': path.resolve(__dirname, './src/validation'),
-			'src/': path.resolve(__dirname, './src') + '/',
-			'next/server': path.resolve(
-				__dirname,
-				'./src/__test__/mocks/next-server.ts',
-			),
+			'@': path.resolve(__dirname, './src'),
 		},
 	},
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		setupFiles: './src/setupTests.ts',
+		setupFiles: './src/setupTests.tsx',
 		css: true,
 		reporters: ['verbose'],
 		exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
 		coverage: {
 			reporter: ['text', 'json', 'html'],
 			include: ['src/**/*'],
-			exclude: ['e2e/**'],
-		},
-	},
-	build: {
-		rollupOptions: {
-			output: {
-				manualChunks: {
-					'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-					'vendor-mui': ['@mui/material', '@mui/system'],
-					'vendor-icons': ['@mui/icons-material'],
-					'vendor-framer': ['framer-motion'],
-					'vendor-utils': ['dayjs', 'axios'],
-					'vendor-joi': ['joi'],
-				},
-			},
+			exclude: [
+				'e2e/**',
+				'**/index.ts',
+				'**/index.tsx',
+				'src/server/db/client.ts',
+			],
 		},
 	},
 }));

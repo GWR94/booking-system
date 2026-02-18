@@ -2,6 +2,8 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
+			"@/*": ["./src/*"],
+			"@prisma/client": ["./prisma/generated/client"],
 			"@auth": ["./src/server/auth/auth.ts"],
 			"@db": ["./src/server/db/client.ts"],
 			"@config/*": ["./src/config/*"],
@@ -64,6 +66,6 @@
 			}
 		]
 	},
-	"include": ["src/**/*", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+	"include": ["src/**/*", "scripts/**/*", "prisma.config.ts", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
 	"exclude": ["node_modules", "dist", ".next", "src/router/**/*"]
 }

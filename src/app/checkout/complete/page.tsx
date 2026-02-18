@@ -8,13 +8,12 @@ export const metadata: Metadata = {
 	description: 'Your booking has been confirmed.',
 };
 
-export default async function CheckoutCompletePage(props: {
+const CheckoutCompletePage = async (props: {
 	params: Promise<{ [key: string]: string | string[] | undefined }>;
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-	return (
-		<Suspense fallback={<div>Loading confirmation...</div>}>
-			<CompleteBooking />
-		</Suspense>
-	);
-}
+}) => (
+	<Suspense fallback={<div>Loading confirmation...</div>}>
+		<CompleteBooking />
+	</Suspense>
+);
+export default CheckoutCompletePage;

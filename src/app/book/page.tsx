@@ -6,6 +6,5 @@ export const metadata: Metadata = {
 	description: 'Book your indoor golf session at The Short Grass.',
 };
 
-export default function BookPage() {
-	return <Booking />;
-}
+const BookPage = () => <Booking />;
+export default BookPage;
