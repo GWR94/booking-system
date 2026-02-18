@@ -2,10 +2,6 @@ import { db } from '@db';
 import { getStripe } from '@lib/stripe';
 import { handleSendEmail } from '@utils/email';
 import { groupSlotsByBay } from '@utils';
-import { getServerAppUrl, getLogoUrl } from '@lib/app-url';
-// Logger? Maybe just console for now or simple wrapper.
-
-// stripe is now handled by getStripe utility inside methods
 
 export class BookingService {
 	/**
@@ -28,7 +24,7 @@ export class BookingService {
 			let finalUserId = userId;
 
 			if (guestInfo) {
-				const guestUser = await tx.user.upsert({
+				const guestUser = await (tx as typeof db).user.upsert({
 					where: { email: guestInfo.email },
 					update: {
 						name: guestInfo.name,
@@ -48,7 +44,7 @@ export class BookingService {
 				throw new Error('User ID or guest info must be provided');
 			}
 
-			const slots = await tx.slot.findMany({
+			const slots = await (tx as typeof db).slot.findMany({
 				where: {
 					id: { in: slotIds },
 					status: 'available',
@@ -59,7 +55,7 @@ export class BookingService {
 				throw new Error('One or more slots do not exist or have been booked');
 			}
 
-			const newBooking = await tx.booking.create({
+			const newBooking = await (tx as typeof db).booking.create({
 				data: {
 					user: { connect: { id: finalUserId } },
 					slots: { connect: slotIds.map((id) => ({ id })) },
@@ -70,7 +66,7 @@ export class BookingService {
 				include: { slots: true },
 			});
 
-			await tx.slot.updateMany({
+			await (tx as typeof db).slot.updateMany({
 				where: { id: { in: slotIds } },
 				data: { status: 'awaiting payment' },
 			});
@@ -90,7 +86,7 @@ export class BookingService {
 		paymentStatus: string,
 	) {
 		const update = await db.$transaction(async (tx) => {
-			return tx.booking.update({
+			return (tx as typeof db).booking.update({
 				where: { id: bookingId },
 				data: {
 					status: 'confirmed',
@@ -133,8 +129,8 @@ export class BookingService {
 						amount: amount.toFixed(2),
 					},
 					year: new Date().getFullYear(),
-					baseUrl: getServerAppUrl(),
-					logoUrl: getLogoUrl(),
+					baseUrl: process.env.NEXT_PUBLIC_APP_URL,
+					logoUrl: process.env.LOGO_URL,
 				},
 			});
 		}
@@ -147,7 +143,7 @@ export class BookingService {
 	 */
 	static async handleFailedPayment(bookingId: number) {
 		return db.$transaction(async (tx) => {
-			const booking = await tx.booking.update({
+			const booking = await (tx as typeof db).booking.update({
 				where: { id: bookingId },
 				data: { status: 'failed' },
 				include: { slots: true },
@@ -155,7 +151,7 @@ export class BookingService {
 
 			const slotIds = booking.slots.map((slot: any) => slot.id);
 
-			await tx.slot.updateMany({
+			await (tx as typeof db).slot.updateMany({
 				where: { id: { in: slotIds } },
 				data: { status: 'available' },
 			});

@@ -68,7 +68,7 @@ describe('POST /api/admin/bookings/local-book', () => {
 		mockIsAdmin.mockResolvedValue(true);
 		mockGetSessionUser.mockResolvedValue({ id: 1, role: 'admin' });
 
-		mockDb.slot.findMany.mockResolvedValue([]); // No slots found as available
+		mockDb.slot.findMany.mockResolvedValue([]);
 
 		const req = createMockRequest({
 			method: 'POST',

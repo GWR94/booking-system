@@ -57,61 +57,48 @@ const LegacyRegister: React.FC<LegacyRegisterProps> = ({
 			confirm: formInput.confirm.value,
 		};
 
-		// get validation errors from joi validation library
-		const { error } = registrationSchema.validate(validationData, {
-			abortEarly: false,
-		});
+		const result = registrationSchema.safeParse(validationData);
 
-		if (error) {
-			const updatedFormInput: FormInput = { ...formInput };
-			if (type) {
-				// filter out others to return error which matches the input type
-				const err = error.details?.filter(
-					(detail) => detail.path[0] === type,
-				)[0];
-				if (err) {
-					setFormInput({
-						...formInput,
-						[type]: {
-							...formInput[type],
-							errorMsg: err.message,
-						},
-					});
-					return false;
-				} else {
-					setFormInput({
-						...formInput,
-						[type]: {
-							...formInput[type],
-							errorMsg: '',
-						},
-					});
-					return true;
-				}
-			}
-			error.details.forEach((detail) => {
-				// get key for incorrectly validated
-				const key = detail.path[0] as keyof typeof formInput;
-				if (key in updatedFormInput) {
-					updatedFormInput[key] = {
-						...updatedFormInput[key],
-						errorMsg: detail.message,
-					};
-				}
-				setFormInput(updatedFormInput);
-			});
-			return false;
-		} else {
-			// clear all error messages if there are no validation errors.
-			setFormInput((prevData) => ({
-				...prevData,
-				name: { ...prevData.name, errorMsg: '' },
-				email: { ...prevData.email, errorMsg: '' },
-				password: { ...prevData.password, errorMsg: '' },
-				confirm: { ...prevData.confirm, errorMsg: '' },
+		if (result.success) {
+			setFormInput((prev) => ({
+				...prev,
+				name: { ...prev.name, errorMsg: '' },
+				email: { ...prev.email, errorMsg: '' },
+				password: { ...prev.password, errorMsg: '' },
+				confirm: { ...prev.confirm, errorMsg: '' },
 			}));
 			return true;
 		}
+
+		const issues = result.error.issues;
+		if (type) {
+			const err = issues.find((i) => i.path[0] === type);
+			if (err) {
+				setFormInput({
+					...formInput,
+					[type]: { ...formInput[type], errorMsg: err.message },
+				});
+				return false;
+			}
+			setFormInput({
+				...formInput,
+				[type]: { ...formInput[type], errorMsg: '' },
+			});
+			return true;
+		}
+
+		let updated: FormInput = { ...formInput };
+		for (const issue of issues) {
+			const key = issue.path[0] as keyof FormInput;
+			if (key in updated) {
+				updated = {
+					...updated,
+					[key]: { ...updated[key], errorMsg: issue.message },
+				};
+			}
+		}
+		setFormInput(updated);
+		return false;
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {

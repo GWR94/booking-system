@@ -195,7 +195,6 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 						Social Connections
 					</Typography>
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-						{/* Facebook */}
 						<Box
 							sx={{
 								display: 'flex',
@@ -233,7 +232,6 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 							)}
 						</Box>
 
-						{/* Google */}
 						<Box
 							sx={{
 								display: 'flex',
@@ -271,7 +269,6 @@ const EditProfile = ({ handleEditToggle }: EditProfileProps) => {
 							)}
 						</Box>
 
-						{/* Twitter */}
 						<Box
 							sx={{
 								display: 'flex',

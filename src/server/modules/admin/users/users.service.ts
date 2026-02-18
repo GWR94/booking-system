@@ -6,7 +6,6 @@ import {
 } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { handleSendEmail } from '@utils/email';
-import { getServerAppUrl, getLogoUrl } from '@lib/app-url';
 
 export class AdminUsersService {
 	/**
@@ -38,11 +37,10 @@ export class AdminUsersService {
 			name?: string;
 			email?: string;
 			role?: string;
-			membershipTier?: string;
-			membershipStatus?: string;
+			membershipTier?: string | null;
+			membershipStatus?: string | null;
 		},
 	) {
-		// Check if user exists
 		const existingUser = await db.user.findUnique({
 			where: { id: userId },
 		});
@@ -51,7 +49,6 @@ export class AdminUsersService {
 			throw new Error('User not found');
 		}
 
-		// Prepare update data (cast string to Prisma enums)
 		const updateData: Prisma.UserUpdateInput = {
 			name: data.name,
 			email: data.email,
@@ -60,7 +57,6 @@ export class AdminUsersService {
 			membershipStatus: data.membershipStatus as MembershipStatus,
 		};
 
-		// Remove undefined fields
 		for (const key of Object.keys(
 			updateData,
 		) as (keyof Prisma.UserUpdateInput)[]) {
@@ -108,7 +104,7 @@ export class AdminUsersService {
 			},
 		});
 
-		const resetUrl = `${getServerAppUrl()}/reset-password?token=${resetToken}`;
+		const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
 
 		await handleSendEmail({
 			senderPrefix: 'noreply',
@@ -119,8 +115,8 @@ export class AdminUsersService {
 				name: user.name,
 				resetUrl,
 				year: new Date().getFullYear(),
-				baseUrl: getServerAppUrl(),
-				logoUrl: getLogoUrl(),
+				baseUrl: process.env.NEXT_PUBLIC_APP_URL,
+				logoUrl: process.env.LOGO_URL,
 			},
 		});
 

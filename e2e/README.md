@@ -10,6 +10,10 @@ Playwright is already installed. To install browsers:
 npx playwright install
 ```
 
+When you run the tests, the **Next.js dev server is started automatically** (see `playwright.config.ts` `webServer`). You do not need to run `npm run dev` yourself unless you want to reuse an existing server.
+
+For tests that log in or create bookings (e.g. authenticated booking, login with valid credentials), a **running database** and **test users** (see Test Data below) are required. If login does not succeed (e.g. database not running), those tests are **skipped** automatically so the rest of the suite can pass.
+
 ## Running Tests
 
 ```bash
@@ -19,8 +23,9 @@ npm run test:e2e
 # Run in UI mode (interactive)
 npm run test:e2e:ui
 
-# Run in debug mode
-npm run test:e2e:debug
+# Debug or headed: pass flags
+npm run test:e2e -- --debug
+npm run test:e2e -- --headed
 
 # Run specific test file
 npx playwright test e2e/auth/login.spec.ts
@@ -143,9 +148,9 @@ Tests are configured to run in CI with:
 
 ### Tests timing out
 
-- Increase timeout in `playwright.config.ts`
-- Check if dev server is running
-- Verify backend is accessible
+- The dev server is started automatically; if it fails to start, check `npm run dev` locally.
+- For login/booking tests: ensure a database is running and test users exist (see Test Data).
+- Increase timeout in `playwright.config.ts` if needed.
 
 ### Flaky tests
 

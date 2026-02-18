@@ -66,5 +66,15 @@ describe('pricing utilities', () => {
 			expect(result.discountedPrice).toBe(offPeakPrice * 0.8);
 			expect(result.hasDiscount).toBe(true);
 		});
+
+		it('should apply no discount for unknown tier (default branch)', () => {
+			const result = calculateSlotPrice(
+				'2024-01-22T10:00:00Z',
+				'UNKNOWN' as any,
+				true,
+			);
+			expect(result.hasDiscount).toBe(false);
+			expect(result.discountedPrice).toBe(result.originalPrice);
+		});
 	});
 });

@@ -6,6 +6,24 @@ vi.mock('@shared', () => ({
 	ContactForm: () => <div>Contact Form Component</div>,
 }));
 
+vi.mock('@ui', () => ({
+	SectionHeader: ({
+		title,
+		subtitle,
+		description,
+	}: {
+		title: string;
+		subtitle?: string;
+		description?: string;
+	}) => (
+		<div>
+			{subtitle && <span data-testid="section-subtitle">{subtitle}</span>}
+			<h2>{title}</h2>
+			{description && <p>{description}</p>}
+		</div>
+	),
+}));
+
 import createWrapper from '@utils/test-utils';
 
 describe('Contact Page', () => {

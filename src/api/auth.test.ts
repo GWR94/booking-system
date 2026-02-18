@@ -7,6 +7,8 @@ import {
 	updateProfile,
 	deleteAccount,
 	checkEmailExists,
+	requestPasswordReset,
+	resetPassword,
 } from './auth';
 
 vi.mock('@api/client', () => ({
@@ -91,6 +93,32 @@ describe('auth api', () => {
 
 		expect(axios.get).toHaveBeenCalledWith(
 			`/api/user/check-email?email=${email}`,
+		);
+		expect(result).toEqual(mockResponse);
+	});
+
+	it('requestPasswordReset should call POST /api/user/request-password-reset', async () => {
+		const email = 'user@example.com';
+		(axios.post as any).mockResolvedValue({ data: { ok: true } });
+
+		await requestPasswordReset(email);
+
+		expect(axios.post).toHaveBeenCalledWith(
+			'/api/user/request-password-reset',
+			{ email },
+		);
+	});
+
+	it('resetPassword should call POST /api/user/reset-password and return data', async () => {
+		const credentials = { token: 'reset-token', password: 'newPassword1' };
+		const mockResponse = { success: true };
+		(axios.post as any).mockResolvedValue({ data: mockResponse });
+
+		const result = await resetPassword(credentials);
+
+		expect(axios.post).toHaveBeenCalledWith(
+			'/api/user/reset-password',
+			credentials,
 		);
 		expect(result).toEqual(mockResponse);
 	});

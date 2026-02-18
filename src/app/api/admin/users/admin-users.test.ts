@@ -13,7 +13,7 @@ vi.mock('@auth', () => ({
 import { GET } from './route';
 import { createMockRequest } from '@test/api-test-utils';
 import { db } from '@db';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 
 describe('GET /api/admin/users', () => {
 	beforeEach(() => {

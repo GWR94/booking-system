@@ -3,22 +3,19 @@ export const dynamic = 'force-dynamic';
 import { db } from '@db';
 import { getStripe } from '@lib/stripe';
 import { calculateBasketCost } from '@utils';
+import { parseWithFirstError } from '@lib/zod';
 import { apiPaymentIntentSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../_utils/responses';
-import { verifyRecaptcha } from 'src/server/lib/recaptcha';
+import { verifyRecaptcha } from '@/server/lib/recaptcha';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	try {
 		const rawBody = await req.json();
-		const { error, value } = apiPaymentIntentSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiPaymentIntentSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-
-		const { items, guestInfo, recaptchaToken } = value;
+		const { items, guestInfo, recaptchaToken } = parsed.data;
 
 		// Guest checkout: require and verify reCAPTCHA (standard server-side verification)
 		if (guestInfo) {
@@ -45,7 +42,6 @@ export async function POST(req: NextRequest) {
 
 		const slotIds = items.map((item: any) => item.slotIds).flat();
 
-		// Database validation
 		const dbSlots = await db.slot.findMany({
 			where: {
 				id: { in: slotIds },
@@ -65,19 +61,22 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const amount = calculateBasketCost(dbSlots as any); // Ensure this function expects dbSlots/TimeSlot array
+		const amount = calculateBasketCost(dbSlots as any);
 
 		const stripe = getStripe();
+		const metadata: Record<string, string> = {
+			slotIds: JSON.stringify(slotIds),
+			isGuest: guestInfo ? 'true' : 'false',
+		};
+		if (guestInfo) {
+			metadata.guestName = guestInfo.name;
+			metadata.guestEmail = guestInfo.email;
+			metadata.guestPhone = guestInfo.phone ?? '';
+		}
 		const intent = await stripe.paymentIntents.create({
 			amount,
 			currency: 'gbp',
-			metadata: {
-				slotIds: JSON.stringify(slotIds),
-				isGuest: guestInfo ? 'true' : 'false',
-				guestName: guestInfo?.name,
-				guestEmail: guestInfo?.email,
-				guestPhone: guestInfo?.phone || '',
-			},
+			metadata,
 		});
 
 		return NextResponse.json({ clientSecret: intent.client_secret });
@@ -85,4 +84,4 @@ export async function POST(req: NextRequest) {
 		console.error('Error creating payment intent:', error);
 		return errorResponse('Internal Server Error', 500);
 	}
-}
+};

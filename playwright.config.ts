@@ -12,7 +12,7 @@ export default defineConfig({
 	reporter: [['html', { outputFolder: 'playwright/playwright-report' }]],
 	outputDir: 'playwright/test-results',
 	use: {
-		baseURL: process.env.FRONT_END,
+		baseURL: process.env.FRONT_END ?? 'http://localhost:3000',
 		trace: 'on-first-retry',
 		screenshot: 'only-on-failure',
 		video: 'retain-on-failure',
@@ -36,11 +36,10 @@ export default defineConfig({
 	],
 
 	/* Run your local dev server before starting the tests */
-	// Commented out - start dev server manually with: npm run dev
-	// webServer: {
-	// 	command: 'npm run dev',
-	// 	url: 'http://localhost:5173',
-	// 	reuseExistingServer: !process.env.CI,
-	// 	timeout: 120000,
-	// },
+	webServer: {
+		command: 'npm run dev',
+		url: 'http://localhost:3000',
+		reuseExistingServer: !process.env.CI,
+		timeout: 120000,
+	},
 });

@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, Container, Typography, Paper, useTheme } from '@mui/material';
 import { ContactForm } from '@shared';
 import { COMPANY_INFO } from '@constants/company';
-import { SEO } from '@layout';
 import { SectionHeader } from '@ui';
 
 const Contact: React.FC = () => {
@@ -10,10 +9,6 @@ const Contact: React.FC = () => {
 
 	return (
 		<Box sx={{ py: 4 }}>
-			<SEO
-				title="Contact Us"
-				description={`Get in touch with ${COMPANY_INFO.name}. Located in Maidstone, we offer premium golf simulation experiences.`}
-			/>
 			<Container maxWidth="xl" sx={{ px: { xs: 0, sm: 0, md: 3 } }}>
 				<SectionHeader
 					subtitle="GET IN TOUCH"

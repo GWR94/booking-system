@@ -1,5 +1,4 @@
 import Settings from '@features/profile/Settings';
 
-export default function ProfileSettingsPage() {
-	return <Settings />;
-}
+const ProfileSettingsPage = () => <Settings />;
+export default ProfileSettingsPage;

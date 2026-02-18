@@ -73,7 +73,6 @@ const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 		>
 			<CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
 				<Grid container spacing={2} alignItems="center">
-					{/* Bay Info */}
 					<Grid size={{ xs: 12, sm: 3 }}>
 						<Stack direction="row" spacing={1.5} alignItems="center">
 							<Box
@@ -98,7 +97,6 @@ const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 						</Stack>
 					</Grid>
 
-					{/* Date & Time */}
 					<Grid size={{ xs: 6, sm: 4 }}>
 						<Stack spacing={0.5}>
 							<Stack direction="row" spacing={1} alignItems="center">
@@ -125,7 +123,6 @@ const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 						</Stack>
 					</Grid>
 
-					{/* Duration & Price */}
 					<Grid size={{ xs: 6, sm: 4 }}>
 						<Stack
 							direction="row"
@@ -151,7 +148,6 @@ const CheckoutItem: React.FC<CheckoutItemProps> = ({ slot, isCompleted }) => {
 						</Stack>
 					</Grid>
 
-					{/* Remove Action */}
 					{!isCompleted && (
 						<Grid
 							size={{ xs: 12, sm: 1 }}

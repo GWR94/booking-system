@@ -33,7 +33,6 @@ const DisconnectAccountDialog = ({ open, onClose, provider }: Props) => {
 			await unlinkProvider(provider);
 			onClose();
 		} catch (error: any) {
-			// Error handled by setting state below
 			seterror(error.response?.data?.message || 'Failed to disconnect account');
 		}
 	};

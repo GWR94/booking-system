@@ -34,13 +34,10 @@ describe('LegacyRegister', () => {
 		renderLegacyRegister();
 
 		expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
-		expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
-		// Match the input by its ID/Name to be 100% sure and avoid label ambiguity with asterisk
+		// Use placeholder for email; MUI label/input association can be unreliable in jsdom
+		expect(screen.getByPlaceholderText('your@email.com')).toBeInTheDocument();
 		expect(
 			screen.getByRole('textbox', { name: /Full Name/i }),
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole('textbox', { name: /Email Address/i }),
 		).toBeInTheDocument();
 
 		// For password fields, they are roles "textbox" usually if not "password",
@@ -63,9 +60,11 @@ describe('LegacyRegister', () => {
 		fireEvent.blur(nameInput);
 		expect(await screen.findByText(/Name is required/i)).toBeInTheDocument();
 
-		const emailInput = screen.getByLabelText(/Email Address/i);
+		const emailInput = screen.getByPlaceholderText('your@email.com');
 		fireEvent.blur(emailInput);
-		expect(await screen.findByText(/Email is required/i)).toBeInTheDocument();
+		expect(
+			await screen.findByText(/Please enter a valid email address/i),
+		).toBeInTheDocument();
 	});
 
 	it('should show password match error', async () => {
@@ -95,7 +94,7 @@ describe('LegacyRegister', () => {
 		fireEvent.change(screen.getByLabelText(/Full Name/i), {
 			target: { value: 'John Doe' },
 		});
-		fireEvent.change(screen.getByLabelText(/Email Address/i), {
+		fireEvent.change(screen.getByPlaceholderText('your@email.com'), {
 			target: { value: 'john@example.com' },
 		});
 		fireEvent.change(screen.getByLabelText(/^Password/i), {

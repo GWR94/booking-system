@@ -1,11 +1,7 @@
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-	SnackbarProvider,
-	useSnackbar,
-	SnackbarContext,
-} from './SnackbarContext';
-import { useContext } from 'react';
+import { vi, describe, it, expect } from 'vitest';
+import { SnackbarProvider, useSnackbar } from './SnackbarContext';
 
 // Helper component to trigger snackbar
 const TestComponent = () => {
@@ -19,6 +15,19 @@ const TestComponent = () => {
 				Show Error
 			</button>
 			<button onClick={hideSnackbar}>Hide</button>
+		</div>
+	);
+};
+
+// Helper to test setBottomOffset
+const OffsetComponent = () => {
+	const { showSnackbar, setBottomOffset } = useSnackbar();
+	return (
+		<div>
+			<button onClick={() => setBottomOffset(100)}>Set Offset</button>
+			<button onClick={() => showSnackbar('With offset', 'info')}>
+				Show
+			</button>
 		</div>
 	);
 };
@@ -83,5 +92,20 @@ describe('SnackbarContext', () => {
 		);
 
 		consoleSpy.mockRestore();
+	});
+
+	it('setBottomOffset can be called without throwing', async () => {
+		const user = userEvent.setup();
+		render(
+			<SnackbarProvider>
+				<OffsetComponent />
+			</SnackbarProvider>,
+		);
+
+		await user.click(screen.getByText('Set Offset'));
+		await user.click(screen.getByText('Show'));
+
+		const alert = await screen.findByRole('alert');
+		expect(alert).toHaveTextContent('With offset');
 	});
 });

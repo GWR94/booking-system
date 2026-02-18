@@ -6,7 +6,7 @@ import { getGroupedTimeSlots } from '@utils';
 import { useSession, useBasket } from '@hooks';
 import { TimeSlot } from '@features/booking/components';
 
-export function useSlots() {
+export const useSlots = () => {
 	const { selectedDate, selectedSession, selectedBay } = useSession();
 	const { basket } = useBasket();
 
@@ -36,4 +36,4 @@ export function useSlots() {
 		error,
 		currentDate: selectedDate,
 	};
-}
+};

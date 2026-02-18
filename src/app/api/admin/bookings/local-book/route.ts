@@ -1,11 +1,12 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin, getSessionUser } from 'src/server/auth/auth';
+import { isAdmin, getSessionUser } from '@/server/auth/auth';
 import { AdminBookingsService } from '@modules';
+import { parseWithFirstError } from '@lib/zod';
 import { apiAdminLocalBookingSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
 		return errorResponse('Unauthorized', 403, 'FORBIDDEN');
 	}
@@ -18,14 +19,11 @@ export async function POST(req: NextRequest) {
 
 	try {
 		const rawBody = await req.json();
-		const { error, value } = apiAdminLocalBookingSchema.validate(rawBody, {
-			abortEarly: false,
-			stripUnknown: true,
-		});
-		if (error) {
-			return errorResponse(error.details[0].message, 400, 'VALIDATION_ERROR');
+		const parsed = parseWithFirstError(apiAdminLocalBookingSchema, rawBody);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400, 'VALIDATION_ERROR');
 		}
-		const { slotIds } = value;
+		const { slotIds } = parsed.data;
 
 		const result = await AdminBookingsService.createAdminBooking(
 			currentUser.id,
@@ -36,7 +34,6 @@ export async function POST(req: NextRequest) {
 	} catch (error) {
 		console.error('Create admin booking error:', error);
 
-		// Handle specific error cases
 		if (error instanceof Error && error.message.includes('not available')) {
 			return NextResponse.json(
 				{
@@ -52,4 +49,4 @@ export async function POST(req: NextRequest) {
 			500,
 		);
 	}
-}
+};

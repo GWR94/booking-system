@@ -1,20 +1,14 @@
 'use client';
 
-import React from 'react';
 import { Container, Typography, Button, Box, Stack } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useRouter } from 'next/navigation';
-import { SEO } from '@layout';
 
 const NotFound = () => {
 	const router = useRouter();
 
 	return (
 		<Container maxWidth="md">
-			<SEO
-				title="404 Not Found"
-				description="The page you are looking for does not exist."
-			/>
 			<Box
 				sx={{
 					display: 'flex',

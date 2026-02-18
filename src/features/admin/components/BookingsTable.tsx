@@ -179,7 +179,7 @@ const BookingsTable = ({
 					page={page}
 					onPageChange={(e, newPage) => onPageChange(newPage)}
 					onRowsPerPageChange={(e) => {
-						onRowsPerPageChange(parseInt(e.target.value, 10));
+						onRowsPerPageChange(Number(e.target.value));
 						onPageChange(0);
 					}}
 				/>

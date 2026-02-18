@@ -1,13 +1,14 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
-import { getSessionUser } from 'src/server/auth/auth';
+import { getSessionUser } from '@/server/auth/auth';
 import { getStripe } from '@lib/stripe';
+import { Slot } from '@prisma/client';
 
-export async function POST(
+export const POST = async (
 	_req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	try {
 		const user = await getSessionUser();
 
@@ -16,7 +17,7 @@ export async function POST(
 		}
 
 		const { id } = await params;
-		const bookingId = parseInt(id, 10);
+		const bookingId = Number(id);
 		const booking = await db.booking.findUnique({
 			where: { id: bookingId },
 			include: { slots: { orderBy: { startTime: 'asc' } } },
@@ -66,7 +67,7 @@ export async function POST(
 			}
 		}
 
-		const slotIds = booking.slots.map((slot) => slot.id);
+		const slotIds = booking.slots.map((slot: Slot) => slot.id);
 
 		if (slotIds.length > 0) {
 			await db.slot.updateMany({
@@ -92,4 +93,4 @@ export async function POST(
 			{ status: 500 },
 		);
 	}
-}
+};

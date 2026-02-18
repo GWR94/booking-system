@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Box, useTheme, alpha } from '@mui/material';
-import { SEO } from '@layout';
 import { CallToAction } from '@shared';
 import {
 	AboutHero,
@@ -16,10 +15,6 @@ const About: React.FC = () => {
 
 	return (
 		<Box sx={{ bgcolor: 'background.default' }}>
-			<SEO
-				title="About Us"
-				description="Learn more about The Short Grass, Maidstone's premier indoor golf simulator venue. Meet our team and discover our story."
-			/>
 			<AboutHero />
 
 			{/* Services Section - Flowing Gradient */}

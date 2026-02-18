@@ -4,13 +4,13 @@ import { vi } from 'vitest';
 /**
  * Creates a mock NextRequest object for testing API routes.
  */
-export function createMockRequest(options: {
+export const createMockRequest = (options: {
 	method?: string;
 	url?: string;
 	body?: any;
 	headers?: Record<string, string>;
 	query?: Record<string, string>;
-}) {
+}) => {
 	const {
 		method = 'GET',
 		url = 'http://localhost:3000/api/test',
@@ -39,23 +39,22 @@ export function createMockRequest(options: {
 		requestInit as NextRequestInit,
 	);
 
-	// Add helper for req.json() to return the body directly if needed
 	if (body) {
 		request.json = vi.fn().mockResolvedValue(body);
 	}
 
 	return request;
-}
+};
 
 /**
  * Creates a mock params object matching Next.js App Router convention.
  * Params are wrapped in a Promise for Next.js 15+ compatibility.
  */
-export function createMockParams<T extends Record<string, string>>(
+export const createMockParams = <T extends Record<string, string>>(
 	params: T,
-): { params: Promise<T> } {
+): { params: Promise<T> } => {
 	return { params: Promise.resolve(params) };
-}
+};
 
 /**
  * Note: vi.mock() calls are hoisted to the top of the file, so mock
@@ -67,7 +66,7 @@ export function createMockParams<T extends Record<string, string>>(
 /**
  * Extract JSON body and status from a NextResponse.
  */
-export async function parseResponse(response: Response) {
+export const parseResponse = async (response: Response) => {
 	const body = await response.json();
 	return { body, status: response.status };
-}
+};

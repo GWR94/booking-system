@@ -16,7 +16,7 @@ export const getSessionUser = async () => {
 
 	try {
 		const user = await db.user.findUnique({
-			where: { id: parseInt(session.user.id, 10) },
+			where: { id: Number(session.user.id) },
 		});
 
 		if (!user) return null;

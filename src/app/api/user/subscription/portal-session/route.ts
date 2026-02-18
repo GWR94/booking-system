@@ -1,12 +1,12 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
-import { getSessionUser } from 'src/server/auth/auth';
+import { getSessionUser } from '@/server/auth/auth';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	const sessionUser = await getSessionUser();
 
 	if (!sessionUser) {
@@ -25,8 +25,7 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const { getAuthBaseUrl } = await import('@lib/app-url');
-		const baseUrl = getAuthBaseUrl();
+		const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 		const session = await stripe.billingPortal.sessions.create({
 			customer: user.stripeCustomerId,
@@ -43,4 +42,4 @@ export async function POST(req: NextRequest) {
 			{ status: 500 },
 		);
 	}
-}
+};

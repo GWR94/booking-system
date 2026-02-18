@@ -27,8 +27,6 @@ interface ConfirmationEmailContext {
 	year: number;
 }
 
-// ... (other interfaces simplified for brevity if not strictly needed immediately, but keeping generic structure)
-
 /**
  * Props for sending templated emails
  */
@@ -42,14 +40,14 @@ interface SendConfirmProps<T extends EmailTemplateName> {
 	/** Name of the Handlebars template to use */
 	templateName: T;
 	/** Context/variables to pass to the email template */
-	templateContext: any;
+	templateContext: Record<string, unknown>;
 	/** Optional reply-to email address */
 	replyTo?: string;
 }
 
 const transporter = nodemailer.createTransport({
 	host: process.env.SMTP_HOST || process.env.EMAIL_HOST,
-	port: parseInt(process.env.SMTP_PORT || process.env.EMAIL_PORT || '465', 10),
+	port: Number(process.env.SMTP_PORT || process.env.EMAIL_PORT || '465'),
 	secure:
 		process.env.SMTP_SECURE === 'true' || process.env.EMAIL_SECURE === 'true',
 	auth: {
@@ -58,7 +56,6 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-// Configure handlebars
 const handlebarOptions = {
 	viewEngine: {
 		extname: '.hbs',
@@ -87,7 +84,7 @@ transporter.use('compile', hbs(handlebarOptions));
  * @example
  * await handleSendEmail({
  *   recipientEmail: 'user@example.com',
- *   senderPrefix: 'Booking Confirmation',
+ *   senderPrefix: 'booking',
  *   subject: 'Your booking is confirmed!',
  *   templateName: 'confirmation',
  *   templateContext: { booking, payment, baseUrl }
@@ -97,7 +94,7 @@ transporter.use('compile', hbs(handlebarOptions));
  * // Password reset email
  * await handleSendEmail({
  *   recipientEmail: 'user@example.com',
- *   senderPrefix: 'Password Reset',
+ *   senderPrefix: 'noreply',
  *   subject: 'Reset your password',
  *   templateName: 'password-reset',
  *   templateContext: { resetUrl, expiresIn: '1 hour' },

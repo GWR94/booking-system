@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { DashboardService } from '@modules';
 
-export async function GET() {
+export const GET = async () => {
 	if (!(await isAdmin())) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
 	}
@@ -21,4 +21,4 @@ export async function GET() {
 			{ status: 500 },
 		);
 	}
-}
+};

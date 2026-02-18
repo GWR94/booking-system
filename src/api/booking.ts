@@ -41,7 +41,7 @@ export const getBookingByPaymentIntent = async (paymentIntentId: string) => {
 
 export const confirmFreeBooking = async (
 	slotIds: number[],
-	guestInfo?: GuestUser | null,
+	guestInfo?: GuestUser,
 ) => {
 	const response = await axios.post('/api/bookings', {
 		slotIds,

@@ -1,19 +1,19 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdmin } from 'src/server/auth/auth';
+import { isAdmin } from '@/server/auth/auth';
 import { AdminUsersService } from '@modules';
 
-export async function POST(
+export const POST = async (
 	_req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
-) {
+) => {
 	if (!(await isAdmin())) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
 	}
 
 	try {
 		const { id } = await params;
-		const userId = parseInt(id, 10);
+		const userId = Number(id);
 
 		const result = await AdminUsersService.resetUserPassword(userId);
 
@@ -23,7 +23,10 @@ export async function POST(
 
 		if (error instanceof Error) {
 			if (error.message === 'User not found') {
-				return NextResponse.json({ message: 'User not found' }, { status: 404 });
+				return NextResponse.json(
+					{ message: 'User not found' },
+					{ status: 404 },
+				);
 			}
 			if (error.message === 'User has no email address') {
 				return NextResponse.json(
@@ -34,8 +37,10 @@ export async function POST(
 		}
 
 		return NextResponse.json(
-			{ error: error instanceof Error ? error.message : 'Internal Server Error' },
+			{
+				error: error instanceof Error ? error.message : 'Internal Server Error',
+			},
 			{ status: 500 },
 		);
 	}
-}
+};

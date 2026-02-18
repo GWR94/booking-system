@@ -14,7 +14,7 @@ const ScrollToTop = () => {
 		return () => cancelAnimationFrame(scrollRaf);
 	}, [pathname]);
 
-	return null; // This component doesn't render anything
+	return null;
 };
 
 export { ScrollToTop };

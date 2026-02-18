@@ -3,12 +3,10 @@ import Google from 'next-auth/providers/google';
 import Facebook from 'next-auth/providers/facebook';
 import Twitter from 'next-auth/providers/twitter';
 import Credentials from 'next-auth/providers/credentials';
+import type { Prisma } from '@prisma/client';
 import { db } from '@db';
 import bcrypt from 'bcryptjs';
-
-if (!process.env.AUTH_SECRET) {
-	throw new Error('AUTH_SECRET is not defined');
-}
+import { authorizeCredentials } from '@/server/auth/credentials-authorize';
 
 export default {
 	providers: [
@@ -33,35 +31,7 @@ export default {
 				password: { label: 'Password', type: 'password' },
 			},
 			async authorize(credentials) {
-				if (!credentials?.email || !credentials?.password) {
-					return null;
-				}
-
-				const user = await db.user.findUnique({
-					where: { email: credentials.email as string },
-				});
-
-				if (!user || !user.passwordHash) {
-					return null;
-				}
-
-				const validPassword = await bcrypt.compare(
-					credentials.password as string,
-					user.passwordHash,
-				);
-
-				if (!validPassword) {
-					return null;
-				}
-
-				return {
-					id: user.id.toString(),
-					email: user.email,
-					name: user.name,
-					role: user.role,
-					membershipTier: user.membershipTier ?? undefined,
-					membershipStatus: user.membershipStatus ?? undefined,
-				};
+				return authorizeCredentials(credentials, db, bcrypt);
 			},
 		}),
 	],
@@ -131,7 +101,7 @@ export default {
 						},
 					});
 				} else {
-					const updateData: any = {};
+					const updateData: Prisma.UserUpdateInput = {};
 					if (account?.provider === 'google' && !existingUser.googleId) {
 						updateData.googleId = account.providerAccountId;
 					}

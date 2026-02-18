@@ -2,13 +2,11 @@ import { GroupedSlot, TimeSlot } from '@features/booking/components';
 import { axios } from '@api/client';
 import { Dayjs } from 'dayjs';
 
-// Constants
 export const STORAGE_KEYS = {
 	BASKET: 'booking-basket',
 	BOOKING: 'booking-data',
 };
 
-// API Functions
 export const fetchSlots = async (date: Dayjs) => {
 	const { data } = await axios.get<TimeSlot[]>('/api/slots', {
 		params: {
@@ -19,7 +17,6 @@ export const fetchSlots = async (date: Dayjs) => {
 	return data;
 };
 
-// Local Storage Functions
 export const getBasket = (): GroupedSlot[] => {
 	const saved = localStorage.getItem(STORAGE_KEYS.BASKET);
 	return saved ? JSON.parse(saved) : [];

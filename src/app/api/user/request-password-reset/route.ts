@@ -3,18 +3,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import crypto from 'crypto';
 import { handleSendEmail } from '@utils/email';
+import { parseWithFirstError } from '@lib/zod';
 import { apiRequestPasswordResetSchema } from '@validation/api-schemas';
-import { errorResponse } from 'src/app/api/_utils/responses';
-import { getServerAppUrl, getLogoUrl } from 'src/server/lib/app-url';
+import { errorResponse } from '@/app/api/_utils/responses';
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
 	try {
 		const body = await req.json();
-		const { error } = apiRequestPasswordResetSchema.validate(body);
-		if (error) {
-			return errorResponse(error.details[0].message, 400);
+		const parsed = parseWithFirstError(apiRequestPasswordResetSchema, body);
+		if (!parsed.success) {
+			return errorResponse(parsed.message, 400);
 		}
-		const { email } = body;
+		const { email } = parsed.data;
 
 		const user = await db.user.findUnique({ where: { email } });
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		const token = crypto.randomBytes(32).toString('hex');
-		const expires = new Date(Date.now() + 3600000); // 1 hour
+		const expires = new Date(Date.now() + 3600000);
 
 		await db.user.update({
 			where: { email },
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 			},
 		});
 
-		const resetUrl = `${getServerAppUrl()}/reset-password?token=${token}`;
+		const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
 
 		await handleSendEmail({
 			recipientEmail: email,
@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
 				name: user.name,
 				resetUrl,
 				year: new Date().getFullYear(),
-				baseUrl: getServerAppUrl(),
-				logoUrl: getLogoUrl(),
+				baseUrl: process.env.NEXT_PUBLIC_APP_URL,
+				logoUrl: process.env.LOGO_URL,
 			},
 		});
 
@@ -59,4 +59,4 @@ export async function POST(req: NextRequest) {
 		console.error('Request password reset error:', err);
 		return errorResponse('Internal Server Error', 500);
 	}
-}
+};
