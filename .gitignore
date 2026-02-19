@@ -18,7 +18,7 @@ lighthouse-report-*.html
 /dist
 
 # Prisma generated client (run prisma generate)
-prisma/generated/
+prisma/generated
 
 # misc
 .DS_Store
