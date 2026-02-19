@@ -10,16 +10,18 @@ export const useSlots = () => {
 	const { selectedDate, selectedSession, selectedBay } = useSession();
 	const { basket } = useBasket();
 
+	const dateKey = selectedDate.format('YYYY-MM-DD');
+
 	const {
 		data: slots = [],
 		isLoading,
+		isFetching,
 		error,
 	} = useQuery({
-		queryKey: ['slots', selectedDate],
+		queryKey: ['slots', dateKey],
 		queryFn: () => fetchSlots(selectedDate),
-		refetchOnMount: 'always',
-		refetchInterval: 0,
-		staleTime: 0,
+		staleTime: 60 * 1000, // 1 min – avoid refetch storm; new date = new key = fresh fetch
+		refetchOnWindowFocus: false,
 	});
 
 	const groupedTimeSlots = getGroupedTimeSlots(
@@ -29,10 +31,13 @@ export const useSlots = () => {
 		basket,
 	);
 
+	// Show loading when no data yet (isLoading) or when refetching after date change (isFetching)
+	const isSlotsLoading = isLoading || isFetching;
+
 	return {
 		slots,
 		groupedTimeSlots,
-		isLoading,
+		isLoading: isSlotsLoading,
 		error,
 		currentDate: selectedDate,
 	};
