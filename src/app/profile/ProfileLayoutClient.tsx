@@ -22,7 +22,7 @@ import {
 	ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@hooks';
-import { NavBar, Footer, PROFILE_MENU_ITEMS } from '@layout';
+import { PROFILE_MENU_ITEMS } from '@layout';
 
 const ProfileLayoutClient = ({
 	children,
@@ -60,8 +60,6 @@ const ProfileLayoutClient = ({
 				bgcolor: 'grey.50',
 			}}
 		>
-			<NavBar />
-
 			<Box
 				sx={{
 					background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
@@ -249,7 +247,6 @@ const ProfileLayoutClient = ({
 					</Grid>
 				</Grid>
 			</Container>
-			<Footer />
 		</Box>
 	);
 };

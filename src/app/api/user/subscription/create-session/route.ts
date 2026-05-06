@@ -3,12 +3,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import { getSessionUser } from '@/server/auth/auth';
 import { MEMBERSHIP_TIERS, MembershipTier } from '@config/membership.config';
-import Stripe from 'stripe';
 import { parseWithFirstError } from '@lib/zod';
 import { apiSubscriptionTierSchema } from '@validation/api-schemas';
 import { errorResponse } from '@/app/api/_utils/responses';
+import { getStripe } from '@/server/lib/stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = getStripe();
+
+const resolveBaseUrl = (req: NextRequest) => {
+	const configured = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
+	if (configured) {
+		if (/^https?:\/\//i.test(configured)) return configured;
+		const isLocal =
+			configured.startsWith('localhost') ||
+			configured.startsWith('127.0.0.1');
+		return `${isLocal ? 'http' : 'https'}://${configured}`;
+	}
+	return req.nextUrl?.origin ?? 'http://localhost:3000';
+};
 
 export const POST = async (req: NextRequest) => {
 	const sessionUser = await getSessionUser();
@@ -57,7 +69,7 @@ export const POST = async (req: NextRequest) => {
 			});
 		}
 
-		const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+		const baseUrl = resolveBaseUrl(req);
 
 		const session = await stripe.checkout.sessions.create({
 			customer: customerId,
@@ -69,7 +81,7 @@ export const POST = async (req: NextRequest) => {
 					quantity: 1,
 				},
 			],
-			success_url: `${baseUrl}/profile?session_id={CHECKOUT_SESSION_ID}`,
+			success_url: `${baseUrl}/profile/settings?session_id={CHECKOUT_SESSION_ID}`,
 			cancel_url: `${baseUrl}/membership`,
 			metadata: {
 				userId: user.id.toString(),

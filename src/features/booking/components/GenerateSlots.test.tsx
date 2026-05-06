@@ -25,22 +25,23 @@ vi.mock('@context', () => ({
 
 vi.mock('@mui/material', async () => {
 	const actual = await vi.importActual('@mui/material');
-	return {
-		...actual,
-		alpha: (color: string, opacity: number) => `alpha(${color}, ${opacity})`,
-		useTheme: vi.fn(() => ({
-			palette: {
-				primary: { main: '#000' },
-				error: { main: '#f00' },
-				background: { paper: '#fff' },
-				common: { black: '#000' },
-				divider: '#ccc',
-			},
-			breakpoints: {
-				down: vi.fn(() => '(max-width:900px)'),
-			},
-		})),
-		useMediaQuery: vi.fn(() => true),
+		return {
+			...actual,
+			alpha: (color: string, opacity: number) => `alpha(${color}, ${opacity})`,
+			useTheme: vi.fn(() => ({
+				palette: {
+					primary: { main: '#000' },
+					error: { main: '#f00' },
+					background: { paper: '#fff' },
+					common: { black: '#000' },
+					divider: '#ccc',
+				},
+				breakpoints: {
+					down: vi.fn(() => '(max-width:900px)'),
+					up: vi.fn(() => '(min-width:600px)'),
+				},
+			})),
+			useMediaQuery: vi.fn(() => true),
 		Slide: ({ children, in: open }: any) => (open ? children : null),
 		Button: ({ children, onClick }: any) => (
 			<button onClick={onClick}>{children}</button>

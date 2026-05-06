@@ -2,6 +2,7 @@ import { db } from '@db';
 import { getStripe } from '@lib/stripe';
 import { handleSendEmail } from '@utils/email';
 import { groupSlotsByBay } from '@utils';
+import dayjs from 'dayjs';
 
 export class BookingService {
 	/**
@@ -20,30 +21,19 @@ export class BookingService {
 		paymentStatus?: string;
 		guestInfo?: { name: string; email: string; phone?: string };
 	}) {
+		if (!Array.isArray(slotIds) || slotIds.length === 0) {
+			throw new Error('At least one slot is required to create a booking');
+		}
+
+		if (!userId && !guestInfo) {
+			throw new Error('User ID or guest info must be provided');
+		}
+
+		if (guestInfo && (!guestInfo.name?.trim() || !guestInfo.email?.trim())) {
+			throw new Error('Guest name and email are required');
+		}
+
 		const booking = await db.$transaction(async (tx) => {
-			let finalUserId = userId;
-
-			if (guestInfo) {
-				const guestUser = await (tx as typeof db).user.upsert({
-					where: { email: guestInfo.email },
-					update: {
-						name: guestInfo.name,
-						...(guestInfo.phone && { phone: guestInfo.phone }),
-					},
-					create: {
-						email: guestInfo.email,
-						name: guestInfo.name,
-						...(guestInfo.phone && { phone: guestInfo.phone }),
-						role: 'guest',
-					},
-				});
-				finalUserId = guestUser.id;
-			}
-
-			if (!finalUserId) {
-				throw new Error('User ID or guest info must be provided');
-			}
-
 			const slots = await (tx as typeof db).slot.findMany({
 				where: {
 					id: { in: slotIds },
@@ -57,7 +47,12 @@ export class BookingService {
 
 			const newBooking = await (tx as typeof db).booking.create({
 				data: {
-					user: { connect: { id: finalUserId } },
+					...(userId && { user: { connect: { id: userId } } }),
+					...(guestInfo && {
+						guestName: guestInfo.name,
+						guestEmail: guestInfo.email,
+						guestPhone: guestInfo.phone,
+					}),
 					slots: { connect: slotIds.map((id) => ({ id })) },
 					status: 'pending',
 					paymentId,
@@ -112,17 +107,23 @@ export class BookingService {
 		const intent = await stripe.paymentIntents.retrieve(paymentId);
 		const amount = intent.amount / 100;
 		const groupedSlots = groupSlotsByBay(booking.slots as any);
+		const recipientEmail = booking.user?.email ?? booking.guestEmail;
 
-		if (booking.user.email) {
+		if (recipientEmail) {
 			await handleSendEmail({
 				senderPrefix: 'bookings',
-				recipientEmail: booking.user.email,
+				recipientEmail,
 				templateName: 'confirmation',
 				subject: 'Booking Confirmation',
 				templateContext: {
 					booking: {
 						id: booking.id,
-						slots: groupedSlots,
+						slots: groupedSlots.map((slot) => ({
+							bay: `Bay ${slot.bayId}`,
+							date: dayjs(slot.startTime).format('DD MMM YYYY'),
+							startTime: dayjs(slot.startTime).format('HH:mm'),
+							endTime: dayjs(slot.endTime).format('HH:mm'),
+						})),
 					},
 					payment: {
 						intentId: paymentId,

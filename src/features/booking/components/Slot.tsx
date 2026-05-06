@@ -16,11 +16,12 @@ import MobileSlot from './MobileSlot';
 type SlotProps = {
 	timeRange: string;
 	timeSlots: GroupedTimeSlots;
+	totalSlotCount?: number;
 };
 
-const Slot = ({ timeSlots, timeRange }: SlotProps) => {
+const Slot = ({ timeSlots, timeRange, totalSlotCount = 10 }: SlotProps) => {
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { basket, addToBasket, removeFromBasket } = useBasket();
 	const { showSnackbar } = useSnackbar();
 	const { isAdmin, user } = useAuth();
@@ -28,14 +29,19 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 
 	const hourlySlots = timeSlots[timeRange];
 
+	// Only show "in basket" when the basket contains this exact slot grouping: same start time
+	// and same slotIds. Otherwise a 1-hour slot in the basket would show "in basket" for the
+	// 2/3-hour row, or a slot from another time range would show as in basket here.
+	const slotStartTime = timeRange.split('-')[0];
 	const slotsInBasket = basket.filter((basketSlot) => {
-		// Only show as "in basket" if this slot block matches the START time of the basket item
-		// This prevents multi-hour bookings from showing "in basket" on subsequent hours
-		const slotStartTime = timeRange.split('-')[0];
-		const isStartTimeCheck =
+		const startMatches =
 			dayjs(basketSlot.startTime).format('HH:mm') === slotStartTime;
-
-		return isStartTimeCheck;
+		const exactSlotMatch = hourlySlots.some(
+			(slot) =>
+				basketSlot.slotIds.length === slot.slotIds.length &&
+				basketSlot.slotIds.every((id, i) => id === slot.slotIds[i]),
+		);
+		return startMatches && exactSlotMatch;
 	});
 	const basketCount = slotsInBasket.length;
 	const isInBasket = basketCount > 0;
@@ -132,6 +138,7 @@ const Slot = ({ timeSlots, timeRange }: SlotProps) => {
 					sx={{ borderColor }}
 					handleSlotClick={handleSlotClick}
 					handleRemoveOne={handleRemoveOne}
+					totalSlotCount={totalSlotCount}
 				/>
 			) : isAdmin ? (
 				<DesktopSlot

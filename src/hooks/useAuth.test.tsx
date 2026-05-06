@@ -1,13 +1,14 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useAuth } from './useAuth';
 import createWrapper from '@utils/test-utils';
-import { registerUser } from '@api';
+import { registerUser, verifyUser } from '@api';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // Mock API
 vi.mock('@api', () => ({
 	registerUser: vi.fn(),
+	verifyUser: vi.fn(),
 }));
 
 // Mock next/navigation
@@ -41,10 +42,11 @@ describe('useAuth', () => {
 
 	it('should initialize with authenticated user', () => {
 		const mockUser = { id: '1', name: 'Test User', email: 'test@test.com', role: 'user' };
+		(verifyUser as any).mockResolvedValue(mockUser);
 		
 		// Mock useSession to return authenticated user
 		vi.mocked(useSession).mockReturnValue({
-			data: { user: mockUser },
+			data: { user: mockUser, expires: new Date(Date.now() + 3600_000).toISOString() },
 			status: 'authenticated',
 			update: vi.fn(),
 		});
@@ -53,9 +55,11 @@ describe('useAuth', () => {
 			wrapper: createWrapper(),
 		});
 
-		expect(result.current.user).toEqual(mockUser);
-		expect(result.current.isAuthenticated).toBe(true);
-		expect(result.current.isAdmin).toBe(false);
+		return waitFor(() => {
+			expect(result.current.user).toEqual(mockUser);
+			expect(result.current.isAuthenticated).toBe(true);
+			expect(result.current.isAdmin).toBe(false);
+		});
 	});
 
 	it('should login successfully', async () => {
@@ -95,10 +99,11 @@ describe('useAuth', () => {
 
 	it('should identify admin user correctly', () => {
 		const adminUser = { id: '1', name: 'Admin User', email: 'admin@test.com', role: 'admin' };
+		(verifyUser as any).mockResolvedValue(adminUser);
 		
 		// Mock useSession to return admin user
 		vi.mocked(useSession).mockReturnValue({
-			data: { user: adminUser },
+			data: { user: adminUser, expires: new Date(Date.now() + 3600_000).toISOString() },
 			status: 'authenticated',
 			update: vi.fn(),
 		});
@@ -107,9 +112,11 @@ describe('useAuth', () => {
 			wrapper: createWrapper(),
 		});
 
-		expect(result.current.user).toEqual(adminUser);
-		expect(result.current.isAdmin).toBe(true);
-		expect(result.current.isAuthenticated).toBe(true);
+		return waitFor(() => {
+			expect(result.current.user).toEqual(adminUser);
+			expect(result.current.isAdmin).toBe(true);
+			expect(result.current.isAuthenticated).toBe(true);
+		});
 	});
 
 	it('should handle login error', async () => {
@@ -177,6 +184,7 @@ describe('useAuth', () => {
 				await result.current.register({
 					email: 'existing@test.com',
 					password: 'password',
+					name: 'Existing User',
 				});
 			} catch (error) {
 				// Expected to throw

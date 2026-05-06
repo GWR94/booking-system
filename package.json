@@ -10,8 +10,10 @@
 		"@fontsource/roboto": "^5.1.0",
 		"@mui/icons-material": "^6.1.6",
 		"@mui/material": "^6.1.6",
+		"@mui/material-nextjs": "^7.3.9",
 		"@mui/system": "^7.3.8",
 		"@mui/x-date-pickers": "^7.22.2",
+		"@prisma/adapter-pg": "^7.4.0",
 		"@stripe/react-stripe-js": "^3.1.1",
 		"@stripe/stripe-js": "^5.5.0",
 		"@tanstack/react-query": "^5.67.1",
@@ -20,15 +22,14 @@
 		"bcryptjs": "^3.0.3",
 		"cookie": "^1.1.1",
 		"dayjs": "^1.11.13",
+		"dotenv": "^16.4.5",
 		"eslint-config-next": "^16.1.6",
 		"framer-motion": "^12.23.25",
 		"jsonwebtoken": "^9.0.3",
 		"next": "^16.1.6",
-		"next-auth": "^5.0.0-beta.30",
+		"next-auth": "^4.24.13",
 		"nodemailer": "^7.0.13",
 		"nodemailer-express-handlebars": "^7.0.0",
-		"@prisma/adapter-pg": "^7.4.0",
-		"dotenv": "^16.4.5",
 		"pg": "^8.18.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
@@ -52,11 +53,17 @@
 		"seed": "npx tsx scripts/seed.ts",
 		"seed:test-users": "npx tsx scripts/seed-test-users.ts",
 		"seed:demo": "npx tsx scripts/seed-demo-data.ts",
+		"emails:preview": "npx tsx scripts/preview-emails.ts",
 		"db:create-bays": "npx tsx scripts/create-bay.ts",
 		"db:populate-slots": "npx tsx scripts/populate-slots.ts",
 		"db:initialise-admin": "npx tsx scripts/initialise-admin.ts",
 		"setup:production": "npx tsx scripts/setup-production.ts",
-		"setup:dev": "npx tsx scripts/setup-dev.ts"
+		"setup:dev": "npx tsx scripts/setup-dev.ts",
+		"ai:docs": "node -e \"require('child_process').execFileSync(process.platform==='win32'?'ai-docs/.venv/Scripts/python.exe':'ai-docs/.venv/bin/python',['ai-docs/main.py','docs'],{stdio:'inherit'})\"",
+		"ai:changelog": "node -e \"require('child_process').execFileSync(process.platform==='win32'?'ai-docs/.venv/Scripts/python.exe':'ai-docs/.venv/bin/python',['ai-docs/main.py','changelog'],{stdio:'inherit'})\"",
+		"ai:tests": "node -e \"require('child_process').execFileSync(process.platform==='win32'?'ai-docs/.venv/Scripts/python.exe':'ai-docs/.venv/bin/python',['ai-docs/main.py','tests'],{stdio:'inherit'})\"",
+		"ai:review": "node -e \"require('child_process').execFileSync(process.platform==='win32'?'ai-docs/.venv/Scripts/python.exe':'ai-docs/.venv/bin/python',['ai-docs/main.py','review'],{stdio:'inherit'})\"",
+		"emails:snapshots": "npm run emails:preview && npx tsx scripts/screenshot-email-previews.ts"
 	},
 	"prisma": {
 		"seed": "npx tsx scripts/seed.ts"
@@ -94,9 +101,9 @@
 		"eslint": "^9.17.0",
 		"jsdom": "^26.0.0",
 		"prisma": "^7.4.0",
+		"tsx": "^4.19.2",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.18.1",
-		"tsx": "^4.19.2",
 		"vitest": "^3.0.4"
 	}
 }

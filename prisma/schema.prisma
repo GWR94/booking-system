@@ -60,12 +60,17 @@ model Slot {
 }
 
 model Booking {
-  id              Int      @id @default(autoincrement())
-  userId          Int
-  slots           Slot[]   @relation("BookingSlots")
-  bookingTime     DateTime @default(now())
-  status          String   @default("confirmed")
-  user            User     @relation(fields: [userId], references: [id])
-  paymentId       String?
+  id              Int       @id @default(autoincrement())
+  userId          Int?
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
+  slots           Slot[]    @relation("BookingSlots")
+  bookingTime     DateTime  @default(now())
+  status          String    @default("confirmed")
+  user            User?     @relation(fields: [userId], references: [id])
+  paymentId       String?   @unique
   paymentStatus   String?
+  refundFailedAt  DateTime?
+  reminderSentAt  DateTime?
 }

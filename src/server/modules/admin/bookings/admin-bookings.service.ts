@@ -9,7 +9,7 @@ export class AdminBookingsService {
 	static async getAllBookings(params: {
 		page?: number;
 		limit?: number;
-		search?: string;
+		search?: string | null;
 	}) {
 		const page = params.page || 1;
 		const limit = params.limit || 10;

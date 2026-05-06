@@ -12,6 +12,7 @@
 /coverage
 playwright
 lighthouse-report-*.html
+email-previews/
 
 # production
 /build
@@ -23,6 +24,10 @@ prisma/generated
 # misc
 .DS_Store
 .env
+ai-docs/.env
+ai-docs/.venv
+ai-docs/**/__pycache__/
+ai-docs/**/*.pyc
 .env.local
 .env.development.local
 .env.test.local

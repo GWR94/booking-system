@@ -14,6 +14,8 @@ const OAuthButtons = ({ buttonSx, iconOnly = false }: ButtonsProps) => {
 		signIn(provider, { callbackUrl: '/book' });
 	};
 
+	const enableTwitter = false;
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
 			<Button

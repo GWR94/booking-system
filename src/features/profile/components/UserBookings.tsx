@@ -22,19 +22,23 @@ import {
 import {
 	Visibility as ViewIcon,
 	Delete as CancelIcon,
+	Payment as PaymentIcon,
 } from '@mui/icons-material';
 import React, { useState } from 'react';
-import { deleteBooking } from '@api';
+import { deleteBooking, resumePendingBookingPayment } from '@api';
 import { useAuth } from '@hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@context';
+import { trackEvent } from '@utils/analytics';
 import dayjs from 'dayjs';
 import UserBookingDetailsDialog from './UserBookingDetailsDialog';
+import { useRouter } from 'next/navigation';
 
 const UserBookings = () => {
 	const { user } = useAuth();
 	const queryClient = useQueryClient();
 	const { showSnackbar } = useSnackbar();
+	const router = useRouter();
 	const theme = useTheme();
 	const [selectedBooking, setSelectedBooking] = useState<any>(null);
 	const [detailsOpen, setDetailsOpen] = useState(false);
@@ -70,10 +74,13 @@ const UserBookings = () => {
 
 	const handleCancelBooking = async (bookingId: number) => {
 		try {
-			await deleteBooking(bookingId);
+			const data = await deleteBooking(bookingId) as { refundStatus?: string };
 			queryClient.invalidateQueries({ queryKey: ['auth'] });
 			showSnackbar('Booking cancelled successfully', 'success');
 			setDetailsOpen(false);
+			trackEvent('booking_cancelled', {
+				refund_status: data?.refundStatus ?? 'unknown',
+			});
 		} catch (error) {
 			console.error(error);
 			showSnackbar('Failed to cancel booking', 'error');
@@ -83,6 +90,18 @@ const UserBookings = () => {
 	const handleViewDetails = (booking: any) => {
 		setSelectedBooking(booking);
 		setDetailsOpen(true);
+	};
+
+	const handleResumePayment = async (bookingId: number) => {
+		try {
+			const { clientSecret } = await resumePendingBookingPayment(bookingId);
+			router.push(
+				`/checkout?payment_intent_client_secret=${encodeURIComponent(clientSecret)}`,
+			);
+		} catch (error) {
+			console.error(error);
+			showSnackbar('Unable to resume payment for this booking', 'error');
+		}
 	};
 
 	if (!user?.bookings || user.bookings.length === 0) {
@@ -216,6 +235,26 @@ const UserBookings = () => {
 															<ViewIcon fontSize="small" />
 														</IconButton>
 													</Tooltip>
+													{booking.status === 'pending' &&
+														booking.paymentId &&
+														!dayjs(
+															booking.slots?.[booking.slots.length - 1]
+																?.endTime,
+														).isBefore(dayjs()) && (
+															<Tooltip title="Complete Payment">
+																<IconButton
+																	size="small"
+																	color="primary"
+																	aria-label="Complete Payment"
+																	onClick={(e) => {
+																		e.stopPropagation();
+																		handleResumePayment(booking.id);
+																	}}
+																>
+																	<PaymentIcon fontSize="small" />
+																</IconButton>
+															</Tooltip>
+														)}
 													{booking.status !== 'cancelled' &&
 														!dayjs(
 															booking.slots?.[booking.slots.length - 1]
@@ -227,10 +266,8 @@ const UserBookings = () => {
 																	color="error"
 																	aria-label="Cancel Booking"
 																	onClick={(e) => {
-																		-e.stopPropagation();
-																		-handleCancelBooking(booking.id);
-																		+e.stopPropagation();
-																		+handleCancelBooking(booking.id);
+																		e.stopPropagation();
+																		handleCancelBooking(booking.id);
 																	}}
 																>
 																	<CancelIcon fontSize="small" />

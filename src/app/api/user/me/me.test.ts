@@ -31,7 +31,7 @@ vi.mock('@db', () => ({
 }));
 
 // Mock membership service
-vi.mock('src/server/modules/membership/membership.service', () => ({
+vi.mock('@/server/modules/membership/membership.service', () => ({
 	MembershipService: mockMembershipService,
 }));
 

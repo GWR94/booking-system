@@ -7,6 +7,8 @@ import { registerUser, verifyUser } from '@api';
 import type { RegisterCredentials, User } from '@features/auth/components';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { trackLogin, trackSignUp } from '@utils/analytics';
+import { useEffect, useRef } from 'react';
 
 export const useAuth = () => {
 	const queryClient = useQueryClient();
@@ -14,26 +16,60 @@ export const useAuth = () => {
 	const router = useRouter();
 	const { data: session, status } = useSession();
 
-	const { data: meUser } = useQuery({
+	const hasSession = !!session?.user?.id;
+	const invalidateSessionOnceRef = useRef(false);
+
+	const {
+		data: meUser,
+		error: meError,
+		isFetching: isVerifyingUser,
+	} = useQuery({
 		queryKey: ['user', 'me', session?.user?.id],
 		queryFn: () => verifyUser(),
-		enabled: !!session?.user?.id,
+		enabled: hasSession,
+		retry: (failureCount, error: any) => {
+			// Allow one retry for transient post-login/session propagation timing.
+			if (error?.response?.status === 401) return failureCount < 1;
+			return false;
+		},
 	});
 
-	const user = session?.user
+	const isUnauthorizedMeError = (meError as any)?.response?.status === 401;
+
+	useEffect(() => {
+		if (!hasSession) {
+			invalidateSessionOnceRef.current = false;
+			return;
+		}
+
+		if (!isUnauthorizedMeError || isVerifyingUser || invalidateSessionOnceRef.current)
+			return;
+
+		invalidateSessionOnceRef.current = true;
+		void nextAuthSignOut({ redirect: false }).then(() => {
+			queryClient.clear();
+			router.refresh();
+		});
+	}, [
+		hasSession,
+		isUnauthorizedMeError,
+		isVerifyingUser,
+		queryClient,
+		router,
+		showSnackbar,
+	]);
+
+	const user = hasSession
 		? {
-				id: session.user.id,
-				email: session.user.email,
-				name: session.user.name,
-				role: session.user.role,
-				membershipTier: session.user.membershipTier,
-				membershipStatus: session.user.membershipStatus,
-				membershipUsage: meUser?.membershipUsage ?? undefined,
-				hasPassword: meUser?.hasPassword,
-				googleId: meUser?.googleId,
-				facebookId: meUser?.facebookId,
-				twitterId: meUser?.twitterId,
-				bookings: meUser?.bookings,
+				...(meUser ?? {}),
+				id: meUser?.id ?? session?.user?.id,
+				email: meUser?.email ?? session?.user?.email ?? null,
+				name: meUser?.name ?? session?.user?.name ?? '',
+				role: meUser?.role ?? session?.user?.role,
+				membershipTier:
+					meUser?.membershipTier ?? session?.user?.membershipTier ?? undefined,
+				membershipStatus:
+					meUser?.membershipStatus ?? session?.user?.membershipStatus ?? undefined,
 			}
 		: null;
 
@@ -51,6 +87,7 @@ export const useAuth = () => {
 		},
 		onSuccess: () => {
 			showSnackbar('Successfully signed in', 'success');
+			trackLogin('credentials');
 			router.refresh();
 		},
 		onError: (error: any) => {
@@ -76,6 +113,7 @@ export const useAuth = () => {
 		mutationFn: registerUser,
 		onSuccess: () => {
 			showSnackbar('User successfully registered', 'success');
+			trackSignUp('email');
 		},
 		onError: (error: any) => {
 			showSnackbar(
@@ -97,7 +135,7 @@ export const useAuth = () => {
 
 	const useAuth: UseAuthReturnType = {
 		user,
-		isLoading: status === 'loading',
+		isLoading: status === 'loading' || (hasSession && isVerifyingUser),
 		isAuthenticated: !!user,
 		isAdmin: user?.role === 'admin',
 		login: async (credentials) => {

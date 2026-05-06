@@ -3,6 +3,14 @@ import { logger } from './logger';
 
 describe('logger', () => {
 	const originalEnv = process.env.NODE_ENV;
+	const setNodeEnv = (value: string | undefined) => {
+		Object.defineProperty(process.env, 'NODE_ENV', {
+			value,
+			configurable: true,
+			enumerable: true,
+			writable: true,
+		});
+	};
 
 	beforeEach(() => {
 		vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -13,7 +21,7 @@ describe('logger', () => {
 
 	afterEach(() => {
 		vi.restoreAllMocks();
-		process.env.NODE_ENV = originalEnv;
+		setNodeEnv(originalEnv);
 	});
 
 	it('info logs message with prefix', () => {
@@ -49,19 +57,19 @@ describe('logger', () => {
 	});
 
 	it('debug does not log when NODE_ENV is not development', () => {
-		process.env.NODE_ENV = 'production';
+		setNodeEnv('production');
 		logger.debug('debug message');
 		expect(console.debug).not.toHaveBeenCalled();
 	});
 
 	it('debug logs when NODE_ENV is development', () => {
-		process.env.NODE_ENV = 'development';
+		setNodeEnv('development');
 		logger.debug('debug message');
 		expect(console.debug).toHaveBeenCalledWith('[DEBUG] debug message', '');
 	});
 
 	it('debug logs with meta when NODE_ENV is development', () => {
-		process.env.NODE_ENV = 'development';
+		setNodeEnv('development');
 		logger.debug('cache hit', { key: 'user:1' });
 		expect(console.debug).toHaveBeenCalledWith('[DEBUG] cache hit', { key: 'user:1' });
 	});

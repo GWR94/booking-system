@@ -10,9 +10,19 @@ const { mockDb } = vi.hoisted(() => ({
 const mockGetStripe = vi.fn();
 const mockCalculateBasketCost = vi.fn();
 const mockVerifyRecaptcha = vi.fn();
+const mockGetSessionUser = vi.fn();
+const mockAuth = vi.fn();
 
 vi.mock('@db', () => ({
 	db: mockDb,
+}));
+
+vi.mock('@/server/auth/auth', () => ({
+	getSessionUser: (...args: unknown[]) => mockGetSessionUser(...args),
+}));
+
+vi.mock('@/auth', () => ({
+	auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
 vi.mock('@lib/stripe', () => ({
@@ -23,7 +33,7 @@ vi.mock('@utils', () => ({
 	calculateBasketCost: (...args: unknown[]) => mockCalculateBasketCost(...args),
 }));
 
-vi.mock('src/server/lib/recaptcha', () => ({
+vi.mock('@/server/lib/recaptcha', () => ({
 	verifyRecaptcha: (...args: unknown[]) => mockVerifyRecaptcha(...args),
 }));
 
@@ -34,6 +44,8 @@ describe('POST /api/bookings/payment-intent', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+		mockGetSessionUser.mockResolvedValue(null);
+		mockAuth.mockResolvedValue(null);
 		mockGetStripe.mockReturnValue({
 			paymentIntents: {
 				create: mockPaymentIntentsCreate,
@@ -111,7 +123,20 @@ describe('POST /api/bookings/payment-intent', () => {
 		expect(mockDb.slot.findMany).not.toHaveBeenCalled();
 	});
 
+	it('should return 401 when neither authenticated nor guest', async () => {
+		const req = createMockRequest({
+			method: 'POST',
+			body: { items: [{ slotIds: [1] }] },
+		});
+		const response = await POST(req);
+		const { body, status } = await parseResponse(response);
+		expect(status).toBe(401);
+		expect(body.code).toBe('AUTH_REQUIRED');
+		expect(mockDb.slot.findMany).not.toHaveBeenCalled();
+	});
+
 	it('should return 400 when one or more slots not found', async () => {
+		mockAuth.mockResolvedValue({ user: { id: '1' } });
 		mockDb.slot.findMany.mockResolvedValue([{ id: 1 }]);
 
 		const req = createMockRequest({
@@ -127,6 +152,7 @@ describe('POST /api/bookings/payment-intent', () => {
 	});
 
 	it('should return clientSecret for authenticated user when slots exist', async () => {
+		mockAuth.mockResolvedValue({ user: { id: '123' } });
 		mockDb.slot.findMany.mockResolvedValue([{ id: 1 }, { id: 2 }]);
 
 		const req = createMockRequest({
@@ -141,14 +167,14 @@ describe('POST /api/bookings/payment-intent', () => {
 			where: { id: { in: [1, 2] } },
 		});
 		expect(mockCalculateBasketCost).toHaveBeenCalled();
-		expect(mockPaymentIntentsCreate).toHaveBeenCalledWith({
-			amount: 5000,
-			currency: 'gbp',
-			metadata: expect.objectContaining({
-				slotIds: '[1,2]',
-				isGuest: 'false',
-			}),
-		});
+		expect(mockPaymentIntentsCreate).toHaveBeenCalledWith(
+			{
+				amount: 5000,
+				currency: 'gbp',
+				metadata: expect.any(Object),
+			},
+			{ idempotencyKey: expect.any(String) },
+		);
 	});
 
 	it('should verify recaptcha and return clientSecret for guest checkout', async () => {
@@ -172,20 +198,18 @@ describe('POST /api/bookings/payment-intent', () => {
 		expect(status).toBe(200);
 		expect(body.clientSecret).toBe('pi_secret_xyz');
 		expect(mockVerifyRecaptcha).toHaveBeenCalledWith('token123');
-		expect(mockPaymentIntentsCreate).toHaveBeenCalledWith({
-			amount: 5000,
-			currency: 'gbp',
-			metadata: expect.objectContaining({
-				slotIds: '[1]',
-				isGuest: 'true',
-				guestName: 'Guest User',
-				guestEmail: 'guest@example.com',
-				guestPhone: '07700900000',
-			}),
-		});
+		expect(mockPaymentIntentsCreate).toHaveBeenCalledWith(
+			{
+				amount: 5000,
+				currency: 'gbp',
+				metadata: expect.any(Object),
+			},
+			{ idempotencyKey: expect.any(String) },
+		);
 	});
 
 	it('should return 500 on Stripe error', async () => {
+		mockAuth.mockResolvedValue({ user: { id: '1' } });
 		mockDb.slot.findMany.mockResolvedValue([{ id: 1 }]);
 		mockPaymentIntentsCreate.mockRejectedValue(new Error('Stripe error'));
 

@@ -4,7 +4,7 @@ import { createMockRequest, parseResponse } from '@test/api-test-utils';
 const mockIsAdmin = vi.fn();
 const mockGetAllBookings = vi.fn();
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	isAdmin: (...args: unknown[]) => mockIsAdmin(...args),
 }));
 
@@ -45,7 +45,7 @@ describe('GET /api/admin/bookings', () => {
 		expect(mockGetAllBookings).toHaveBeenCalledWith({
 			page: 1,
 			limit: 10,
-			search: '',
+			search: null,
 		});
 	});
 

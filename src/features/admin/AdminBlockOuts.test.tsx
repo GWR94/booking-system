@@ -1,13 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AdminBlockOuts from './AdminBlockOuts';
-import { ThemeProvider, createTheme } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { SnackbarProvider } from '@context';
 import dayjs from 'dayjs';
-
-const theme = createTheme();
 
 // Mock UI components
 vi.mock('@ui', () => ({
@@ -54,17 +50,12 @@ describe('AdminBlockOuts', () => {
 		vi.clearAllMocks();
 	});
 
-	const renderBlockOuts = () => {
-		return render(
+	const renderBlockOuts = () =>
+		render(
 			<LocalizationProvider dateAdapter={AdapterDayjs}>
-				<SnackbarProvider>
-					<ThemeProvider theme={theme}>
-						<AdminBlockOuts />
-					</ThemeProvider>
-				</SnackbarProvider>
+				<AdminBlockOuts />
 			</LocalizationProvider>,
 		);
-	};
 
 	it('should render slots and handle toggle block', async () => {
 		vi.mocked(getSlots).mockResolvedValue(mockSlots);

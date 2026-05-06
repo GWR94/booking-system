@@ -1,10 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@test/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import UserBookingsModal from './UserBookingsModal';
-import { ThemeProvider, createTheme } from '@mui/material';
-import { SnackbarProvider } from '@context';
-
-const theme = createTheme();
 
 // Mock UserBookingDetailsDialog
 vi.mock('@features/profile/components/UserBookingDetailsDialog', () => ({
@@ -43,13 +39,7 @@ describe('UserBookingsModal', () => {
 	};
 
 	it('should render user bookings correctly', () => {
-		render(
-			<SnackbarProvider>
-				<ThemeProvider theme={theme}>
-					<UserBookingsModal {...defaultProps} />
-				</ThemeProvider>
-			</SnackbarProvider>,
-		);
+		render(<UserBookingsModal {...defaultProps} />);
 
 		expect(screen.getByText("John Doe's Bookings")).toBeInTheDocument();
 		expect(screen.getByText('Bay 1')).toBeInTheDocument();
@@ -58,14 +48,10 @@ describe('UserBookingsModal', () => {
 
 	it('should show "No bookings found" if user has no bookings', () => {
 		render(
-			<SnackbarProvider>
-				<ThemeProvider theme={theme}>
-					<UserBookingsModal
-						{...defaultProps}
-						user={{ ...mockUserWithBookings, bookings: [] }}
-					/>
-				</ThemeProvider>
-			</SnackbarProvider>,
+			<UserBookingsModal
+				{...defaultProps}
+				user={{ ...mockUserWithBookings, bookings: [] }}
+			/>,
 		);
 
 		expect(
@@ -74,13 +60,7 @@ describe('UserBookingsModal', () => {
 	});
 
 	it('should call onClose when Close icon button is clicked', () => {
-		render(
-			<SnackbarProvider>
-				<ThemeProvider theme={theme}>
-					<UserBookingsModal {...defaultProps} />
-				</ThemeProvider>
-			</SnackbarProvider>,
-		);
+		render(<UserBookingsModal {...defaultProps} />);
 
 		// Use a more specific selector if needed, or find the button by its label
 		const closeBtn = screen.getByRole('button', { name: /close/i });

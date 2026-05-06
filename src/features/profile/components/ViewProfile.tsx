@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import {
 	Box,
 	Typography,
@@ -95,7 +93,6 @@ const ViewProfile = ({ handleEditToggle }: ViewProfileProps) => {
 				label="Email Address"
 				value={user.email || 'Not provided'}
 			/>
-
 			{user.passwordHash && (
 				<InfoRow icon={LockIcon} label="Password" value="••••••••••••" />
 			)}

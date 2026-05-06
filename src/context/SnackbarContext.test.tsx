@@ -3,6 +3,16 @@ import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect } from 'vitest';
 import { SnackbarProvider, useSnackbar } from './SnackbarContext';
 
+// Mock cookie context used inside SnackbarProvider so we don't require CookieProvider in tests
+vi.mock('@context', () => ({
+	useCookie: () => ({
+		isConsentSet: true,
+		savePreferences: vi.fn(),
+		acceptAll: vi.fn(),
+		rejectAll: vi.fn(),
+	}),
+}));
+
 // Helper component to trigger snackbar
 const TestComponent = () => {
 	const { showSnackbar, hideSnackbar } = useSnackbar();

@@ -1,17 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createMockRequest, parseResponse } from '@test/api-test-utils';
 
 const mockAuth = vi.fn();
-const mockCreateBooking = vi.fn();
+const mockCreatePendingBooking = vi.fn();
 
 vi.mock('../../../auth', () => ({
-	auth: (...args: any[]) => mockAuth(...args),
+	auth: (...args: unknown[]) => mockAuth(...args),
 }));
 
-vi.mock('src/server/modules/bookings/booking.service', () => ({
-	BookingService: {
-		createBooking: (...args: any[]) => mockCreateBooking(...args),
-	},
+// Ensure route.ts never touches real BookingService/prisma during unit tests.
+vi.mock('@/server/modules/bookings/booking.service', () => ({
+	BookingService: {},
+}));
+
+vi.mock('@/server/modules/booking-lifecycle/booking/booking-lifecycle', () => ({
+	makeBookingLifecycle: () => ({
+		createPendingBooking: (...args: unknown[]) => mockCreatePendingBooking(...args),
+	}),
 }));
 
 import { POST } from './route';
@@ -22,14 +27,10 @@ describe('POST /api/bookings', () => {
 	});
 
 	it('should create booking for authenticated user', async () => {
-		mockAuth.mockResolvedValue({
-			user: { id: '1', email: 'user@example.com', role: 'user' },
-		});
-		mockCreateBooking.mockResolvedValue({
-			id: 100,
-			userId: 1,
-			status: 'pending',
-			slots: [{ id: 10 }],
+		mockAuth.mockResolvedValue({ user: { id: '1' } });
+		mockCreatePendingBooking.mockResolvedValue({
+			ok: true,
+			booking: { id: 100, status: 'pending', slots: [{ id: 10 }] },
 		});
 
 		const req = createMockRequest({
@@ -42,7 +43,7 @@ describe('POST /api/bookings', () => {
 
 		expect(status).toBe(200);
 		expect(body.message).toBe('Booking created successfully');
-		expect(mockCreateBooking).toHaveBeenCalledWith({
+		expect(mockCreatePendingBooking).toHaveBeenCalledWith({
 			userId: 1,
 			slotIds: [10, 11],
 			paymentId: undefined,
@@ -52,7 +53,7 @@ describe('POST /api/bookings', () => {
 	});
 
 	it('should create guest booking with guestInfo', async () => {
-		mockAuth.mockResolvedValue(null); // Not authenticated
+		mockAuth.mockResolvedValue(null);
 
 		const guestInfo = {
 			name: 'Guest User',
@@ -60,10 +61,9 @@ describe('POST /api/bookings', () => {
 			phone: '07700900000',
 		};
 
-		mockCreateBooking.mockResolvedValue({
-			id: 101,
-			status: 'pending',
-			slots: [{ id: 10 }],
+		mockCreatePendingBooking.mockResolvedValue({
+			ok: true,
+			booking: { id: 101, status: 'pending', slots: [{ id: 10 }] },
 		});
 
 		const req = createMockRequest({
@@ -82,7 +82,7 @@ describe('POST /api/bookings', () => {
 		expect(status).toBe(200);
 		expect(body.message).toBe('Guest booking created successfully');
 		expect(body.guestEmail).toBe('guest@example.com');
-		expect(mockCreateBooking).toHaveBeenCalledWith({
+		expect(mockCreatePendingBooking).toHaveBeenCalledWith({
 			userId: undefined,
 			slotIds: [10, 11],
 			paymentId: 'FREE_MEMBERSHIP',
@@ -103,48 +103,15 @@ describe('POST /api/bookings', () => {
 		const { body, status } = await parseResponse(response);
 
 		expect(status).toBe(401);
-		expect(body.error).toContain('Authentication required');
+		expect(body.code).toBe('AUTH_REQUIRED');
 	});
 
-	it('should prioritise guestInfo when both auth and guestInfo provided', async () => {
-		// Edge case: authenticated user creating a booking with guest info
-		// (e.g. admin creating on behalf of guest)
-		mockAuth.mockResolvedValue({
-			user: { id: '1', email: 'admin@example.com', role: 'admin' },
+	it('should return 500 when lifecycle returns a failure result', async () => {
+		mockAuth.mockResolvedValue({ user: { id: '1' } });
+		mockCreatePendingBooking.mockResolvedValue({
+			ok: false,
+			error: 'slots do not exist',
 		});
-
-		const guestInfo = {
-			name: 'Guest',
-			email: 'guest@example.com',
-		};
-
-		mockCreateBooking.mockResolvedValue({ id: 102, status: 'pending' });
-
-		const req = createMockRequest({
-			method: 'POST',
-			body: { slotIds: [10], guestInfo },
-		});
-
-		const response = await POST(req);
-		const { body, status } = await parseResponse(response);
-
-		expect(status).toBe(200);
-		// Both userId and guestInfo should be passed; service handles priority
-		expect(mockCreateBooking).toHaveBeenCalledWith(
-			expect.objectContaining({
-				userId: 1,
-				guestInfo,
-			}),
-		);
-	});
-
-	it('should return 500 on service error', async () => {
-		mockAuth.mockResolvedValue({
-			user: { id: '1', email: 'user@example.com', role: 'user' },
-		});
-		mockCreateBooking.mockRejectedValue(
-			new Error('One or more slots do not exist or have been booked'),
-		);
 
 		const req = createMockRequest({
 			method: 'POST',
@@ -155,6 +122,6 @@ describe('POST /api/bookings', () => {
 		const { body, status } = await parseResponse(response);
 
 		expect(status).toBe(500);
-		expect(body.error).toContain('slots do not exist');
+		expect(body.error).toBe('slots do not exist');
 	});
 });

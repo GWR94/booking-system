@@ -1,140 +1,74 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { after } from 'next/server';
 import { db } from '@db';
 import { BookingService } from '@modules';
 import { MembershipService } from '@modules';
 import { getStripe } from '@lib/stripe';
+import { makeBookingStripePayments } from '@/server/modules/payments/booking-stripe-payments';
+import { makeBookingLifecycle } from '@/server/modules/booking-lifecycle/booking/booking-lifecycle';
+import { parseWithFirstError } from '@lib/zod';
+import {
+	apiStripeWebhookHeaderSchema,
+	apiStripeWebhookPayloadSchema,
+} from '@validation/api-schemas';
 
 export const POST = async (req: NextRequest) => {
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 	try {
-		const signature = req.headers.get('stripe-signature');
+		const parsedHeaders = parseWithFirstError(apiStripeWebhookHeaderSchema, {
+			signature: req.headers.get('stripe-signature') ?? undefined,
+		});
 
-		if (!signature || !endpointSecret) {
+		if (!parsedHeaders.success) {
+			return NextResponse.json({ error: parsedHeaders.message }, { status: 400 });
+		}
+
+		const { signature } = parsedHeaders.data;
+
+		if (!endpointSecret) {
 			return NextResponse.json(
 				{ error: 'Missing signature or secret' },
 				{ status: 400 },
 			);
 		}
 
-		const rawBody = await req.text();
+		const rawBodyInput = await req.text();
+		const parsedPayload = parseWithFirstError(
+			apiStripeWebhookPayloadSchema,
+			rawBodyInput,
+		);
 
-		const stripe = getStripe();
-		let event: Stripe.Event;
-
-		try {
-			event = stripe.webhooks.constructEvent(
-				rawBody,
-				signature,
-				endpointSecret,
-			);
-		} catch (err: any) {
-			console.error(
-				`⚠️  Webhook signature verification failed. ${err.message}`,
-			);
-			return NextResponse.json(
-				{ error: 'Webhook signature verification failed' },
-				{ status: 400 },
-			);
+		if (!parsedPayload.success) {
+			return NextResponse.json({ error: parsedPayload.message }, { status: 400 });
 		}
 
-		switch (event.type) {
-			case 'payment_intent.succeeded': {
-				const payment = event.data.object as Stripe.PaymentIntent;
-				const { bookingId } = payment.metadata;
+		const rawBody = parsedPayload.data;
 
-				if (bookingId) {
-					const existing = await db.booking.findUnique({
-						where: { id: Number(bookingId) },
-						select: { status: true },
-					});
-					if (existing?.status !== 'confirmed') {
-						await BookingService.confirmBooking(
-							Number(bookingId),
-							payment.id,
-							payment.status,
-						);
-					}
-				}
-				break;
-			}
-			case 'payment_intent.created': {
-				const payment = event.data.object as Stripe.PaymentIntent;
-				const {
-					bookingId,
-					userId,
-					slotIds,
-					isGuest,
-					guestName,
-					guestEmail,
-					guestPhone,
-				} = payment.metadata;
+		const stripe = getStripe();
+		const lifecycle = makeBookingLifecycle({
+			db,
+			bookingService: BookingService,
+			stripe,
+		});
 
-				if (bookingId) {
-					break;
-				}
+		const payments = makeBookingStripePayments({
+			stripe,
+			db,
+			bookingService: BookingService,
+			bookingLifecycle: lifecycle,
+			membershipService: MembershipService,
+		});
 
-				let booking;
-				if (isGuest === 'true') {
-					const name = typeof guestName === 'string' ? guestName : '';
-					const email = typeof guestEmail === 'string' ? guestEmail : '';
-					if (!name || !email) {
-						console.error(
-							'Guest payment intent missing guestName or guestEmail in metadata',
-						);
-						break;
-					}
-					booking = await BookingService.createBooking({
-						slotIds: JSON.parse(slotIds),
-						paymentId: payment.id,
-						paymentStatus: payment.status,
-						guestInfo: {
-							name,
-							email,
-							phone: typeof guestPhone === 'string' ? guestPhone : undefined,
-						},
-					});
-				} else {
-					booking = await BookingService.createBooking({
-						userId: Number(userId),
-						slotIds: JSON.parse(slotIds),
-						paymentId: payment.id,
-						paymentStatus: payment.status,
-					});
-				}
+		const verified = await payments.handleWebhook({
+			rawBody,
+			signature,
+			webhookSecret: endpointSecret,
+			schedule: after,
+		});
 
-				const stripe = getStripe();
-				await stripe.paymentIntents.update(payment.id, {
-					metadata: { ...payment.metadata, bookingId: booking.id.toString() },
-				});
-				break;
-			}
-			case 'payment_intent.payment_failed': {
-				const payment = event.data.object as Stripe.PaymentIntent;
-				const { bookingId } = payment.metadata;
-
-				if (bookingId) {
-					const existing = await db.booking.findUnique({
-						where: { id: Number(bookingId) },
-						select: { status: true },
-					});
-					if (existing?.status !== 'failed') {
-						await BookingService.handleFailedPayment(Number(bookingId));
-					}
-				}
-				break;
-			}
-			case 'customer.subscription.created':
-			case 'customer.subscription.updated':
-			case 'customer.subscription.deleted': {
-				const subscription = event.data.object as Stripe.Subscription;
-				await MembershipService.handleMembershipUpdate(subscription);
-				break;
-			}
-			default:
-				console.warn(`Unhandled event type ${event.type}.`);
-				break;
+		if (!verified.ok) {
+			return NextResponse.json({ error: verified.error }, { status: verified.status });
 		}
 
 		return NextResponse.json({ received: true });

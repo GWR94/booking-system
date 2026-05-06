@@ -17,6 +17,7 @@ const renderAuthModal = () => {
 describe('AuthModal', () => {
 	const closeAuthModal = vi.fn();
 	const toggleAuthModalView = vi.fn();
+	const openAuthModal = vi.fn();
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -25,6 +26,7 @@ describe('AuthModal', () => {
 			closeAuthModal,
 			authModalView: 'login',
 			toggleAuthModalView,
+			openAuthModal,
 		});
 	});
 
@@ -39,6 +41,7 @@ describe('AuthModal', () => {
 			closeAuthModal,
 			authModalView: 'register',
 			toggleAuthModalView,
+			openAuthModal,
 		});
 		renderAuthModal();
 		expect(screen.getByRole('heading', { name: 'Create Account' })).toBeInTheDocument();
@@ -62,6 +65,7 @@ describe('AuthModal', () => {
 			closeAuthModal,
 			authModalView: 'login',
 			toggleAuthModalView,
+			openAuthModal,
 		});
 		renderAuthModal();
 		expect(screen.getByRole('heading', { name: 'Sign In' })).toBeInTheDocument();

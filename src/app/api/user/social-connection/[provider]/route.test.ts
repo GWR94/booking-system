@@ -3,7 +3,7 @@ import { createMockRequest, createMockParams, parseResponse } from '@test/api-te
 
 const mockGetSessionUser = vi.fn();
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	getSessionUser: (...args: any[]) => mockGetSessionUser(...args),
 }));
 

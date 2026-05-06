@@ -21,7 +21,7 @@ vi.mock('@db', () => ({
 	db: mockDb,
 }));
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	getSessionUser: mockGetSessionUser,
 }));
 
@@ -68,6 +68,7 @@ describe('POST /api/bookings/[id]/cancel', () => {
 		expect(response.status).toBe(200);
 		const data = await response.json();
 		expect(data.refundStatus).toBe('refunded');
+		// Detailed Stripe/idempotency behavior is tested at the lifecycle module boundary.
 		expect(mockStripe.refunds.create).toHaveBeenCalled();
 	});
 

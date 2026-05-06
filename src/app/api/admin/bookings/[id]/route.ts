@@ -5,6 +5,7 @@ import { AdminBookingsService } from '@modules';
 import { parseWithFirstError } from '@lib/zod';
 import { apiAdminBookingStatusSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
+import { makeAdminBookingLifecycle } from '@/server/modules/booking-lifecycle/admin-booking/admin-booking-lifecycle';
 
 export const PATCH = async (
 	req: NextRequest,
@@ -23,12 +24,21 @@ export const PATCH = async (
 		}
 		const { status } = parsed.data;
 
-		const result = await AdminBookingsService.updateBookingStatus(
-			Number(id),
-			status,
-		);
+		const lifecycle = makeAdminBookingLifecycle({
+			adminBookingsService: AdminBookingsService,
+		});
 
-		return NextResponse.json(result);
+		const result = await lifecycle.updateBookingStatus({
+			user: { role: 'admin' },
+			bookingId: Number(id),
+			status,
+		});
+
+		if (!result.ok) {
+			return errorResponse(result.message, result.status);
+		}
+
+		return NextResponse.json(result.value);
 	} catch (error) {
 		console.error('Update booking status error:', error);
 		return errorResponse(
@@ -50,9 +60,20 @@ export const DELETE = async (
 		const { id } = await params;
 		const bookingId = Number(id);
 
-		const result = await AdminBookingsService.deleteBooking(bookingId);
+		const lifecycle = makeAdminBookingLifecycle({
+			adminBookingsService: AdminBookingsService,
+		});
 
-		return NextResponse.json(result);
+		const result = await lifecycle.deleteBooking({
+			user: { role: 'admin' },
+			bookingId,
+		});
+
+		if (!result.ok) {
+			return errorResponse(result.message, result.status, result.code);
+		}
+
+		return NextResponse.json(result.value);
 	} catch (error) {
 		console.error('Delete booking error:', error);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
 	Dialog,
 	DialogContent,
@@ -7,22 +7,53 @@ import {
 	Box,
 	Typography,
 	Divider,
+	Alert,
 	useTheme,
 	useMediaQuery,
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useUI } from '@context';
+import { useSearchParams } from 'next/navigation';
 import { LoginForm, LegacyRegister, OAuthButtons } from './';
+
+const getAuthErrorMessage = (error: string | null): string | null => {
+	if (!error) return null;
+
+	if (error === 'AccessDenied') {
+		return 'Unable to sign in with that provider. Please use an account with a verified email or sign in with your password first.';
+	}
+	if (error === 'OAuthAccountNotLinked') {
+		return 'This email is already linked to a different sign-in method. Please use your original method first.';
+	}
+	if (error === 'Callback') {
+		return 'Authentication callback failed. Please try again.';
+	}
+
+	return 'Unable to complete sign-in. Please try again.';
+};
 
 const AuthModal = () => {
 	const theme = useTheme();
 	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+	const searchParams = useSearchParams();
 	const {
 		isAuthModalOpen,
 		closeAuthModal,
 		authModalView,
 		toggleAuthModalView,
+		openAuthModal,
 	} = useUI();
+	const authError = searchParams.get('error');
+	const authErrorMessage = getAuthErrorMessage(authError);
+	const lastAutoOpenedErrorRef = useRef<string | null>(null);
+
+	useEffect(() => {
+		if (!authError) return;
+		if (lastAutoOpenedErrorRef.current === authError) return;
+
+		openAuthModal('login');
+		lastAutoOpenedErrorRef.current = authError;
+	}, [authError, openAuthModal]);
 
 	const handleClose = () => {
 		closeAuthModal();
@@ -88,6 +119,9 @@ const AuthModal = () => {
 						my: fullScreen ? 'auto' : 0,
 					}}
 				>
+					{isLogin && authErrorMessage && (
+						<Alert severity="error">{authErrorMessage}</Alert>
+					)}
 					{isLogin ? (
 						<LoginForm
 							onSuccess={handleSuccess}

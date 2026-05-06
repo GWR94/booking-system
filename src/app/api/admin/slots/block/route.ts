@@ -5,6 +5,7 @@ import { AdminSlotsService } from '@modules';
 import { parseWithFirstError } from '@lib/zod';
 import { apiAdminSlotBlockSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
+import { makeAdminSlotsLifecycle } from '@/server/modules/booking-lifecycle/admin-slots/admin-slots-lifecycle';
 
 export const POST = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
@@ -19,13 +20,19 @@ export const POST = async (req: NextRequest) => {
 		}
 		const { startTime, endTime, bayId } = parsed.data;
 
-		const result = await AdminSlotsService.blockSlots({
+		const lifecycle = makeAdminSlotsLifecycle({ adminSlotsService: AdminSlotsService });
+		const res = await lifecycle.blockSlots({
+			user: { role: 'admin' },
 			startTime,
 			endTime,
 			bayId,
 		});
 
-		return NextResponse.json(result);
+		if (!res.ok) {
+			return errorResponse(res.error, res.status, res.code);
+		}
+
+		return NextResponse.json(res.value);
 	} catch (error) {
 		console.error('Block slots error:', error);
 

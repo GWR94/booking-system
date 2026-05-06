@@ -5,6 +5,7 @@ import { AdminSlotsService } from '@modules';
 import { parseWithFirstError } from '@lib/zod';
 import { apiAdminSlotUpdateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
+import { makeAdminSlotsLifecycle } from '@/server/modules/booking-lifecycle/admin-slots/admin-slots-lifecycle';
 
 export const PUT = async (
 	req: NextRequest,
@@ -28,14 +29,21 @@ export const PUT = async (
 		const value = parsed.data;
 		const { startTime, endTime, status, bay } = value;
 
-		const result = await AdminSlotsService.updateSlot(id, {
+		const lifecycle = makeAdminSlotsLifecycle({ adminSlotsService: AdminSlotsService });
+		const res = await lifecycle.updateSlot({
+			user: { role: 'admin' },
+			slotId: id,
 			startTime,
 			endTime,
 			status,
 			bay,
 		});
 
-		return NextResponse.json(result);
+		if (!res.ok) {
+			return errorResponse(res.error, res.status, res.code);
+		}
+
+		return NextResponse.json(res.value);
 	} catch (error) {
 		console.error('Update slot error:', error);
 
@@ -64,9 +72,18 @@ export const DELETE = async (
 		if (Number.isNaN(id)) {
 			return errorResponse('Invalid slot id', 400, 'VALIDATION_ERROR');
 		}
-		const result = await AdminSlotsService.deleteSlot(id);
 
-		return NextResponse.json(result);
+		const lifecycle = makeAdminSlotsLifecycle({ adminSlotsService: AdminSlotsService });
+		const res = await lifecycle.deleteSlot({
+			user: { role: 'admin' },
+			slotId: id,
+		});
+
+		if (!res.ok) {
+			return errorResponse(res.error, res.status, res.code);
+		}
+
+		return NextResponse.json(res.value);
 	} catch (error) {
 		console.error('Delete slot error:', error);
 		return errorResponse(

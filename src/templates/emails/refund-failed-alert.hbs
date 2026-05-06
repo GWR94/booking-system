@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Refund failed – manual action required</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f9; font-size: 16px; line-height: 1.6; color: #333;">
+    {{> header}}
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f9;">
+        <tr>
+            <td align="center" style="padding: 20px 10px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width: 600px; width: 100%; margin: 0 auto;">
+                    <tr>
+                        <td style="padding: 20px;">
+                            <h1 style="color: #9c4221; text-align: center; margin: 0 0 24px 0; font-size: 24px; font-weight: bold;">Refund failed - manual action required</h1>
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p style="margin: 0 0 16px 0;">Automatic refund failed when a booking was cancelled. Please process the refund manually in Stripe.</p>
+                                        <p style="margin: 0 0 16px 0;"><strong>Detected:</strong> {{detectedAtFormatted}}</p>
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f9f9f9; border-radius: 4px;">
+                                            <tr>
+                                                <td style="padding: 12px;"><strong>Booking ID</strong></td>
+                                                <td style="padding: 12px;">{{bookingId}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 12px;"><strong>Payment Intent ID</strong></td>
+                                                <td style="padding: 12px;">{{paymentId}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 12px;"><strong>Customer email</strong></td>
+                                                <td style="padding: 12px;"><a href="mailto:{{userEmail}}" style="color: #2a9d8f; text-decoration: none;">{{userEmail}}</a></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    {{> footer}}
+</body>
+</html>

@@ -34,6 +34,12 @@ export default defineConfig(({ mode }) => ({
 			'@styles': path.resolve(__dirname, './src/styles'),
 			'@validation': path.resolve(__dirname, './src/validation'),
 			'@': path.resolve(__dirname, './src'),
+			// Stub Next.js server APIs for Vitest so importing `next/server`
+			// in routes and tests doesn't require the real Next runtime.
+			'next/server': path.resolve(
+				__dirname,
+				'./src/__test__/mocks/next-server.ts',
+			),
 		},
 	},
 	test: {
@@ -42,7 +48,10 @@ export default defineConfig(({ mode }) => ({
 		setupFiles: './src/setupTests.tsx',
 		css: true,
 		reporters: ['verbose'],
-		exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+		// Keep Vitest focused on this project's actual test locations.
+		// Prevent accidental execution of any junk generated outside `src/` (e.g. top-level `api/`).
+		include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+		exclude: ['api/**', 'e2e/**', 'node_modules/**', 'dist/**'],
 		coverage: {
 			reporter: ['text', 'json', 'html'],
 			include: ['src/**/*'],

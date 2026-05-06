@@ -52,8 +52,6 @@ describe('auth.config', () => {
 			expect(result).toEqual({
 				id: '42',
 				role: 'admin',
-				membershipTier: 'BIRDIE',
-				membershipStatus: 'ACTIVE',
 			});
 		});
 
@@ -62,6 +60,24 @@ describe('auth.config', () => {
 			const token = { id: '1', role: 'user' };
 			const result = await (jwt as any)({ token, user: undefined });
 			expect(result).toBe(token);
+		});
+
+		it('should create oauth user and set token id when no existing db user', async () => {
+			mockUserFindUnique.mockResolvedValue(null);
+			mockUserCreate.mockResolvedValue({
+				id: 55,
+				role: 'user',
+				membershipTier: null,
+				membershipStatus: null,
+			});
+			const jwt = authConfig.callbacks?.jwt;
+			const result = await (jwt as any)({
+				token: { email: null },
+				user: { name: 'X User' },
+				account: { provider: 'twitter', providerAccountId: 'tw-999' },
+			});
+			expect(mockUserCreate).toHaveBeenCalled();
+			expect(result).toMatchObject({ id: '55', role: 'user' });
 		});
 	});
 
@@ -123,13 +139,15 @@ describe('auth.config', () => {
 		});
 
 		it('should update existing user with provider id when missing and return true', async () => {
-			mockUserFindUnique.mockResolvedValue({
-				id: 1,
-				email: 'existing@example.com',
-				googleId: null,
-				facebookId: null,
-				twitterId: null,
-			});
+			mockUserFindUnique
+				.mockResolvedValueOnce(null)
+				.mockResolvedValueOnce({
+					id: 1,
+					email: 'existing@example.com',
+					googleId: null,
+					facebookId: null,
+					twitterId: null,
+				});
 			mockUserUpdate.mockResolvedValue({});
 			const signIn = authConfig.callbacks?.signIn;
 			const result = await (signIn as any)({
@@ -141,6 +159,22 @@ describe('auth.config', () => {
 				where: { email: 'existing@example.com' },
 				data: { googleId: 'google-456' },
 			});
+		});
+
+		it('should return true without email when provider account is already linked', async () => {
+			mockUserFindUnique.mockResolvedValueOnce({
+				id: 3,
+				name: 'X User',
+				twitterId: 'tw-123',
+			});
+			const signIn = authConfig.callbacks?.signIn;
+			const result = await (signIn as any)({
+				user: { email: null, name: 'X User' },
+				account: { provider: 'twitter', providerAccountId: 'tw-123' },
+			});
+			expect(result).toBe(true);
+			expect(mockUserCreate).not.toHaveBeenCalled();
+			expect(mockUserUpdate).not.toHaveBeenCalled();
 		});
 
 		it('should return false when user has no email (OAuth)', async () => {

@@ -1,21 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Users from './AdminUsers';
-import { ThemeProvider, createTheme } from '@mui/material';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarProvider } from '@context';
 import { getAllUsers } from '@api';
 
-const theme = createTheme();
-
-// Mock UI components
 vi.mock('@ui', () => ({
 	AnimateIn: ({ children }: any) => <div>{children}</div>,
 	LoadingSpinner: () => <div>Loading...</div>,
 	SectionHeader: ({ title }: any) => <h1>{title}</h1>,
 }));
 
-// Mock API
 vi.mock('@api', () => ({
 	getAllUsers: vi.fn(),
 	updateUser: vi.fn(),
@@ -50,26 +43,11 @@ const mockUsers = [
 ];
 
 describe('AdminUsers', () => {
-	let queryClient: QueryClient;
-
 	beforeEach(() => {
-		queryClient = new QueryClient({
-			defaultOptions: { queries: { retry: false } },
-		});
 		vi.clearAllMocks();
 	});
 
-	const renderUsers = () => {
-		return render(
-			<QueryClientProvider client={queryClient}>
-				<SnackbarProvider>
-					<ThemeProvider theme={theme}>
-						<Users />
-					</ThemeProvider>
-				</SnackbarProvider>
-			</QueryClientProvider>,
-		);
-	};
+	const renderUsers = () => render(<Users />);
 
 	it('should render users table correctly', async () => {
 		vi.mocked(getAllUsers).mockResolvedValue(mockUsers);

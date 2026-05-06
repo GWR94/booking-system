@@ -2,9 +2,21 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import { getSessionUser } from '@/server/auth/auth';
-import Stripe from 'stripe';
+import { getStripe } from '@/server/lib/stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = getStripe();
+
+const resolveBaseUrl = (req: NextRequest) => {
+	const configured = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
+	if (configured) {
+		if (/^https?:\/\//i.test(configured)) return configured;
+		const isLocal =
+			configured.startsWith('localhost') ||
+			configured.startsWith('127.0.0.1');
+		return `${isLocal ? 'http' : 'https'}://${configured}`;
+	}
+	return req.nextUrl?.origin ?? 'http://localhost:3000';
+};
 
 export const POST = async (req: NextRequest) => {
 	const sessionUser = await getSessionUser();
@@ -25,11 +37,11 @@ export const POST = async (req: NextRequest) => {
 			);
 		}
 
-		const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+		const baseUrl = resolveBaseUrl(req);
 
 		const session = await stripe.billingPortal.sessions.create({
 			customer: user.stripeCustomerId,
-			return_url: `${baseUrl}/profile`,
+			return_url: `${baseUrl}/profile/settings`,
 		});
 
 		return NextResponse.json({ url: session.url });

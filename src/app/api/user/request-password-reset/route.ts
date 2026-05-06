@@ -6,6 +6,7 @@ import { handleSendEmail } from '@utils/email';
 import { parseWithFirstError } from '@lib/zod';
 import { apiRequestPasswordResetSchema } from '@validation/api-schemas';
 import { errorResponse } from '@/app/api/_utils/responses';
+import dayjs from 'dayjs';
 
 export const POST = async (req: NextRequest) => {
 	try {
@@ -46,9 +47,7 @@ export const POST = async (req: NextRequest) => {
 			templateContext: {
 				name: user.name,
 				resetUrl,
-				year: new Date().getFullYear(),
-				baseUrl: process.env.NEXT_PUBLIC_APP_URL,
-				logoUrl: process.env.LOGO_URL,
+				expiresAtFormatted: dayjs(expires).format('DD MMM YYYY [at] HH:mm'),
 			},
 		});
 

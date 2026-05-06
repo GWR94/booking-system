@@ -7,10 +7,20 @@ vi.mock('@db', () => ({
 			findMany: vi.fn(),
 			update: vi.fn(),
 		},
-		slot: {
-			updateMany: vi.fn(),
-		},
 	},
+}));
+
+const mockCleanupStalePendingBookings = vi.fn();
+vi.mock('@/server/modules/booking-lifecycle/booking/booking-lifecycle', () => ({
+	makeBookingLifecycle: () => ({
+		cleanupStalePendingBookings: mockCleanupStalePendingBookings,
+	}),
+}));
+
+const mockSendPendingPaymentReminder = vi.fn();
+vi.mock('@utils/email', () => ({
+	sendPendingPaymentReminder: (...args: any[]) =>
+		mockSendPendingPaymentReminder(...args),
 }));
 
 import { GET } from './route';
@@ -22,24 +32,35 @@ describe('GET /api/cron/cleanup-bookings', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		process.env.CRON_SECRET = CRON_SECRET;
+		mockCleanupStalePendingBookings.mockResolvedValue({
+			ok: true,
+			result: { cleaned: 0 },
+		});
 	});
 
 	it('should clean up stale bookings', async () => {
-		const staleBookings = [
+		const remindableBookings = [
 			{
 				id: 1,
 				status: 'pending',
-				slots: [{ id: 10 }, { id: 11 }],
+				guestEmail: 'guest-1@test.com',
+				slots: [{ endTime: new Date(Date.now() + 60_000).toISOString() }],
+				user: null,
 			},
 			{
 				id: 2,
 				status: 'pending',
-				slots: [{ id: 20 }],
+				guestEmail: 'guest-2@test.com',
+				slots: [{ endTime: new Date(Date.now() + 60_000).toISOString() }],
+				user: null,
 			},
 		];
-		(db.booking.findMany as any).mockResolvedValue(staleBookings);
+		mockCleanupStalePendingBookings.mockResolvedValue({
+			ok: true,
+			result: { cleaned: 2 },
+		});
+		(db.booking.findMany as any).mockResolvedValue(remindableBookings);
 		(db.booking.update as any).mockResolvedValue({});
-		(db.slot.updateMany as any).mockResolvedValue({});
 
 		const req = createMockRequest({
 			headers: { authorization: `Bearer ${CRON_SECRET}` },
@@ -50,8 +71,8 @@ describe('GET /api/cron/cleanup-bookings', () => {
 
 		expect(status).toBe(200);
 		expect(body.cleaned).toBe(2);
+		expect(body.reminded).toBe(2);
 		expect(db.booking.update).toHaveBeenCalledTimes(2);
-		expect(db.slot.updateMany).toHaveBeenCalledTimes(2);
 	});
 
 	it('should return 0 when no stale bookings', async () => {
@@ -66,6 +87,7 @@ describe('GET /api/cron/cleanup-bookings', () => {
 
 		expect(status).toBe(200);
 		expect(body.cleaned).toBe(0);
+		expect(body.reminded).toBe(0);
 	});
 
 	it('should return 401 with wrong secret', async () => {
@@ -90,7 +112,7 @@ describe('GET /api/cron/cleanup-bookings', () => {
 	});
 
 	it('should return 500 on database error', async () => {
-		(db.booking.findMany as any).mockRejectedValue(new Error('DB error'));
+		mockCleanupStalePendingBookings.mockRejectedValue(new Error('DB error'));
 
 		const req = createMockRequest({
 			headers: { authorization: `Bearer ${CRON_SECRET}` },

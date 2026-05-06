@@ -6,6 +6,7 @@ import {
 } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { handleSendEmail } from '@utils/email';
+import dayjs from 'dayjs';
 
 export class AdminUsersService {
 	/**
@@ -114,9 +115,7 @@ export class AdminUsersService {
 			templateContext: {
 				name: user.name,
 				resetUrl,
-				year: new Date().getFullYear(),
-				baseUrl: process.env.NEXT_PUBLIC_APP_URL,
-				logoUrl: process.env.LOGO_URL,
+				expiresAtFormatted: dayjs(resetTokenExpiry).format('DD MMM YYYY [at] HH:mm'),
 			},
 		});
 

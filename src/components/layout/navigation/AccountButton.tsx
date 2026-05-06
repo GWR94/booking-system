@@ -95,6 +95,14 @@ const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
 							vertical: 'top',
 							horizontal: 'right',
 						}}
+						MenuListProps={{
+							sx: {
+								// Add a bit of vertical space before the first list item (Profile)
+								'& > li:first-of-type': {
+									mt: 0.75,
+								},
+							},
+						}}
 						slotProps={{
 							transition: { timeout: 0 },
 							paper: {
@@ -160,7 +168,7 @@ const AccountButton = ({ isMobile, onMobileClick }: AccountButtonProps) => {
 								</MenuItem>
 							))}
 
-						{isAuthenticated && <Divider />}
+						{isAuthenticated && <Divider sx={{ my: 0 }} />}
 
 						<MenuItem
 							onClick={() => {

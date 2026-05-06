@@ -1,29 +1,59 @@
-import type { NextAuthConfig } from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 import Google from 'next-auth/providers/google';
 import Facebook from 'next-auth/providers/facebook';
-import Twitter from 'next-auth/providers/twitter';
+import { TwitterLegacy } from 'next-auth/providers/twitter';
 import Credentials from 'next-auth/providers/credentials';
 import type { Prisma } from '@prisma/client';
 import { db } from '@db';
 import bcrypt from 'bcryptjs';
 import { authorizeCredentials } from '@/server/auth/credentials-authorize';
 
+interface DbUser {
+	id: number;
+	role: string;
+	membershipTier: 'PAR' | 'BIRDIE' | 'HOLEINONE' | null;
+	membershipStatus: 'ACTIVE' | 'CANCELLED' | null;
+}
+
+const getProviderWhere = (provider: string, providerAccountId: string) => {
+	if (provider === 'google') return { googleId: providerAccountId };
+	if (provider === 'facebook') return { facebookId: providerAccountId };
+	if (provider === 'twitter') return { twitterId: providerAccountId };
+	return null;
+};
+
+const isOAuthEmailVerified = (provider: string, profile?: unknown): boolean => {
+	if (!profile || typeof profile !== 'object') return false;
+
+	// Google exposes a reliable boolean email_verified claim.
+	if (provider === 'google') {
+		const googleProfile = profile as { email_verified?: unknown };
+		return googleProfile.email_verified === true;
+	}
+
+	// Facebook includes a "verified" marker in many profile payloads.
+	if (provider === 'facebook') {
+		const facebookProfile = profile as { verified?: unknown };
+		return facebookProfile.verified === true;
+	}
+
+	// Twitter/X legacy provider doesn't provide a consistent verified-email claim.
+	return false;
+};
+
 export default {
 	providers: [
 		Google({
-			clientId: process.env.GOOGLE_CLIENT_ID,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-			allowDangerousEmailAccountLinking: true,
+			clientId: process.env.GOOGLE_CLIENT_ID!,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
 		}),
 		Facebook({
-			clientId: process.env.FACEBOOK_CLIENT_ID,
-			clientSecret: process.env.FACEBOOK_APP_SECRET,
-			allowDangerousEmailAccountLinking: true,
+			clientId: process.env.FACEBOOK_CLIENT_ID!,
+			clientSecret: process.env.FACEBOOK_APP_SECRET!,
 		}),
-		Twitter({
-			clientId: process.env.TWITTER_CLIENT_ID,
-			clientSecret: process.env.TWITTER_CLIENT_SECRET,
-			allowDangerousEmailAccountLinking: true,
+		TwitterLegacy({
+			clientId: process.env.TWITTER_CONSUMER_KEY!,
+			clientSecret: process.env.TWITTER_CONSUMER_SECRET!,
 		}),
 		Credentials({
 			credentials: {
@@ -40,17 +70,98 @@ export default {
 		error: '/',
 	},
 	callbacks: {
-		async jwt({ token, user }) {
-			if (user) {
-				token.id = user.id;
-				token.role = user.role;
-				token.membershipTier = (user.membershipTier ?? undefined) as
+		async jwt({ token, user, account }) {
+			if (account?.provider && account.providerAccountId) {
+				token.oauthProvider = account.provider;
+				token.oauthProviderAccountId = account.providerAccountId;
+			}
+
+			const oauthProvider =
+				typeof token.oauthProvider === 'string'
+					? token.oauthProvider
+					: undefined;
+			const oauthProviderAccountId =
+				typeof token.oauthProviderAccountId === 'string'
+					? token.oauthProviderAccountId
+					: undefined;
+			const tokenEmail =
+				typeof token.email === 'string'
+					? token.email
+					: (user?.email ?? undefined);
+			let dbUser: DbUser | null = null;
+
+			// Prefer provider account resolution first for OAuth users (e.g. X can lack email).
+			if (oauthProvider && oauthProviderAccountId) {
+				const providerWhere = getProviderWhere(
+					oauthProvider,
+					oauthProviderAccountId,
+				);
+				if (providerWhere) {
+					dbUser = await db.user.findUnique({
+						where: providerWhere,
+						select: {
+							id: true,
+							role: true,
+							membershipTier: true,
+							membershipStatus: true,
+						},
+					});
+				}
+			}
+
+			if (!dbUser && tokenEmail) {
+				dbUser = await db.user.findUnique({
+					where: { email: tokenEmail },
+					select: {
+						id: true,
+						role: true,
+						membershipTier: true,
+						membershipStatus: true,
+					},
+				});
+			}
+
+			if (!dbUser && oauthProvider && oauthProviderAccountId) {
+				const providerWhere = getProviderWhere(
+					oauthProvider,
+					oauthProviderAccountId,
+				);
+				if (providerWhere) {
+					const created = await db.user.create({
+						data: {
+							name: user?.name || '',
+							email: tokenEmail,
+							...providerWhere,
+						},
+						select: {
+							id: true,
+							role: true,
+							membershipTier: true,
+							membershipStatus: true,
+						},
+					});
+					dbUser = created;
+				}
+			}
+
+			if (dbUser) {
+				token.id = String(dbUser.id);
+				token.role = dbUser.role;
+				token.membershipTier = (dbUser.membershipTier ?? undefined) as
 					| 'PAR'
 					| 'BIRDIE'
 					| 'HOLEINONE';
-				token.membershipStatus = (user.membershipStatus ?? undefined) as
+				token.membershipStatus = (dbUser.membershipStatus ?? undefined) as
 					| 'ACTIVE'
 					| 'CANCELLED';
+				return token;
+			}
+
+			if (user?.id) {
+				token.id = String(user.id);
+			}
+			if (user?.role) {
+				token.role = user.role;
 			}
 			return token;
 		},
@@ -62,21 +173,48 @@ export default {
 					| 'PAR'
 					| 'BIRDIE'
 					| 'HOLEINONE';
-				session.user.membershipStatus = (token.membershipStatus ?? undefined) as
-					| 'ACTIVE'
-					| 'CANCELLED';
+				session.user.membershipStatus = (token.membershipStatus ??
+					undefined) as 'ACTIVE' | 'CANCELLED';
 			}
 			return session;
 		},
-		async signIn({ user, account }) {
+		async signIn({ user, account, profile }) {
 			if (account?.provider === 'credentials') {
 				return true;
 			}
 
 			const email = user.email;
-			if (!email) return false;
+			const provider = account?.provider;
+			const providerAccountId = account?.providerAccountId;
+			const emailVerified =
+				!!provider && isOAuthEmailVerified(provider, profile);
+			const providerWhere =
+				provider && providerAccountId
+					? getProviderWhere(provider, providerAccountId)
+					: null;
 
 			try {
+				if (providerWhere) {
+					const existingProviderUser = await db.user.findUnique({
+						where: providerWhere,
+					});
+					if (existingProviderUser) {
+						return true;
+					}
+				}
+
+				if (!email) {
+					if (!providerWhere) return false;
+
+					await db.user.create({
+						data: {
+							name: user.name || '',
+							...providerWhere,
+						},
+					});
+					return true;
+				}
+
 				const existingUser = await db.user.findUnique({
 					where: { email },
 				});
@@ -101,15 +239,20 @@ export default {
 						},
 					});
 				} else {
+					// Only link by email when the provider confirms email ownership.
+					if (!emailVerified) {
+						return false;
+					}
+
 					const updateData: Prisma.UserUpdateInput = {};
-					if (account?.provider === 'google' && !existingUser.googleId) {
-						updateData.googleId = account.providerAccountId;
+					if (provider === 'google' && !existingUser.googleId) {
+						updateData.googleId = providerAccountId;
 					}
-					if (account?.provider === 'facebook' && !existingUser.facebookId) {
-						updateData.facebookId = account.providerAccountId;
+					if (provider === 'facebook' && !existingUser.facebookId) {
+						updateData.facebookId = providerAccountId;
 					}
-					if (account?.provider === 'twitter' && !existingUser.twitterId) {
-						updateData.twitterId = account.providerAccountId;
+					if (provider === 'twitter' && !existingUser.twitterId) {
+						updateData.twitterId = providerAccountId;
 					}
 
 					if (Object.keys(updateData).length > 0) {
@@ -127,5 +270,4 @@ export default {
 			}
 		},
 	},
-	trustHost: true,
-} satisfies NextAuthConfig;
+} satisfies NextAuthOptions;

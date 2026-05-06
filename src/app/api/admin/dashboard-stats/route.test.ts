@@ -4,7 +4,7 @@ import { parseResponse } from '@test/api-test-utils';
 const mockIsAdmin = vi.fn();
 const mockGetDashboardStats = vi.fn();
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	isAdmin: (...args: any[]) => mockIsAdmin(...args),
 }));
 

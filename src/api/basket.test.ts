@@ -42,12 +42,25 @@ describe('basket api', () => {
 		expect(result).toEqual([]);
 	});
 
-	it('getBasket should return parsed data from localStorage', () => {
-		const mockBasket = [{ id: 1 }];
+	it('getBasket should return parsed data from localStorage with dayjs dates', () => {
+		const mockBasket = [
+			{
+				id: 1,
+				startTime: '2026-03-05T10:00:00.000Z',
+				endTime: '2026-03-05T11:00:00.000Z',
+				bayId: 1,
+				slotIds: [1],
+			},
+		];
 		localStorage.setItem(STORAGE_KEYS.BASKET, JSON.stringify(mockBasket));
 
 		const result = getBasket();
-		expect(result).toEqual(mockBasket);
+		expect(result).toHaveLength(1);
+		expect(result[0].id).toBe(1);
+		expect(result[0].bayId).toBe(1);
+		expect(result[0].slotIds).toEqual([1]);
+		expect(dayjs.isDayjs(result[0].startTime)).toBe(true);
+		expect(dayjs.isDayjs(result[0].endTime)).toBe(true);
 	});
 
 	it('saveBasket should save data to localStorage', () => {

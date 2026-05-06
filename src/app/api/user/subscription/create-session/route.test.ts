@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import { createMockRequest, parseResponse } from '@test/api-test-utils';
 
 const mockGetSessionUser = vi.fn();
@@ -12,7 +12,7 @@ const mockCustomersCreate = vi.fn();
 const mockCustomersUpdate = vi.fn();
 const mockCheckoutSessionsCreate = vi.fn();
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	getSessionUser: (...args: unknown[]) => mockGetSessionUser(...args),
 }));
 
@@ -37,13 +37,20 @@ vi.mock('stripe', () => ({
 import { POST } from './route';
 
 describe('POST /api/user/subscription/create-session', () => {
+	const originalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+
 	beforeEach(() => {
 		vi.clearAllMocks();
+		process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
 		mockCustomersCreate.mockResolvedValue({ id: 'cus_new123' });
 		mockCheckoutSessionsCreate.mockResolvedValue({
 			id: 'cs_123',
 			url: 'https://checkout.stripe.com/session/xyz',
 		});
+	});
+
+	afterAll(() => {
+		process.env.NEXT_PUBLIC_APP_URL = originalAppUrl;
 	});
 
 	it('should return 401 when not authenticated', async () => {
@@ -164,5 +171,28 @@ describe('POST /api/user/subscription/create-session', () => {
 
 		expect(status).toBe(500);
 		expect(body.error).toBe('Stripe failed');
+	});
+
+	it('should normalize env host without scheme for Stripe URLs', async () => {
+		process.env.NEXT_PUBLIC_APP_URL = 'localhost:3000';
+		mockGetSessionUser.mockResolvedValue({ id: 1 });
+		mockDb.user.findUnique.mockResolvedValue({
+			id: 1,
+			email: 'user@example.com',
+			name: 'User',
+			stripeCustomerId: 'cus_existing',
+		});
+
+		const req = createMockRequest({ method: 'POST', body: { tier: 'PAR' } });
+		const response = await POST(req);
+		const { status } = await parseResponse(response);
+
+		expect(status).toBe(200);
+		expect(mockCheckoutSessionsCreate).toHaveBeenCalledWith(
+			expect.objectContaining({
+				success_url: expect.stringContaining('http://localhost:3000/profile'),
+				cancel_url: expect.stringContaining('http://localhost:3000/membership'),
+			}),
+		);
 	});
 });

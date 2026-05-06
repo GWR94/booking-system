@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarProvider } from '@context/SnackbarContext';
+import { CookieProvider, SnackbarProvider } from '@context';
 import { ThemeProvider } from '@context/ThemeContext';
 
 const createTestQueryClient = () =>
@@ -18,7 +18,9 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<ThemeProvider>
-				<SnackbarProvider>{children}</SnackbarProvider>
+				<CookieProvider>
+					<SnackbarProvider>{children}</SnackbarProvider>
+				</CookieProvider>
 			</ThemeProvider>
 		</QueryClientProvider>
 	);

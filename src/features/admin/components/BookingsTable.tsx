@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import {
 	Paper,
 	Table,
@@ -146,12 +144,23 @@ const BookingsTable = ({
 										/>
 									</TableCell>
 									<TableCell>
-										<Chip
-											label={booking.status}
-											color={getStatusColor(booking.status)}
-											size="small"
-											sx={{ textTransform: 'capitalize', fontWeight: 600 }}
-										/>
+										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center' }}>
+											<Chip
+												label={booking.status}
+												color={getStatusColor(booking.status)}
+												size="small"
+												sx={{ textTransform: 'capitalize', fontWeight: 600 }}
+											/>
+											{booking.refundFailedAt && (
+												<Chip
+													label="Refund failed"
+													size="small"
+													color="error"
+													variant="outlined"
+													sx={{ fontWeight: 600 }}
+												/>
+											)}
+										</Box>
 									</TableCell>
 									<TableCell align="right">
 										<Tooltip title="View Details">

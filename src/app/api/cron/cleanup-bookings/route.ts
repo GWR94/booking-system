@@ -1,7 +1,17 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
-import { Slot } from '@prisma/client';
+import { makeBookingLifecycle } from '@/server/modules/booking-lifecycle/booking/booking-lifecycle';
+import { sendPendingPaymentReminder } from '@utils/email';
+
+const resolveBaseUrl = () => {
+	const configured = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
+	if (!configured) return 'http://localhost:3000';
+	if (/^https?:\/\//i.test(configured)) return configured;
+	const isLocal =
+		configured.startsWith('localhost') || configured.startsWith('127.0.0.1');
+	return `${isLocal ? 'http' : 'https'}://${configured}`;
+};
 
 /**
  * Booking cleanup cron job.
@@ -23,47 +33,69 @@ export const GET = async (req: NextRequest) => {
 	}
 
 	try {
-		const thresholdDate = new Date(Date.now() - 15 * 60 * 1000);
-
-		const staleBookings = await db.booking.findMany({
-			where: {
-				status: 'pending',
-				bookingTime: { lt: thresholdDate },
-			},
-			include: { slots: true },
+		const lifecycle = makeBookingLifecycle({ db });
+		const result = await lifecycle.cleanupStalePendingBookings({
+			olderThanMinutes: 15,
 		});
 
-		if (staleBookings.length === 0) {
-			return NextResponse.json({ cleaned: 0, message: 'No stale bookings' });
+		if (!result.ok) {
+			return NextResponse.json({ error: result.error }, { status: result.status });
 		}
 
-		console.log(
-			`[Cleanup] Found ${staleBookings.length} stale bookings to clean up`,
-		);
+		if (result.result.cleaned === 0) {
+			// Continue to reminder dispatch even if nothing was cleaned.
+		}
 
-		for (const booking of staleBookings) {
-			console.log(`[Cleanup] Cancelling stale booking ${booking.id}`);
+		const reminderCutoff = new Date(Date.now() - 10 * 60 * 1000);
+		const candidates = await db.booking.findMany({
+			where: {
+				status: 'pending',
+				paymentId: { not: null },
+				reminderSentAt: null,
+				bookingTime: { lte: reminderCutoff },
+			},
+			include: {
+				user: { select: { email: true } },
+				slots: {
+					orderBy: { endTime: 'desc' },
+					select: { endTime: true },
+				},
+			},
+			orderBy: { bookingTime: 'desc' },
+			take: 50,
+		});
+
+		const baseUrl = resolveBaseUrl();
+		let reminded = 0;
+		for (const booking of candidates) {
+			const recipientEmail = booking.user?.email ?? booking.guestEmail ?? null;
+			const expiresAt = booking.slots[0]?.endTime ?? null;
+			if (!recipientEmail || !expiresAt) continue;
+			if (new Date(expiresAt).getTime() <= Date.now()) continue;
+
+			await sendPendingPaymentReminder({
+				bookingId: booking.id,
+				recipientEmail,
+				resumeUrl: `${baseUrl}/profile/bookings`,
+				expiresAt: new Date(expiresAt),
+			});
 
 			await db.booking.update({
 				where: { id: booking.id },
-				data: { status: 'cancelled' },
+				data: { reminderSentAt: new Date() },
 			});
-
-			const slotIds = booking.slots.map((slot: Slot) => slot.id);
-			if (slotIds.length > 0) {
-				console.log(
-					`[Cleanup] Reverting slots ${slotIds.join(', ')} back to available`,
-				);
-				await db.slot.updateMany({
-					where: { id: { in: slotIds } },
-					data: { status: 'available' },
-				});
-			}
+			reminded += 1;
 		}
 
 		return NextResponse.json({
-			cleaned: staleBookings.length,
-			message: `Cleaned up ${staleBookings.length} stale booking(s)`,
+			cleaned: result.result.cleaned,
+			reminded,
+			message:
+				result.result.cleaned === 0
+					? reminded > 0
+						? `Sent ${reminded} pending payment reminder(s)`
+						: 'No stale bookings'
+					: `Cleaned up ${result.result.cleaned} stale booking(s)`,
 		});
 	} catch (error) {
 		console.error('[Cleanup] Error cleaning up stale bookings:', error);

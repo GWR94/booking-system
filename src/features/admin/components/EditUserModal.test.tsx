@@ -1,11 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import EditUserModal from './EditUserModal';
-import { ThemeProvider, createTheme } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SnackbarProvider } from '@context';
-
-const theme = createTheme();
 
 // Mock API
 vi.mock('@api', () => ({
@@ -35,17 +31,12 @@ describe('EditUserModal', () => {
 		vi.clearAllMocks();
 	});
 
-	const renderModal = (user = mockUser) => {
-		return render(
+	const renderModal = (user = mockUser) =>
+		render(
 			<QueryClientProvider client={queryClient}>
-				<SnackbarProvider>
-					<ThemeProvider theme={theme}>
-						<EditUserModal user={user} open={true} onClose={vi.fn()} />
-					</ThemeProvider>
-				</SnackbarProvider>
+				<EditUserModal user={user} open={true} onClose={vi.fn()} />
 			</QueryClientProvider>,
 		);
-	};
 
 	it('should render initial user data', () => {
 		renderModal();

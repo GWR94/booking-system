@@ -24,11 +24,13 @@ import {
 	Search as SearchIcon,
 	Visibility as ViewIcon,
 	Edit as EditIcon,
+	Close,
 } from '@mui/icons-material';
 import { LoadingSpinner, AnimateIn, SectionHeader } from '@ui';
 import { useState } from 'react';
 import UserBookingsModal from './components/UserBookingsModal';
 import EditUserModal from './components/EditUserModal';
+import dayjs from 'dayjs';
 
 const Users = () => {
 	const theme = useTheme();
@@ -115,7 +117,7 @@ const Users = () => {
 										<TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
 										<TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
 										<TableCell sx={{ fontWeight: 600 }}>Membership</TableCell>
-										<TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+										<TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
 										<TableCell align="right" sx={{ fontWeight: 600 }}>
 											Actions
 										</TableCell>
@@ -159,44 +161,50 @@ const Users = () => {
 													</Typography>
 												</Tooltip>
 											</TableCell>
-											<TableCell>
+											<TableCell align="center">
 												{user.membershipTier ? (
+													!!user.cancelAtPeriodEnd ? (
+														<Tooltip title="Won't renew; stays active until the end of the current billing period.">
+															<Chip
+																label={user.membershipTier}
+																size="small"
+																color="success"
+																sx={{ fontWeight: 600 }}
+															/>
+														</Tooltip>
+													) : (
+														<Tooltip
+															title={`Active until ${dayjs(user.currentPeriodEnd).format('DD/MM/YYYY')}`}
+														>
+															<Chip
+																label={user.membershipTier}
+																size="small"
+																color="success"
+																sx={{ fontWeight: 600 }}
+															/>
+														</Tooltip>
+													)
+												) : (
 													<Chip
-														label={user.membershipTier}
+														label="INACTIVE"
+														color="default"
 														size="small"
-														color="primary"
-														variant={
-															user.membershipStatus === 'ACTIVE'
-																? 'filled'
-																: 'outlined'
-														}
 														sx={{ fontWeight: 600 }}
 													/>
-												) : (
-													<Typography variant="caption" color="text.secondary">
-														None
-													</Typography>
 												)}
 											</TableCell>
-											<TableCell>
-												{user.membershipStatus === 'ACTIVE' &&
-												user.cancelAtPeriodEnd ? (
+											<TableCell align="center">
+												{user.role === 'admin' ? (
 													<Chip
-														label="CANCELLING"
-														color="warning"
+														label="ADMIN"
+														color="error"
 														size="small"
 														sx={{ fontWeight: 600 }}
 													/>
 												) : (
 													<Chip
-														label={user.membershipStatus || 'INACTIVE'}
-														color={
-															user.membershipStatus === 'ACTIVE'
-																? 'success'
-																: user.membershipStatus === 'CANCELLED'
-																	? 'error'
-																	: 'default'
-														}
+														label="USER"
+														color="primary"
 														size="small"
 														sx={{ fontWeight: 600 }}
 													/>

@@ -5,6 +5,7 @@ import { AdminBookingsService } from '@modules';
 import { parseWithFirstError } from '@lib/zod';
 import { apiAdminBookingExtendSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../../_utils/responses';
+import { makeAdminBookingLifecycle } from '@/server/modules/booking-lifecycle/admin-booking/admin-booking-lifecycle';
 
 export const PATCH = async (
 	req: NextRequest,
@@ -23,9 +24,24 @@ export const PATCH = async (
 		}
 		const { hours } = parsed.data;
 
-		const result = await AdminBookingsService.extendBooking(Number(id), hours);
+		const lifecycle = makeAdminBookingLifecycle({
+			adminBookingsService: AdminBookingsService,
+		});
 
-		return NextResponse.json(result);
+		const result = await lifecycle.extendBooking({
+			user: { role: 'admin' },
+			bookingId: Number(id),
+			hours,
+		});
+
+		if (!result.ok) {
+			if (result.status === 404) {
+				return errorResponse(result.message, 404, result.code);
+			}
+			return errorResponse(result.message, result.status);
+		}
+
+		return NextResponse.json(result.value);
 	} catch (error) {
 		console.error('Extend booking error:', error);
 

@@ -107,10 +107,13 @@ const CheckoutForm = ({
 		setLoading(true);
 		setMessage('');
 
+		// Only runs on submit (client-side click), so `window` is available.
+		const returnUrl = `${window.location.origin}/checkout/complete`;
+
 		const result = await stripe.confirmPayment({
 			elements,
 			confirmParams: {
-				return_url: `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/checkout/complete`,
+				return_url: returnUrl,
 			},
 		});
 
@@ -241,7 +244,7 @@ const CheckoutForm = ({
 				</Grid>
 
 				<Grid size={{ xs: 12, md: 4 }}>
-					<Box sx={{ position: 'sticky', top: 24 }}>
+					<Box sx={{ position: 'sticky', top: { xs: 16, md: 96 } }}>
 						{includedHours > 0 && (
 							<Box sx={{ mb: 3 }}>
 								<MembershipUsageSummary

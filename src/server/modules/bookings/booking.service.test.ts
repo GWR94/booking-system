@@ -47,7 +47,6 @@ describe('BookingService', () => {
 			let capturedTx: any;
 			mockTransaction.mockImplementation(async (cb: (tx: any) => Promise<any>) => {
 				capturedTx = {
-					user: { upsert: vi.fn() },
 					slot: {
 						findMany: vi.fn().mockResolvedValue([{ id: 1 }, { id: 2 }]),
 						updateMany: vi.fn().mockResolvedValue({ count: 2 }),
@@ -83,23 +82,21 @@ describe('BookingService', () => {
 				where: { id: { in: [1, 2] } },
 				data: { status: 'awaiting payment' },
 			});
-			expect(capturedTx.user.upsert).not.toHaveBeenCalled();
 		});
 
-		it('should upsert guest user and create booking when guestInfo is provided', async () => {
-			const mockGuestUser = { id: 99, email: 'guest@example.com', name: 'Guest', role: 'guest' };
+		it('should create booking with guest fields when guestInfo is provided', async () => {
 			const mockBooking = {
 				id: 1,
-				userId: 99,
+				userId: null,
+				guestName: 'Guest',
+				guestEmail: 'guest@example.com',
+				guestPhone: '07700900123',
 				status: 'pending',
 				slots: [{ id: 1 }],
 			};
 			let capturedTx: any;
 			mockTransaction.mockImplementation(async (cb: (tx: any) => Promise<any>) => {
 				capturedTx = {
-					user: {
-						upsert: vi.fn().mockResolvedValue(mockGuestUser),
-					},
 					slot: {
 						findMany: vi.fn().mockResolvedValue([{ id: 1 }]),
 						updateMany: vi.fn().mockResolvedValue({ count: 1 }),
@@ -121,23 +118,12 @@ describe('BookingService', () => {
 			});
 
 			expect(result).toEqual(mockBooking);
-			expect(capturedTx.user.upsert).toHaveBeenCalledWith({
-				where: { email: 'guest@example.com' },
-				update: {
-					name: 'Guest',
-					phone: '07700900123',
-				},
-				create: {
-					email: 'guest@example.com',
-					name: 'Guest',
-					phone: '07700900123',
-					role: 'guest',
-				},
-			});
 			expect(capturedTx.booking.create).toHaveBeenCalledWith(
 				expect.objectContaining({
 					data: expect.objectContaining({
-						user: { connect: { id: 99 } },
+						guestName: 'Guest',
+						guestEmail: 'guest@example.com',
+						guestPhone: '07700900123',
 						status: 'pending',
 					}),
 				}),
@@ -147,7 +133,6 @@ describe('BookingService', () => {
 		it('should throw when neither userId nor guestInfo provided', async () => {
 			mockTransaction.mockImplementation(async (cb: (tx: any) => Promise<any>) => {
 				const tx = {
-					user: { upsert: vi.fn() },
 					slot: { findMany: vi.fn(), updateMany: vi.fn() },
 					booking: { create: vi.fn() },
 				};
@@ -159,10 +144,24 @@ describe('BookingService', () => {
 			).rejects.toThrow('User ID or guest info must be provided');
 		});
 
+		it('should throw when slotIds is empty', async () => {
+			await expect(
+				BookingService.createBooking({ userId: 1, slotIds: [] }),
+			).rejects.toThrow('At least one slot is required to create a booking');
+		});
+
+		it('should throw when guest info is missing required fields', async () => {
+			await expect(
+				BookingService.createBooking({
+					slotIds: [1],
+					guestInfo: { name: '', email: '' },
+				}),
+			).rejects.toThrow('Guest name and email are required');
+		});
+
 		it('should throw when one or more slots do not exist or are not available', async () => {
 			mockTransaction.mockImplementation(async (cb: (tx: any) => Promise<any>) => {
 				const tx = {
-					user: { upsert: vi.fn() },
 					slot: {
 						findMany: vi.fn().mockResolvedValue([{ id: 1 }]), // only 1 slot, but we requested 2
 						updateMany: vi.fn(),
@@ -218,6 +217,35 @@ describe('BookingService', () => {
 			await expect(
 				BookingService.confirmBooking(1, 'pi_1', 'succeeded'),
 			).rejects.toThrow('Booking not found');
+		});
+
+		it('should send confirmation email to guestEmail when user is absent', async () => {
+			const mockUpdate = { id: 22, status: 'confirmed' };
+			const mockBooking = {
+				id: 22,
+				status: 'confirmed',
+				guestEmail: 'guest@example.com',
+				slots: [{ id: 10, bayId: 1 }],
+				user: null,
+			};
+			mockTransaction.mockImplementation(async (cb: (tx: any) => Promise<any>) => {
+				const tx = { booking: { update: vi.fn().mockResolvedValue(mockUpdate) } };
+				return cb(tx);
+			});
+			mockBookingFindUnique.mockResolvedValue(mockBooking);
+			mockGetStripe.mockReturnValue({
+				paymentIntents: { retrieve: vi.fn().mockResolvedValue({ amount: 2000 }) },
+			});
+			mockHandleSendEmail.mockResolvedValue(undefined);
+
+			await BookingService.confirmBooking(22, 'pi_guest', 'succeeded');
+
+			expect(mockHandleSendEmail).toHaveBeenCalledWith(
+				expect.objectContaining({
+					recipientEmail: 'guest@example.com',
+					templateName: 'confirmation',
+				}),
+			);
 		});
 	});
 

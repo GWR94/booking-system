@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdmin } from '@/server/auth/auth';
 import { AdminBookingsService } from '@modules';
+import { makeAdminBookingLifecycle } from '@/server/modules/booking-lifecycle/admin-booking/admin-booking-lifecycle';
 
 export const GET = async (
 	req: NextRequest,
@@ -13,11 +14,23 @@ export const GET = async (
 
 	try {
 		const { id } = await params;
-		const result = await AdminBookingsService.checkBookingExtendAvailability(
-			Number(id),
-		);
+		const lifecycle = makeAdminBookingLifecycle({
+			adminBookingsService: AdminBookingsService,
+		});
 
-		return NextResponse.json(result);
+		const result = await lifecycle.checkBookingExtendAvailability({
+			user: { role: 'admin' },
+			bookingId: Number(id),
+		});
+
+		if (!result.ok) {
+			if (result.status === 404) {
+				return NextResponse.json({ message: result.message }, { status: 404 });
+			}
+			return NextResponse.json({ error: result.message }, { status: result.status });
+		}
+
+		return NextResponse.json(result.value);
 	} catch (error) {
 		console.error('Check extend availability error:', error);
 

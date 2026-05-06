@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { useMotionValueEvent, useScroll, motion } from 'framer-motion';
 import { Close, Menu } from '@mui/icons-material';
 import {
@@ -37,7 +35,9 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	const [menuContent, setMenuContent] = useState<
 		'nav' | 'basket' | 'account' | 'admin' | 'theme'
 	>('nav');
+
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const isLgDown = useMediaQuery(theme.breakpoints.down('lg'));
 
 	const { scrollY } = useScroll();
 	const [hidden, setHidden] = useState(false);
@@ -152,7 +152,7 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 									left: '50%',
 									transform: 'translateX(-50%)',
 								}}
-								logoOnly={useMediaQuery(theme.breakpoints.down('lg'))}
+								logoOnly={isLgDown}
 							/>
 							<Box
 								sx={{

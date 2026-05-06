@@ -1,13 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import CompletePage from './CompleteBooking';
-import { useStripe } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { axios } from '@api/client';
 import createWrapper from '@utils/test-utils';
 import { useBasket, useBookingManager, useSession } from '@hooks';
 
-vi.mock('@stripe/react-stripe-js', () => ({
-	useStripe: vi.fn(),
+vi.mock('@stripe/stripe-js', () => ({
+	loadStripe: vi.fn(),
 }));
 
 vi.mock('@api/client', () => ({
@@ -48,7 +48,7 @@ describe('CompletePage Polling Logic', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		(useStripe as any).mockReturnValue(mockStripe);
+		(loadStripe as any).mockResolvedValue(mockStripe);
 		(useBasket as any).mockReturnValue({
 			clearBasket: mockClearBasket,
 			removeFromBasket: vi.fn(),
@@ -78,13 +78,22 @@ describe('CompletePage Polling Logic', () => {
 
 		(axios.get as any).mockResolvedValue({
 			data: {
-				booking: { id: 1, status: 'confirmed' },
+				booking: {
+					id: 1,
+					status: 'confirmed',
+					slots: [
+						{
+							id: 10,
+							startTime: '2023-01-01T10:00:00Z',
+							endTime: '2023-01-01T10:55:00Z',
+							bayId: 1,
+						},
+					],
+				},
 				groupedSlots: [
 					{
-						slotIds: [1],
-						startTimeISO: '2023-01-01T10:00:00Z',
-						endTimeISO: '2023-01-01T11:00:00Z',
-						bayId: 1,
+						// Only used as a truthy flag in the component
+						bogus: true,
 					},
 				],
 			},
@@ -94,10 +103,12 @@ describe('CompletePage Polling Logic', () => {
 
 		await waitFor(() => {
 			expect(axios.get).toHaveBeenCalledTimes(1);
-			expect(mockSetBooking).toHaveBeenCalledWith({
-				id: 1,
-				status: 'confirmed',
-			});
+			expect(mockSetBooking).toHaveBeenCalledWith(
+				expect.objectContaining({
+					id: 1,
+					status: 'confirmed',
+				}),
+			);
 			expect(mockClearBasket).toHaveBeenCalled();
 		});
 	});
@@ -118,13 +129,21 @@ describe('CompletePage Polling Logic', () => {
 			.mockRejectedValueOnce(new Error('Not found'))
 			.mockResolvedValue({
 				data: {
-					booking: { id: 1, status: 'confirmed' },
+					booking: {
+						id: 1,
+						status: 'confirmed',
+						slots: [
+							{
+								id: 10,
+								startTime: '2023-01-01T10:00:00Z',
+								endTime: '2023-01-01T10:55:00Z',
+								bayId: 1,
+							},
+						],
+					},
 					groupedSlots: [
 						{
-							slotIds: [1],
-							startTimeISO: '2023-01-01T10:00:00Z',
-							endTimeISO: '2023-01-01T11:00:00Z',
-							bayId: 1,
+							bogus: true,
 						},
 					],
 				},
@@ -135,10 +154,12 @@ describe('CompletePage Polling Logic', () => {
 		await waitFor(
 			() => {
 				expect(axios.get).toHaveBeenCalledTimes(3);
-				expect(mockSetBooking).toHaveBeenCalledWith({
-					id: 1,
-					status: 'confirmed',
-				});
+				expect(mockSetBooking).toHaveBeenCalledWith(
+					expect.objectContaining({
+						id: 1,
+						status: 'confirmed',
+					}),
+				);
 			},
 			{ timeout: 10000 },
 		); // Increase timeout to account for polling delays

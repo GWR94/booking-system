@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Container, useTheme } from '@mui/material';
 import { SectionHeader } from '@ui';
 import {

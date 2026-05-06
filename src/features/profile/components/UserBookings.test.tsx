@@ -3,9 +3,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import UserBookings from './UserBookings';
 import { useAuth } from '@hooks';
 import { useSnackbar, ThemeProvider } from '@context';
-import { deleteBooking } from '@api';
+import { deleteBooking, resumePendingBookingPayment } from '@api';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+const mockPush = vi.fn();
 
 vi.mock('@hooks', () => ({
 	useAuth: vi.fn(),
@@ -21,6 +22,13 @@ vi.mock('@context', async (importOriginal) => {
 
 vi.mock('@api', () => ({
 	deleteBooking: vi.fn(),
+	resumePendingBookingPayment: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+	useRouter: () => ({
+		push: mockPush,
+	}),
 }));
 
 const queryClient = new QueryClient({
@@ -61,7 +69,7 @@ describe('UserBookings', () => {
 			{
 				id: 2,
 				bookingTime: dayjs().add(1, 'day').toISOString(), // Future booking
-				status: 'confirmed',
+				status: 'pending',
 				paymentId: 'pi_future',
 				slots: [
 					{
@@ -111,7 +119,8 @@ describe('UserBookings', () => {
 			}).length,
 		).toBeGreaterThan(0);
 
-		expect(screen.getAllByText('confirmed').length).toBe(2);
+		expect(screen.getByText('confirmed')).toBeInTheDocument();
+		expect(screen.getByText('pending')).toBeInTheDocument();
 	});
 
 	it('should return null when no user or no bookings', () => {
@@ -149,6 +158,24 @@ describe('UserBookings', () => {
 			expect(mockShowSnackbar).toHaveBeenCalledWith(
 				'Failed to cancel booking',
 				'error',
+			);
+		});
+	});
+
+	it('resumes payment for pending booking', async () => {
+		(resumePendingBookingPayment as any).mockResolvedValue({
+			clientSecret: 'pi_abc_secret_xyz',
+			paymentIntentId: 'pi_abc',
+		});
+		render(<UserBookings />, { wrapper });
+
+		const resumeBtn = screen.getByLabelText(/complete payment/i);
+		fireEvent.click(resumeBtn);
+
+		await waitFor(() => {
+			expect(resumePendingBookingPayment).toHaveBeenCalledWith(2);
+			expect(mockPush).toHaveBeenCalledWith(
+				'/checkout?payment_intent_client_secret=pi_abc_secret_xyz',
 			);
 		});
 	});

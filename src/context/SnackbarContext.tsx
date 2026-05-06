@@ -11,6 +11,7 @@ import React, {
 	FC,
 } from 'react';
 import { Snackbar, Alert, AlertProps } from '@mui/material';
+import { useCookie } from '@context';
 
 interface SnackbarContextType {
 	showSnackbar: (message: string, severity?: AlertProps['severity']) => void;
@@ -35,6 +36,7 @@ export const SnackbarProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		key: 0,
 	});
 	const [bottomOffset, setBottomOffset] = useState(0);
+	const { isConsentSet } = useCookie();
 
 	const showSnackbar = useCallback(
 		(message: string, severity: AlertProps['severity'] = 'info') => {
@@ -75,7 +77,8 @@ export const SnackbarProvider: FC<{ children: ReactNode }> = ({ children }) => {
 				autoHideDuration={3000}
 				onClose={handleClose}
 				anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-				sx={{ mb: bottomOffset }}
+				// Lift snackbar above cookie banner and any additional offsets
+				sx={{ mb: bottomOffset + (isConsentSet ? 0 : 10), zIndex: 10000 }}
 			>
 				<Alert
 					onClose={handleClose}

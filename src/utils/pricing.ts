@@ -59,14 +59,13 @@ const getDiscountPercentage = (tier?: string): number => {
  * @param isActive - Whether the membership is currently active
  * @returns Object containing original price, discounted price, and discount status
  * @example
- * // Peak time with active Birdie membership
+ * Peak time with active Birdie membership
  * calculateSlotPrice(new Date('2024-01-15 18:00'), 'BIRDIE', true);
- * // Returns: { originalPrice: 45, discountedPrice: 38.25, hasDiscount: true }
- *
+ * Returns: { originalPrice: 45, discountedPrice: 38.25, hasDiscount: true }
  * @example
- * // Off-peak time without membership
+ * Off-peak time without membership
  * calculateSlotPrice(new Date('2024-01-15 14:00'));
- * // Returns: { originalPrice: 35, discountedPrice: 35, hasDiscount: false }
+ * Returns: { originalPrice: 35, discountedPrice: 35, hasDiscount: false }
  */
 export const calculateSlotPrice = (
 	startTime: Date | string | dayjs.Dayjs,

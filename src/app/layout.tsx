@@ -1,5 +1,6 @@
 import Providers from './providers';
-import { NavBar, Footer, CookieConsentBanner, GoogleAnalytics } from '@layout';
+import { Footer, CookieConsentBanner, GoogleAnalytics, NavBar } from '@layout';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { Suspense } from 'react';
 import '../styles/globals.css';
 import '@fontsource/roboto/300.css';
@@ -17,15 +18,17 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<html lang="en">
 			<body id="root">
-				<Providers>
-					<Suspense fallback={null}>
-						<GoogleAnalytics />
-					</Suspense>
-					<NavBar />
-					<main>{children}</main>
-					<Footer />
-					<CookieConsentBanner />
-				</Providers>
+				<AppRouterCacheProvider>
+					<Providers>
+						<Suspense fallback={null}>
+							<GoogleAnalytics />
+						</Suspense>
+						<NavBar />
+						<main>{children}</main>
+						<Footer />
+						<CookieConsentBanner />
+					</Providers>
+				</AppRouterCacheProvider>
 			</body>
 		</html>
 	);

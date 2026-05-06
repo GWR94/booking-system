@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import {
 	Slide,
 	Box,
@@ -16,6 +17,10 @@ type Props = {};
 const CheckoutFooter = (props: Props) => {
 	const theme = useTheme();
 	const { basket, basketPrice, clearBasket } = useBasket();
+	const totalHours = basket.reduce(
+		(sum, item) => sum + (item.slotIds?.length ?? 0),
+		0,
+	);
 	return (
 		<Slide direction="up" in={basket.length > 0} mountOnEnter unmountOnExit>
 			<Box
@@ -60,6 +65,12 @@ const CheckoutFooter = (props: Props) => {
 							>
 								{basket.length} {basket.length === 1 ? 'Slot' : 'Slots'}{' '}
 								Selected
+								{totalHours > 0 && (
+									<>
+										{' '}
+										({totalHours} {totalHours === 1 ? 'hr' : 'hrs'})
+									</>
+								)}
 							</Typography>
 							<Typography
 								variant="h5"
@@ -94,12 +105,8 @@ const CheckoutFooter = (props: Props) => {
 							</Button>
 							<Button
 								variant="contained"
-								component="a"
+								component={Link}
 								href="/checkout"
-								onClick={(e) => {
-									e.preventDefault();
-									window.location.href = '/checkout';
-								}}
 								sx={{
 									borderRadius: 2,
 									px: { xs: 3, sm: 4 },

@@ -26,7 +26,13 @@ interface MobileSlotProps {
 	handleRemoveOne: () => void;
 	basketCount: number;
 	availability?: 'good' | 'fair' | 'limited' | 'unavailable';
+	totalSlotCount?: number;
 }
+
+const getMobileGridSize = () => ({
+	xs: 6,
+	sm: 6,
+});
 
 const MobileSlot = ({
 	slot,
@@ -36,6 +42,7 @@ const MobileSlot = ({
 	handleRemoveOne,
 	basketCount,
 	availability,
+	totalSlotCount: _totalSlotCount,
 }: MobileSlotProps) => {
 	const theme = useTheme();
 	const { isAdmin } = useAuth();
@@ -43,26 +50,27 @@ const MobileSlot = ({
 
 	const { originalPrice, discountedPrice, hasDiscount } = price;
 	const isInBasket = basketCount > 0;
+	const gridSize = getMobileGridSize();
 
 	return (
-		<Grid size={{ xs: 6, sm: 4 }}>
+		<Grid size={gridSize}>
 			<Card
 				variant="outlined"
 				sx={{
 					...sx,
 					height: '100%',
 					minHeight: 96,
-					borderRadius: 2,
-					transition: 'all 0.2s ease',
-					borderWidth: 2,
-					boxShadow: isInBasket
-						? `0 0 0 1px ${theme.palette.primary.main}`
-						: 'none',
-					display: 'flex',
-					flexDirection: 'column',
-					position: 'relative',
-				}}
-			>
+				borderRadius: 2,
+				transition: 'all 0.2s ease',
+				borderWidth: 2,
+				boxShadow: isInBasket
+					? `0 0 0 1px ${theme.palette.primary.main}`
+					: 'none',
+				display: 'flex',
+				flexDirection: 'column',
+				position: 'relative',
+			}}
+		>
 				<CardActionArea
 					onClick={(e) => {
 						// For specific bay and already in basket: toggle (remove)

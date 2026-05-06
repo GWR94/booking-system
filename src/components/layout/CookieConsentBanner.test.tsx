@@ -4,8 +4,13 @@ import CookieConsentBanner from './CookieConsentBanner';
 import { useCookie } from '@context';
 import { ThemeProvider, createTheme } from '@mui/material';
 
+// Mock cookie + basket hooks so we don't need full providers in tests
 vi.mock('@context', () => ({
 	useCookie: vi.fn(),
+}));
+
+vi.mock('@/hooks', () => ({
+	useBasket: () => ({ basket: [] }),
 }));
 
 const theme = createTheme();

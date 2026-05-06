@@ -1,20 +1,21 @@
 'use client';
 
-import { Box, Container, useTheme } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Button, Container, Stack, Typography, useTheme } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
-import { createGuestPaymentIntent, createPaymentIntent } from '@api';
-import { Appearance, loadStripe } from '@stripe/stripe-js';
 import {
-	CheckoutForm,
-	GuestUser,
-	GuestInfo,
-	CheckoutSkeleton,
-} from './components';
-import { useBasket, useAuth, useBookingManager } from '@hooks';
+	createGuestPaymentIntent,
+	createPaymentIntent,
+	getBasket,
+} from '@api';
+import { Appearance, loadStripe } from '@stripe/stripe-js';
+import { CheckoutForm, GuestUser, GuestInfo, CheckoutSkeleton } from './components';
+import { useBasket, useAuth } from '@hooks';
 import { useSnackbar } from '@context';
+import { trackBeginCheckout } from '@utils/analytics';
 import { SectionHeader, AnimateIn } from '@ui';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import type { CheckoutIdentityMode } from './checkout-contract';
 
 const stripe = loadStripe(
 	process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string,
@@ -22,71 +23,188 @@ const stripe = loadStripe(
 
 const Checkout = () => {
 	const router = useRouter();
-	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const paymentIntentClientSecret = searchParams?.get(
 		'payment_intent_client_secret',
 	);
 
-	const [clientSecret, setClientSecret] = useState(
-		paymentIntentClientSecret || '',
-	);
-	const [isLoading, setLoading] = useState(!paymentIntentClientSecret);
+	const [clientSecret, setClientSecret] = useState(paymentIntentClientSecret || '');
+	/**
+	 * Start non-loading so guest checkout doesn't get stuck on the skeleton
+	 * while we wait for client-side session/basket hydration
+	 */
+	const [isLoading, setLoading] = useState(false);
+	const [clientSecretError, setClientSecretError] = useState(false);
 	const [guestInfo, setGuestInfo] = useState<GuestUser | null>(null);
 	const [recaptchaToken, setRecaptchaToken] = useState<string>('');
 
 	const { showSnackbar } = useSnackbar();
-	const { basket } = useBasket();
-	const { isAuthenticated } = useAuth();
+	const { basket, basketPrice, isBasketFetched } = useBasket();
+	const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+	const identityMode: CheckoutIdentityMode = isAuthenticated
+		? 'authenticated'
+		: 'guest';
+	const beginCheckoutTracked = useRef(false);
 	const theme = useTheme();
-	const { booking } = useBookingManager();
-
 	const [isFreeBooking, setIsFreeBooking] = useState(false);
+	const hasBasketItems = basket.length > 0;
+	const isReturningFromStripe = Boolean(paymentIntentClientSecret);
+	const isAuthUnresolved = isAuthLoading && !isAuthenticated;
+	const shouldRedirectEmptyBasket =
+		isBasketFetched && !hasBasketItems && !isReturningFromStripe;
 
 	useEffect(() => {
-		// Only redirect if:
-		// 1. Basket is empty
-		// 2. We're NOT returning from a payment (no client secret)
-		// 3. We're NOT returning from a free booking (no success param check here as it was for complete page)
-		const isReturningFromStripe = !!paymentIntentClientSecret;
+		if (!shouldRedirectEmptyBasket) return;
+		router.replace('/book');
+	}, [router, shouldRedirectEmptyBasket]);
 
-		if (basket.length === 0 && !isReturningFromStripe) {
-			router.push('/book');
+	useEffect(() => {
+		// Fallback guard: if basket query hydration is delayed, check persisted basket directly.
+		if (
+			isReturningFromStripe ||
+			shouldRedirectEmptyBasket ||
+			hasBasketItems ||
+			isBasketFetched !== false
+		)
+			return;
+		const persistedBasket = getBasket();
+		if (persistedBasket.length === 0) {
+			router.replace('/book');
 		}
-	}, [basket.length, paymentIntentClientSecret, router]);
+	}, [
+		hasBasketItems,
+		isBasketFetched,
+		isReturningFromStripe,
+		router,
+		shouldRedirectEmptyBasket,
+	]);
 
 	useEffect(() => {
-		if (paymentIntentClientSecret) return;
+		if (isReturningFromStripe) return;
 
 		const getClientSecret = async () => {
-			if (basket.length === 0) {
+			if (!hasBasketItems) {
+				setLoading(false);
+				setClientSecretError(false);
+				return;
+			}
+
+			if (isAuthUnresolved) {
 				setLoading(false);
 				return;
 			}
 
-			if (!isAuthenticated && !guestInfo) {
-				setLoading(false);
-				return;
-			}
-
-			setLoading(true);
-			try {
-				const { clientSecret, amount } = await createPaymentIntent(basket);
-
-				if (clientSecret === null && amount === 0) {
-					setIsFreeBooking(true);
-					setClientSecret('');
-				} else {
-					setClientSecret(clientSecret);
+			const runAuthenticatedCheckoutStrategy = async () => {
+				// Guest checkout creates its intent via `handleSubmitGuest`.
+				// Only auto-create intent here for authenticated users.
+				if (identityMode !== 'authenticated') {
+					setLoading(false);
+					setClientSecretError(false);
+					return;
 				}
-			} catch (error: any) {
-				console.error('Error fetching client secret:', error);
-			} finally {
-				setLoading(false);
-			}
+
+				// Any time we attempt to fetch a client secret, clear error state.
+				setClientSecretError(false);
+				setLoading(true);
+				try {
+					const { clientSecret, amount } = await createPaymentIntent(basket);
+
+					if (clientSecret === null && amount === 0) {
+						setIsFreeBooking(true);
+						setClientSecret('');
+					} else {
+						setIsFreeBooking(false);
+						setClientSecret(clientSecret);
+					}
+				} catch (error: any) {
+					if (error?.response?.status === 401) {
+						// Don't force logout here; this can be a transient auth mismatch.
+						setClientSecretError(true);
+						setClientSecret('');
+						return;
+					}
+
+					setClientSecretError(true);
+					console.error('Error fetching client secret:', error);
+				} finally {
+					setLoading(false);
+				}
+			};
+
+			await runAuthenticatedCheckoutStrategy();
 		};
 		getClientSecret();
-	}, [basket, isAuthenticated, guestInfo, paymentIntentClientSecret]);
+	}, [basket, hasBasketItems, identityMode, isAuthUnresolved, isReturningFromStripe]);
+
+	const runGuestCheckoutStrategy = () => {
+		if (identityMode !== 'guest' || guestInfo || paymentIntentClientSecret) {
+			return null;
+		}
+		return <GuestInfo onSubmit={handleSubmitGuest} />;
+	};
+
+	const runAuthenticatedCheckoutStrategy = () => {
+		if (clientSecretError && identityMode === 'authenticated' && !paymentIntentClientSecret) {
+			return (
+				<Box
+					sx={{
+						py: 6,
+						px: 3,
+						bgcolor: 'background.paper',
+						borderRadius: 2,
+						border: '1px solid',
+						borderColor: 'divider',
+					}}
+				>
+					<Stack spacing={2} alignItems="center">
+						<Typography variant="h6" textAlign="center">
+							Unable to start checkout
+						</Typography>
+						<Button variant="contained" onClick={() => router.refresh()}>
+							Try again
+						</Button>
+					</Stack>
+				</Box>
+			);
+		}
+
+		if (isFreeBooking) {
+			return (
+				<CheckoutForm
+					guest={guestInfo}
+					recaptchaToken={recaptchaToken}
+					isFree={true}
+				/>
+			);
+		}
+
+		if (!clientSecret) {
+			return <CheckoutSkeleton />;
+		}
+
+		return (
+			<Elements options={{ clientSecret, appearance, loader }} stripe={stripe}>
+				<CheckoutForm guest={guestInfo} recaptchaToken={recaptchaToken} />
+			</Elements>
+		);
+	};
+
+	useEffect(() => {
+		if (
+			basket.length > 0 &&
+			!isLoading &&
+			!paymentIntentClientSecret &&
+			!beginCheckoutTracked.current
+		) {
+			beginCheckoutTracked.current = true;
+			const value = parseFloat(String(basketPrice)) || 0;
+			trackBeginCheckout({
+				value: Math.round(value * 100) / 100,
+				currency: 'GBP',
+				items: [{ quantity: basket.length }],
+			});
+		}
+	}, [basket.length, basketPrice, isLoading, paymentIntentClientSecret]);
 
 	const appearance: Appearance = {
 		theme: 'stripe',
@@ -126,33 +244,22 @@ const Checkout = () => {
 	const loader = 'auto';
 
 	const renderContent = () => {
+		// Redirect is handled in an effect; return null to avoid UI flash during redirect.
+		if (shouldRedirectEmptyBasket) {
+			return null;
+		}
+
 		if (isLoading) {
 			return <CheckoutSkeleton />;
 		}
 
-		if (!isAuthenticated && !guestInfo && !paymentIntentClientSecret) {
-			return <GuestInfo onSubmit={handleSubmitGuest} />;
-		}
-
-		if (isFreeBooking) {
-			return (
-				<CheckoutForm
-					guest={guestInfo}
-					recaptchaToken={recaptchaToken}
-					isFree={true}
-				/>
-			);
-		}
-
-		if (!clientSecret) {
+		if (isAuthUnresolved && !guestInfo && !isReturningFromStripe) {
 			return <CheckoutSkeleton />;
 		}
 
-		return (
-			<Elements options={{ clientSecret, appearance, loader }} stripe={stripe}>
-				<CheckoutForm guest={guestInfo} recaptchaToken={recaptchaToken} />
-			</Elements>
-		);
+		const guestFlow = runGuestCheckoutStrategy();
+		if (guestFlow) return guestFlow;
+		return runAuthenticatedCheckoutStrategy();
 	};
 
 	return (

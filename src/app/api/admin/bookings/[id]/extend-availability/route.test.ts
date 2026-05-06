@@ -4,7 +4,7 @@ import { createMockRequest, createMockParams, parseResponse } from '@test/api-te
 const mockIsAdmin = vi.fn();
 const mockCheckAvailability = vi.fn();
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	isAdmin: (...args: any[]) => mockIsAdmin(...args),
 }));
 

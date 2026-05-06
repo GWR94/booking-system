@@ -5,6 +5,7 @@ import { AdminBookingsService } from '@modules';
 import { parseWithFirstError } from '@lib/zod';
 import { apiAdminLocalBookingSchema } from '@validation/api-schemas';
 import { errorResponse } from '../../../_utils/responses';
+import { makeAdminBookingLifecycle } from '@/server/modules/booking-lifecycle/admin-booking/admin-booking-lifecycle';
 
 export const POST = async (req: NextRequest) => {
 	if (!(await isAdmin())) {
@@ -25,12 +26,28 @@ export const POST = async (req: NextRequest) => {
 		}
 		const { slotIds } = parsed.data;
 
-		const result = await AdminBookingsService.createAdminBooking(
-			currentUser.id,
-			slotIds,
-		);
+		const lifecycle = makeAdminBookingLifecycle({
+			adminBookingsService: AdminBookingsService,
+		});
 
-		return NextResponse.json(result, { status: 201 });
+		const result = await lifecycle.createLocalBooking({
+			user: { role: 'admin' },
+			userId: currentUser.id,
+			slotIds,
+		});
+
+		if (!result.ok) {
+			if (result.status === 400 && result.code === 'SLOT_NOT_AVAILABLE') {
+				return NextResponse.json(
+					{ error: 'SLOT_NOT_AVAILABLE', message: result.message },
+					{ status: 400 },
+				);
+			}
+
+			return errorResponse(result.message, result.status);
+		}
+
+		return NextResponse.json(result.value, { status: 201 });
 	} catch (error) {
 		console.error('Create admin booking error:', error);
 

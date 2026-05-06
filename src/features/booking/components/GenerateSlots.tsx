@@ -8,6 +8,7 @@ import {
 	Container,
 	alpha,
 	useTheme,
+	useMediaQuery,
 	Card,
 } from '@mui/material';
 import Slot from './Slot';
@@ -33,7 +34,7 @@ const GenerateSlots = () => {
 		return () => setBottomOffset(0);
 	}, [basket.length, setBottomOffset]);
 
-	const filteredSlots = Object.keys(groupedTimeSlots)
+	const filteredSlots = Object.keys(groupedTimeSlots ?? {})
 		.filter((key: string) => {
 			const firstSlot = groupedTimeSlots[key][0];
 			return dayjs(firstSlot.startTime).isAfter(dayjs());
@@ -43,6 +44,24 @@ const GenerateSlots = () => {
 			const bTime = dayjs(groupedTimeSlots[b][0].startTime).valueOf();
 			return aTime - bTime;
 		});
+
+	const slotCount = filteredSlots.length;
+	// sm (600px)+: responsive grid so we use available width (2–4 cols). Below: single column centered.
+	const isWideEnoughForGrid = useMediaQuery(theme.breakpoints.up('sm'));
+	const useResponsiveGrid = !isLoading && slotCount > 0 && isWideEnoughForGrid;
+	const useMobileCentered = !isLoading && slotCount > 0 && !isWideEnoughForGrid;
+	// Responsive grid: as many columns as fit (min 300px per card), max 4 cols
+	const responsiveGridSx = useResponsiveGrid
+		? {
+				display: 'grid',
+				gridTemplateColumns: 'repeat(auto-fill, 300px)',
+				gap: 2,
+				justifyContent: 'center',
+				maxWidth: 1280,
+				mx: 'auto',
+				alignItems: 'flex-start',
+			}
+		: undefined;
 
 	return (
 		<Container maxWidth="xl" sx={{ flexGrow: 1, p: 3 }}>
@@ -158,13 +177,39 @@ const GenerateSlots = () => {
 								</Card>
 							</Box>
 						)}
-						{filteredSlots.map((timeRange: string, i: number) => (
-							<Slot
-								key={i}
-								timeRange={timeRange}
-								timeSlots={groupedTimeSlots}
-							/>
-						))}
+						{useResponsiveGrid ? (
+							<Grid size={12} sx={responsiveGridSx}>
+								{filteredSlots.map((timeRange: string, i: number) => (
+									<Slot
+										key={i}
+										timeRange={timeRange}
+										timeSlots={groupedTimeSlots}
+										totalSlotCount={filteredSlots.length}
+									/>
+								))}
+							</Grid>
+						) : (
+							<Grid
+								size={12}
+								container
+								spacing={2}
+								columns={12}
+								sx={{
+									maxWidth: 360,
+									mx: 'auto',
+									alignItems: 'flex-start',
+								}}
+							>
+								{filteredSlots.map((timeRange: string, i: number) => (
+									<Slot
+										key={i}
+										timeRange={timeRange}
+										timeSlots={groupedTimeSlots}
+										totalSlotCount={filteredSlots.length}
+									/>
+								))}
+							</Grid>
+						)}
 
 						<CheckoutFooter />
 					</>

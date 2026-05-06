@@ -50,7 +50,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 				email: user.email || '',
 				role: user.role || 'user',
 				membershipTier: user.membershipTier || '',
-				membershipStatus: user.membershipStatus || 'INACTIVE',
+				membershipStatus: user.membershipStatus || '',
 			});
 		}
 	}, [user]);
@@ -84,11 +84,21 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setFormData({ ...formData, [e.target.name]: e.target.value });
+		const { name, value } = e.target;
+		setFormData((prev) => {
+			if (name === 'membershipTier' && value === '') {
+				return { ...prev, membershipTier: '', membershipStatus: '' };
+			}
+			return { ...prev, [name]: value };
+		});
 	};
 
 	const handleUpdate = () => {
-		updateMutation.mutate(formData);
+		updateMutation.mutate({
+			...formData,
+			membershipTier: formData.membershipTier || null,
+			membershipStatus: formData.membershipStatus || null,
+		});
 	};
 
 	const handleResetPassword = () => {
@@ -101,7 +111,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 		<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
 			<DialogTitle>Edit User: {user.name}</DialogTitle>
 			<DialogContent dividers>
-				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
 					<Typography variant="subtitle1" fontWeight={600}>
 						User Details
 					</Typography>
@@ -139,6 +149,17 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 						name="membershipTier"
 						value={formData.membershipTier}
 						onChange={handleChange}
+						slotProps={{
+							select: {
+								displayEmpty: true,
+								renderValue: (value) => {
+									if (!value) return 'None';
+									if (value === 'HOLEINONE') return 'HOLE IN ONE';
+									return String(value);
+								},
+							},
+							inputLabel: { shrink: true },
+						}}
 						fullWidth
 						size="small"
 					>
@@ -153,19 +174,44 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 						name="membershipStatus"
 						value={formData.membershipStatus}
 						onChange={handleChange}
+						disabled={!formData.membershipTier}
+						slotProps={{
+							select: {
+								displayEmpty: true,
+								renderValue: (value) => (!value ? 'None' : String(value)),
+							},
+							inputLabel: { shrink: true },
+						}}
 						fullWidth
 						size="small"
 					>
+						<MenuItem value="">None</MenuItem>
 						<MenuItem value="ACTIVE">Active</MenuItem>
-						<MenuItem value="INACTIVE">Inactive</MenuItem>
 						<MenuItem value="CANCELLED">Cancelled</MenuItem>
-						<MenuItem value="PAUSED">Paused</MenuItem>
 					</TextField>
 				</Box>
 
-				<Accordion elevation={0} sx={{ border: '1px solid #eee' }}>
-					<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-						<Typography fontWeight={600}>Reset Password</Typography>
+				<Accordion
+					elevation={0}
+					sx={{
+						border: 1,
+						borderColor: 'rgba(0, 0, 0, 0.23)',
+						borderRadius: 1,
+						overflow: 'hidden',
+						'&:before': { display: 'none' },
+						'&.Mui-expanded': { margin: 0 },
+					}}
+				>
+					<AccordionSummary
+						expandIcon={<ExpandMoreIcon fontSize="small" />}
+						sx={{
+							minHeight: 40,
+							'&.Mui-expanded': { minHeight: 40 },
+							'& .MuiAccordionSummary-content': { my: 0.75 },
+							'& .MuiAccordionSummary-content.Mui-expanded': { my: 0.75 },
+						}}
+					>
+						<Typography sx={{ fontWeight: 600 }}>Reset Password</Typography>
 					</AccordionSummary>
 					<AccordionDetails>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

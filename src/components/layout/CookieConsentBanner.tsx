@@ -8,27 +8,29 @@ import {
 	Container,
 	Stack,
 	useTheme,
+	alpha,
 } from '@mui/material';
 import { useCookie } from '@context';
+import { useBasket } from '@/hooks';
 
 const CookieConsentBanner = () => {
 	const { isConsentSet, acceptAll, rejectAll } = useCookie();
 	const theme = useTheme();
+	const { basket } = useBasket();
 
 	if (isConsentSet) return null;
 
 	return (
-		<Paper
-			elevation={6}
+		<Box
 			sx={{
 				position: 'fixed',
-				bottom: 0,
+				bottom: basket.length > 0 ? 96 : 0,
 				left: 0,
 				right: 0,
-				zIndex: 9999,
+				zIndex: 9500,
 				borderRadius: 0,
 				borderTop: `1px solid ${theme.palette.divider}`,
-				bgcolor: 'background.paper',
+				bgcolor: alpha(theme.palette.background.paper, 0.9),
 			}}
 		>
 			<Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
@@ -58,7 +60,7 @@ const CookieConsentBanner = () => {
 					</Stack>
 				</Stack>
 			</Container>
-		</Paper>
+		</Box>
 	);
 };
 

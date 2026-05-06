@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, Suspense, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -35,7 +35,9 @@ const Providers = ({ children }: PropsWithChildren) => {
 								<ErrorBoundary>
 									<UIProvider>
 										{children}
-										<AuthModal />
+										<Suspense fallback={null}>
+											<AuthModal />
+										</Suspense>
 									</UIProvider>
 								</ErrorBoundary>
 							</SnackbarProvider>

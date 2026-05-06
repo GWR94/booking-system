@@ -1,9 +1,9 @@
 'use client';
 
 import { ReactElement, useEffect, useState } from 'react';
-import { useStripe } from '@stripe/react-stripe-js';
 import { PaymentIntent } from '@stripe/stripe-js';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js';
 
 import {
 	Box,
@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { AnimateIn } from '@ui';
 import {
-	CheckCircle as CheckCircleIcon,
+	EventAvailable as EventAvailableIcon,
 	Error as ErrorIcon,
 	Info as InfoIcon,
 	Warning as WarningIcon,
@@ -32,6 +32,7 @@ import { getBookingByPaymentIntent } from '@api';
 import dayjs from 'dayjs';
 import { groupSlotsByBay } from '@utils';
 import { useSnackbar } from '@context';
+import { trackPurchase } from '@utils/analytics';
 import { GroupedSlot } from '../../booking/components';
 
 interface StatusContent {
@@ -79,11 +80,14 @@ const STATUS_CONTENT_MAP: Record<PaymentIntent.Status, StatusContent> = {
 };
 
 const CompletePage = () => {
-	const stripe = useStripe();
 	const { clearBasket } = useBasket();
 	const { booking, setBooking } = useBookingManager();
 	const { showSnackbar } = useSnackbar();
 	const searchParams = useSearchParams();
+
+	const paymentIntentClientSecret =
+		searchParams?.get('payment_intent_client_secret') ?? null;
+	const isSuccess = searchParams?.get('success') === 'true';
 
 	const [status, setStatus] = useState<PaymentIntent.Status>('processing');
 	const [intentId, setIntentId] = useState('');
@@ -94,12 +98,12 @@ const CompletePage = () => {
 
 	useEffect(() => {
 		const fetchPaymentIntent = async () => {
+			const stripe = await loadStripe(
+				process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string,
+			);
 			if (!stripe) return;
 
-			const clientSecret = searchParams?.get('payment_intent_client_secret');
-			const isSuccess = searchParams?.get('success') === 'true';
-
-			if (!clientSecret && !isSuccess) {
+			if (!paymentIntentClientSecret && !isSuccess) {
 				setLoading(false);
 				return;
 			}
@@ -113,16 +117,23 @@ const CompletePage = () => {
 				setPaymentMethod('Membership Included');
 				setLoading(false);
 				clearBasket(); // Ensure basket is cleared for free bookings too
+				trackPurchase({
+					transaction_id: String(booking.id),
+					value: 0,
+					currency: 'GBP',
+					slots_count: (booking.slots as any[])?.length ?? 0,
+				});
 				return;
 			}
 
-			if (!clientSecret) {
+			if (!paymentIntentClientSecret) {
 				setLoading(false);
 				return;
 			}
 
-			const { paymentIntent } =
-				await stripe.retrievePaymentIntent(clientSecret);
+			const { paymentIntent } = await stripe.retrievePaymentIntent(
+				paymentIntentClientSecret,
+			);
 
 			if (!paymentIntent) return;
 
@@ -191,6 +202,12 @@ const CompletePage = () => {
 						setItems(grouped);
 						setLoading(false);
 						clearBasket();
+						trackPurchase({
+							transaction_id: String(data.booking.id),
+							value: (paymentIntent.amount ?? 0) / 100,
+							currency: 'GBP',
+							slots_count: data.booking.slots?.length ?? 0,
+						});
 					} else {
 						throw new Error('Incomplete booking data');
 					}
@@ -214,13 +231,27 @@ const CompletePage = () => {
 			await fetchBookingWithRetry();
 		};
 		fetchPaymentIntent();
-	}, [stripe]);
+	}, [
+		paymentIntentClientSecret,
+		isSuccess,
+		booking,
+		clearBasket,
+		showSnackbar,
+	]);
 
 	const subtotal = parseFloat(itemsCost) / 1.2;
 	const vat = parseFloat(itemsCost) - subtotal;
+	const contactName = booking?.user?.name ?? booking?.guestName;
+	const contactEmail = booking?.user?.email ?? booking?.guestEmail;
 
 	return isLoading ? (
-		<Box display="flex" justifyContent="center" p={4}>
+		<Box
+			display="flex"
+			justifyContent="center"
+			alignItems="center"
+			p={4}
+			sx={{ minHeight: '60vh' }}
+		>
 			<CircularProgress />
 		</Box>
 	) : (
@@ -245,7 +276,7 @@ const CompletePage = () => {
 						maxWidth="sm"
 					>
 						{status === 'succeeded' ? (
-							<CheckCircleIcon sx={{ fontSize: 64, color: 'white' }} />
+							<EventAvailableIcon sx={{ fontSize: 64, color: 'white' }} />
 						) : (
 							<ErrorIcon sx={{ fontSize: 64, color: 'white' }} />
 						)}
@@ -440,7 +471,7 @@ const CompletePage = () => {
 														</Typography>
 													</Stack>
 
-													{booking.user && (
+													{(contactName || contactEmail) && (
 														<>
 															<Divider />
 															<Stack
@@ -451,7 +482,7 @@ const CompletePage = () => {
 																	Name
 																</Typography>
 																<Typography sx={{ fontWeight: 'medium' }}>
-																	{booking.user.name}
+																	{contactName || '-'}
 																</Typography>
 															</Stack>
 															<Stack
@@ -462,7 +493,7 @@ const CompletePage = () => {
 																	Email
 																</Typography>
 																<Typography sx={{ fontWeight: 'medium' }}>
-																	{booking.user.email}
+																	{contactEmail || '-'}
 																</Typography>
 															</Stack>
 														</>
@@ -470,7 +501,7 @@ const CompletePage = () => {
 												</Stack>
 											</Box>
 
-											{booking.user && (
+											{contactEmail && (
 												<Box
 													sx={{
 														p: 1.5,
@@ -488,7 +519,7 @@ const CompletePage = () => {
 													/>
 													<Typography variant="caption" color="text.secondary">
 														A confirmation email has been sent to{' '}
-														{booking.user.email}
+														{contactEmail}
 													</Typography>
 												</Box>
 											)}

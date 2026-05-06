@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import React, { ReactNode } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material';
 import { CSSObject } from '@mui/system';
@@ -39,15 +37,24 @@ const ThemeContext = React.createContext<{
 export const useAppTheme = () => React.useContext(ThemeContext);
 
 const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-	// Initialize from local storage or default
-	const [themeId, setThemeIdState] = React.useState(() => {
+	const DEFAULT_THEME_ID = 'blue-yellow-teal';
+
+	// Important: do not read localStorage during initial render.
+	// Next app router will pre-render client components on the server.
+	// If the initial theme differs between server (no localStorage) and client (has localStorage),
+	// MUI's emotion styles can mismatch and cause hydration errors.
+	const [themeId, setThemeIdState] = React.useState<string>(
+		DEFAULT_THEME_ID,
+	);
+
+	React.useEffect(() => {
 		try {
 			const saved = localStorage.getItem('app-theme-id');
-			return saved || 'blue-yellow-teal';
+			if (saved) setThemeIdState(saved);
 		} catch {
-			return 'blue-yellow-teal';
+			// ignore (fail back to default theme)
 		}
-	});
+	}, []);
 
 	const setThemeId = (id: string) => {
 		setThemeIdState(id);

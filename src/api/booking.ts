@@ -1,6 +1,7 @@
 import { axios } from '@api/client';
 import type { GuestUser } from '@features/checkout/components';
 import type { Booking, GroupedSlot } from '@features/booking/components';
+import type { CheckoutIdentityMode } from '@features/checkout/checkout-contract';
 
 const BOOKING_STORAGE_KEY = 'booking-data';
 
@@ -14,9 +15,16 @@ export const deleteBooking = async (bookingId: number) => {
 	return response.data;
 };
 
+export const resumePendingBookingPayment = async (bookingId: number) => {
+	const response = await axios.post(`/api/bookings/${bookingId}/resume-payment`);
+	return response.data as { clientSecret: string; paymentIntentId: string };
+};
+
 export const createPaymentIntent = async (items: GroupedSlot[]) => {
+	const identityMode: CheckoutIdentityMode = 'authenticated';
 	const response = await axios.post('/api/bookings/payment-intent', {
 		items,
+		identityMode,
 	});
 	return response.data;
 };
@@ -26,10 +34,12 @@ export const createGuestPaymentIntent = async (
 	guestInfo: GuestUser,
 	recaptchaToken: string,
 ) => {
+	const identityMode: CheckoutIdentityMode = 'guest';
 	const response = await axios.post('/api/bookings/payment-intent', {
 		items,
 		guestInfo,
 		recaptchaToken,
+		identityMode,
 	});
 	return response.data;
 };
@@ -48,6 +58,7 @@ export const confirmFreeBooking = async (
 		paymentId: 'FREE_MEMBERSHIP',
 		paymentStatus: 'succeeded',
 		guestInfo,
+		identityMode: guestInfo ? 'guest' : 'authenticated',
 	});
 	return response.data;
 };

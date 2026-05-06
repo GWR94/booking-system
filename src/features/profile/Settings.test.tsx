@@ -4,15 +4,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Settings from './Settings';
 import { ThemeProvider } from '@context';
 
-const mockUser = {
+const mockUser: any = {
 	id: '1',
 	name: 'Test User',
 	email: 'test@example.com',
 	membershipTier: 'PAR',
 	membershipStatus: 'active',
+	bookings: [],
 };
 
-const mockUseAuth = vi.fn(() => ({ user: mockUser }));
+const mockUseAuth = vi.fn<() => { user: any | null }>(() => ({ user: mockUser }));
 
 vi.mock('@hooks', () => ({
 	useAuth: () => mockUseAuth(),
@@ -36,6 +37,9 @@ vi.mock('./components', () => ({
 				<button onClick={onClose}>Close</button>
 			</div>
 		) : null,
+	PendingPaymentBanner: ({ bookingId }: { bookingId: number }) => (
+		<div data-testid="pending-payment-banner">{bookingId}</div>
+	),
 }));
 
 vi.mock('@ui', () => ({
@@ -143,5 +147,30 @@ describe('Settings', () => {
 		);
 
 		expect(container.firstChild).toBeNull();
+	});
+
+	it('renders pending payment banner when there is a resumable pending booking', () => {
+		mockUseAuth.mockReturnValueOnce({
+			user: {
+				...mockUser,
+				bookings: [
+					{
+						id: 7,
+						status: 'pending',
+						paymentId: 'pi_abc',
+						bookingTime: new Date().toISOString(),
+						slots: [{ endTime: new Date(Date.now() + 60_000).toISOString() }],
+					},
+				],
+			},
+		});
+
+		render(
+			<ThemeProvider>
+				<Settings />
+			</ThemeProvider>,
+		);
+
+		expect(screen.getByTestId('pending-payment-banner')).toHaveTextContent('7');
 	});
 });

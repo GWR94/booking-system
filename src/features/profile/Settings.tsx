@@ -1,14 +1,17 @@
 'use client';
 
 import { SubscriptionManagement, DeleteAccountDialog } from './components';
+import { PendingPaymentBanner } from './components';
 import { Box, Button, Paper, Divider, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from '@hooks';
 import { SectionHeader } from '@ui';
+import { getLatestResumablePendingBooking } from '@utils/pending-payment';
 
 const Settings = () => {
 	const { user } = useAuth();
 	const [deleteOpen, setDeleteOpen] = useState(false);
+	const pendingBooking = getLatestResumablePendingBooking(user?.bookings);
 
 	if (!user) return null;
 
@@ -20,6 +23,7 @@ const Settings = () => {
 				description="Manage your subscription and account preferences"
 				noAnimation
 			/>
+			{pendingBooking && <PendingPaymentBanner bookingId={pendingBooking.id} />}
 
 			<SubscriptionManagement user={user} />
 

@@ -23,8 +23,6 @@ vi.mock('@hooks', () => ({
 }));
 
 vi.mock('@layout', () => ({
-	NavBar: () => <div data-testid="navbar">NavBar</div>,
-	Footer: () => <div data-testid="footer">Footer</div>,
 	PROFILE_MENU_ITEMS: [
 		{ label: 'Overview', path: '/profile/overview', Icon: () => null },
 		{ label: 'My Bookings', path: '/profile/bookings', Icon: () => null },
@@ -108,15 +106,15 @@ describe('ProfileLayoutClient', () => {
 		expect(screen.getByRole('menuitem', { name: /Logout/i })).toBeInTheDocument();
 	});
 
-	it('renders NavBar and Footer', () => {
+	it('does not render NavBar or Footer (root layout provides them)', () => {
 		renderWithTheme(
 			<ProfileLayoutClient>
 				<div>Profile content</div>
 			</ProfileLayoutClient>,
 		);
 
-		expect(screen.getByTestId('navbar')).toBeInTheDocument();
-		expect(screen.getByTestId('footer')).toBeInTheDocument();
+		expect(screen.queryByTestId('navbar')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
 	});
 
 	it('renders children in main content area', () => {
@@ -172,7 +170,7 @@ describe('ProfileLayoutClient', () => {
 
 	it('renders fallback "User" when user has no name', () => {
 		mockUseAuth.mockReturnValueOnce({
-			user: { name: null, email: 'anon@example.com' },
+			user: { name: '', email: 'anon@example.com' },
 			logout: mockLogout,
 		});
 		renderWithTheme(

@@ -8,8 +8,6 @@ import {
 	Grid2 as Grid,
 	IconButton,
 	Stack,
-	Chip,
-	Divider,
 } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {

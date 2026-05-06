@@ -4,13 +4,13 @@ import { db } from '@db';
 import { getSessionUser } from '@/server/auth/auth';
 
 export const DELETE = async (req: NextRequest) => {
-	const user = await getSessionUser();
-
-	if (!user) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
-
 	try {
+		const user = await getSessionUser();
+
+		if (!user) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
 		await db.user.delete({
 			where: { id: user.id },
 		});

@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Server-side environment variable schema.
  * Validates at runtime when this module is first imported (e.g. by API routes).
- * Use validatedEnv in server code for typed access; optional vars may be undefined.
+ * Use serverEnv in server code for typed access.
  */
 const serverEnvSchema = z.object({
 	NODE_ENV: z
@@ -13,35 +13,39 @@ const serverEnvSchema = z.object({
 	AUTH_SECRET: z.string().min(1, 'AUTH_SECRET is required'),
 
 	STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
-	STRIPE_WEBHOOK_SECRET: z.string().optional(),
+	STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
 
-	ACCESS_TOKEN_SECRET: z.string().optional(),
-	CRON_SECRET: z.string().optional(),
+	ACCESS_TOKEN_SECRET: z.string().min(1, 'ACCESS_TOKEN_SECRET is required'),
+	CRON_SECRET: z.string().min(1, 'CRON_SECRET is required'),
 
-	NEXT_PUBLIC_APP_URL: z.string().optional(),
-	LOGO_URL: z.string().optional(),
+	NEXT_PUBLIC_APP_URL: z.string().min(1, 'NEXT_PUBLIC_APP_URL is required'),
+	LOGO_URL: z.string().min(1, 'LOGO_URL is required'),
 
-	SMTP_HOST: z.string().optional(),
-	SMTP_PORT: z.string().optional(),
-	SMTP_SECURE: z.string().optional(),
-	SMTP_USER: z.string().optional(),
-	SMTP_PASS: z.string().optional(),
-	EMAIL_HOST: z.string().optional(),
-	EMAIL_PORT: z.string().optional(),
-	EMAIL_SECURE: z.string().optional(),
-	EMAIL_USER: z.string().optional(),
-	EMAIL_PASS: z.string().optional(),
+	SMTP_HOST: z.string().min(1, 'SMTP_HOST is required'),
+	SMTP_PORT: z.string().min(1, 'SMTP_PORT is required'),
+	SMTP_SECURE: z.string().min(1, 'SMTP_SECURE is required'),
+	SMTP_USER: z.string().min(1, 'SMTP_USER is required'),
+	SMTP_PASS: z.string().min(1, 'SMTP_PASS is required'),
+	EMAIL_HOST: z.string().min(1, 'EMAIL_HOST is required'),
+	EMAIL_PORT: z.string().min(1, 'EMAIL_PORT is required'),
+	EMAIL_SECURE: z.string().min(1, 'EMAIL_SECURE is required'),
+	EMAIL_USER: z.string().min(1, 'EMAIL_USER is required'),
+	EMAIL_PASS: z.string().min(1, 'EMAIL_PASS is required'),
 
-	GOOGLE_CLIENT_ID: z.string().optional(),
-	GOOGLE_CLIENT_SECRET: z.string().optional(),
-	FACEBOOK_CLIENT_ID: z.string().optional(),
-	FACEBOOK_APP_SECRET: z.string().optional(),
-	TWITTER_CLIENT_ID: z.string().optional(),
-	TWITTER_CLIENT_SECRET: z.string().optional(),
+	GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID is required'),
+	GOOGLE_CLIENT_SECRET: z.string().min(1, 'GOOGLE_CLIENT_SECRET is required'),
+	FACEBOOK_CLIENT_ID: z.string().min(1, 'FACEBOOK_CLIENT_ID is required'),
+	FACEBOOK_APP_SECRET: z.string().min(1, 'FACEBOOK_APP_SECRET is required'),
+	TWITTER_CLIENT_ID: z.string().min(1, 'TWITTER_CLIENT_ID is required'),
+	TWITTER_CLIENT_SECRET: z.string().min(1, 'TWITTER_CLIENT_SECRET is required'),
 
-	STRIPE_PRICE_ID_PAR: z.string().optional(),
-	STRIPE_PRICE_ID_BIRDIE: z.string().optional(),
-	STRIPE_PRICE_ID_HOLEINONE: z.string().optional(),
+	STRIPE_PRICE_ID_PAR: z.string().min(1, 'STRIPE_PRICE_ID_PAR is required'),
+	STRIPE_PRICE_ID_BIRDIE: z
+		.string()
+		.min(1, 'STRIPE_PRICE_ID_BIRDIE is required'),
+	STRIPE_PRICE_ID_HOLEINONE: z
+		.string()
+		.min(1, 'STRIPE_PRICE_ID_HOLEINONE is required'),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

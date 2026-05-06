@@ -21,8 +21,6 @@ vi.mock('@hooks', () => ({
 }));
 
 vi.mock('@layout', () => ({
-	NavBar: () => <div data-testid="navbar">NavBar</div>,
-	Footer: () => <div data-testid="footer">Footer</div>,
 	ADMIN_MENU_ITEMS: [
 		{ label: 'Dashboard', path: '/admin/dashboard', Icon: () => null },
 		{ label: 'Bookings', path: '/admin/bookings', Icon: () => null },
@@ -104,15 +102,15 @@ describe('AdminLayoutClient', () => {
 		expect(screen.getByRole('menuitem', { name: /Logout/i })).toBeInTheDocument();
 	});
 
-	it('renders NavBar and Footer', () => {
+	it('does not render NavBar or Footer (root layout provides them)', () => {
 		renderWithTheme(
 			<AdminLayoutClient>
 				<div>Page content</div>
 			</AdminLayoutClient>,
 		);
 
-		expect(screen.getByTestId('navbar')).toBeInTheDocument();
-		expect(screen.getByTestId('footer')).toBeInTheDocument();
+		expect(screen.queryByTestId('navbar')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
 	});
 
 	it('renders children in main content area', () => {

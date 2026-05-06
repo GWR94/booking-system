@@ -9,6 +9,7 @@ export {
 export {
 	createBooking,
 	deleteBooking,
+	resumePendingBookingPayment,
 	createPaymentIntent,
 	createGuestPaymentIntent,
 	getBookingByPaymentIntent,

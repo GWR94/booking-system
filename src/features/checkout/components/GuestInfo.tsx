@@ -80,7 +80,7 @@ const GuestInfo = ({ onSubmit }: GuestInfoProps) => {
 		}
 		if (basket.length === 0) {
 			showSnackbar('Add an item to the basket to checkout');
-			router.push('/');
+			router.push('/book');
 			setLoading(false);
 			return;
 		}
@@ -215,7 +215,7 @@ const GuestInfo = ({ onSubmit }: GuestInfoProps) => {
 					}}
 				>
 					<Button
-						onClick={() => router.push('/')}
+						onClick={() => router.push('/book')}
 						variant="outlined"
 						size="large"
 						fullWidth={isMobile}

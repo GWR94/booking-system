@@ -10,7 +10,7 @@ const { mockDb } = vi.hoisted(() => ({
 
 const mockBillingPortalCreate = vi.fn();
 
-vi.mock('src/server/auth/auth', () => ({
+vi.mock('@/server/auth/auth', () => ({
 	getSessionUser: (...args: unknown[]) => mockGetSessionUser(...args),
 }));
 

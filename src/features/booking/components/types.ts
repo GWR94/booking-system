@@ -2,7 +2,10 @@ import { Dayjs } from 'dayjs';
 
 export interface Booking {
 	id: number;
-	userId: number;
+	userId: number | null;
+	guestName?: string | null;
+	guestEmail?: string | null;
+	guestPhone?: string | null;
 	slotId: number;
 	bookingTime: Dayjs;
 	status: StatusType;

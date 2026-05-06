@@ -22,7 +22,7 @@ import {
 } from '@mui/icons-material';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@hooks';
-import { NavBar, Footer, ADMIN_MENU_ITEMS } from '@layout';
+import { ADMIN_MENU_ITEMS } from '@layout';
 
 const AdminLayoutClient = ({
 	children,
@@ -63,8 +63,6 @@ const AdminLayoutClient = ({
 				bgcolor: 'grey.50',
 			}}
 		>
-			<NavBar />
-
 			<Box
 				sx={{
 					background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
@@ -255,7 +253,6 @@ const AdminLayoutClient = ({
 					</Grid>
 				</Grid>
 			</Container>
-			<Footer />
 		</Box>
 	);
 };

@@ -7,6 +7,7 @@ import {
 	createGuestPaymentIntent,
 	getBookingByPaymentIntent,
 	confirmFreeBooking,
+	resumePendingBookingPayment,
 	getStoredBooking,
 	saveStoredBooking,
 } from './booking';
@@ -58,6 +59,7 @@ describe('booking api', () => {
 
 		expect(axios.post).toHaveBeenCalledWith('/api/bookings/payment-intent', {
 			items,
+			identityMode: 'authenticated',
 		});
 		expect(result).toEqual(mockResponse);
 	});
@@ -79,6 +81,7 @@ describe('booking api', () => {
 			items,
 			guestInfo,
 			recaptchaToken,
+			identityMode: 'guest',
 		});
 		expect(result).toEqual(mockResponse);
 	});
@@ -109,6 +112,7 @@ describe('booking api', () => {
 				paymentId: 'FREE_MEMBERSHIP',
 				paymentStatus: 'succeeded',
 				guestInfo: undefined,
+				identityMode: 'authenticated',
 			});
 			expect(result).toEqual(mockResponse);
 		});
@@ -126,9 +130,18 @@ describe('booking api', () => {
 				paymentId: 'FREE_MEMBERSHIP',
 				paymentStatus: 'succeeded',
 				guestInfo,
+				identityMode: 'guest',
 			});
 			expect(result).toEqual(mockResponse);
 		});
+	});
+
+	it('resumePendingBookingPayment should call POST /api/bookings/:id/resume-payment', async () => {
+		const mockResponse = { clientSecret: 'secret', paymentIntentId: 'pi_1' };
+		(axios.post as any).mockResolvedValue({ data: mockResponse });
+		const result = await resumePendingBookingPayment(12);
+		expect(axios.post).toHaveBeenCalledWith('/api/bookings/12/resume-payment');
+		expect(result).toEqual(mockResponse);
 	});
 
 	it('getStoredBooking should return null if nothing in localStorage', () => {

@@ -5,6 +5,8 @@ import { auth } from '../../../auth';
 import { parseWithFirstError } from '@lib/zod';
 import { apiBookingCreateSchema } from '@validation/api-schemas';
 import { errorResponse } from '../_utils/responses';
+import { makeBookingLifecycle } from '@/server/modules/booking-lifecycle/booking/booking-lifecycle';
+import { normalizeCheckoutRequest } from '../_utils/checkout';
 
 export const POST = async (req: NextRequest) => {
 	try {
@@ -17,7 +19,6 @@ export const POST = async (req: NextRequest) => {
 
 		const session = await auth();
 		const userId = session?.user?.id ? Number(session.user.id) : undefined;
-
 		if (!userId && !guestInfo) {
 			return errorResponse(
 				'Authentication required or guest info must be provided',
@@ -25,21 +26,41 @@ export const POST = async (req: NextRequest) => {
 				'AUTH_REQUIRED',
 			);
 		}
+		const normalized = normalizeCheckoutRequest({
+			items: [{ slotIds }],
+			guestInfo,
+			sessionUserId: userId ?? null,
+		});
+		if (!normalized.request) {
+			return errorResponse(
+				normalized.errors[0]?.message ?? 'Invalid checkout payload',
+				400,
+				'VALIDATION_ERROR',
+			);
+		}
+		const checkoutRequest = normalized.request;
 
-		const booking = await BookingService.createBooking({
+		const lifecycle = makeBookingLifecycle({ bookingService: BookingService });
+		const result = await lifecycle.createPendingBooking({
 			userId,
-			slotIds,
+			slotIds: checkoutRequest.items.flatMap((item) => item.slotIds),
 			paymentId,
 			paymentStatus,
-			guestInfo,
+			guestInfo: checkoutRequest.guestInfo,
 		});
 
+		if (!result.ok) {
+			return errorResponse(result.error, 500);
+		}
+
 		return NextResponse.json({
-			message: guestInfo
+			message: checkoutRequest.guestInfo
 				? 'Guest booking created successfully'
 				: 'Booking created successfully',
-			booking,
-			...(guestInfo && { guestEmail: guestInfo.email }),
+			booking: result.booking,
+			...(checkoutRequest.guestInfo && {
+				guestEmail: checkoutRequest.guestInfo.email,
+			}),
 		});
 	} catch (error) {
 		console.error('Error creating booking:', error);

@@ -2,10 +2,36 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 describe('server env', () => {
 	beforeEach(() => {
-		vi.stubEnv('NODE_ENV', 'test');
-		vi.stubEnv('DATABASE_URL', process.env.DATABASE_URL || 'postgres://localhost/test');
-		vi.stubEnv('AUTH_SECRET', process.env.AUTH_SECRET || 'test-secret');
-		vi.stubEnv('STRIPE_SECRET_KEY', process.env.STRIPE_SECRET_KEY || 'sk_test_xxx');
+		const stub = (key: string, value: string) =>
+			vi.stubEnv(key, process.env[key] || value);
+		stub('NODE_ENV', 'test');
+		stub('DATABASE_URL', 'postgres://localhost/test');
+		stub('AUTH_SECRET', 'test-secret');
+		stub('STRIPE_SECRET_KEY', 'sk_test_xxx');
+		stub('STRIPE_WEBHOOK_SECRET', 'whsec_test');
+		stub('ACCESS_TOKEN_SECRET', 'test-access-token');
+		stub('CRON_SECRET', 'test-cron');
+		stub('NEXT_PUBLIC_APP_URL', 'http://localhost:3000');
+		stub('LOGO_URL', 'https://example.com/logo.png');
+		stub('SMTP_HOST', 'localhost');
+		stub('SMTP_PORT', '1025');
+		stub('SMTP_SECURE', 'false');
+		stub('SMTP_USER', 'test');
+		stub('SMTP_PASS', 'test');
+		stub('EMAIL_HOST', 'localhost');
+		stub('EMAIL_PORT', '1025');
+		stub('EMAIL_SECURE', 'false');
+		stub('EMAIL_USER', 'test');
+		stub('EMAIL_PASS', 'test');
+		stub('GOOGLE_CLIENT_ID', 'google-id');
+		stub('GOOGLE_CLIENT_SECRET', 'google-secret');
+		stub('FACEBOOK_CLIENT_ID', 'fb-id');
+		stub('FACEBOOK_APP_SECRET', 'fb-secret');
+		stub('TWITTER_CLIENT_ID', 'twitter-id');
+		stub('TWITTER_CLIENT_SECRET', 'twitter-secret');
+		stub('STRIPE_PRICE_ID_PAR', 'price_par');
+		stub('STRIPE_PRICE_ID_BIRDIE', 'price_birdie');
+		stub('STRIPE_PRICE_ID_HOLEINONE', 'price_holeinone');
 	});
 
 	afterEach(() => {
