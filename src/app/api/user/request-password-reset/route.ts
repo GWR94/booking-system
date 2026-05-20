@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import crypto from 'crypto';
 import { handleSendEmail } from '@utils/email';
+import { getEmailSiteUrl } from '@utils/site-url';
 import { parseWithFirstError } from '@lib/zod';
 import { apiRequestPasswordResetSchema } from '@validation/api-schemas';
 import { errorResponse } from '@/app/api/_utils/responses';
@@ -37,11 +38,10 @@ export const POST = async (req: NextRequest) => {
 			},
 		});
 
-		const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+		const resetUrl = `${getEmailSiteUrl()}/reset-password?token=${token}`;
 
 		await handleSendEmail({
 			recipientEmail: email,
-			senderPrefix: 'Password Reset',
 			subject: 'Password Reset Request',
 			templateName: 'password-reset',
 			templateContext: {

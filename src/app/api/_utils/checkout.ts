@@ -5,7 +5,7 @@ import {
 	type CheckoutIdentityMode,
 	type CheckoutRequest,
 	type CheckoutValidationError,
-} from '@/features/checkout/checkout-contract';
+} from '@/validation/checkout-contract';
 
 type NormalizeCheckoutInput = {
 	items: Array<{ slotIds: number[] }>;
@@ -14,9 +14,10 @@ type NormalizeCheckoutInput = {
 	sessionUserId?: number | null;
 };
 
-export function normalizeCheckoutRequest(
-	input: NormalizeCheckoutInput,
-): { request: CheckoutRequest | null; errors: CheckoutValidationError[] } {
+export function normalizeCheckoutRequest(input: NormalizeCheckoutInput): {
+	request: CheckoutRequest | null;
+	errors: CheckoutValidationError[];
+} {
 	const errors: CheckoutValidationError[] = [];
 	const mode: CheckoutIdentityMode =
 		input.sessionUserId != null ? 'authenticated' : 'guest';
@@ -68,4 +69,3 @@ export function normalizeCheckoutRequest(
 
 	return { request, errors: [] };
 }
-

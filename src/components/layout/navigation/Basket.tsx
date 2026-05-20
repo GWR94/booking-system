@@ -55,11 +55,11 @@ const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 		<Tooltip title="Your basket" arrow>
 			<IconButton
 				onClick={handleBasketButtonClick}
-				size="large"
 				sx={{
-					color: theme.palette.link.light,
 					borderRadius: 1.5,
-					transition: 'all 0.2s',
+					p: 1,
+					color: theme.palette.link.light,
+					transition: 'all 0.2s ease',
 					'&:hover': {
 						backgroundColor: alpha(theme.palette.link.light, 0.1),
 					},
@@ -103,18 +103,18 @@ const Basket = ({ isMobile = false, onMobileBasketClick }: BasketProps) => {
 							maxWidth: 'calc(100% - 32px)',
 							minWidth: 320,
 							'&:before': {
-								//speech bubble
+								// Match account / admin menu caret
 								content: '""',
 								display: 'block',
 								position: 'absolute',
 								top: 0,
-								right: 14,
-								width: 10,
-								height: 10,
-								backgroundColor: 'background.paper',
+								right: 15,
+								width: 12,
+								height: 12,
+								backgroundColor: 'inherit',
 								transform: 'translateY(-50%) rotate(45deg)',
 								zIndex: 0,
-								boxShadow: '0px -2px 5px rgba(0,0,0,0.1)',
+								boxShadow: '-3px -3px 5px -2px rgba(0,0,0,0.1)',
 							},
 						},
 					},

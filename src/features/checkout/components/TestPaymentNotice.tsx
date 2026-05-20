@@ -10,6 +10,8 @@ import {
 	Collapse,
 	useTheme,
 	alpha,
+	SxProps,
+	Theme,
 } from '@mui/material';
 import {
 	ContentCopy as ContentCopyIcon,
@@ -18,7 +20,13 @@ import {
 } from '@mui/icons-material';
 import { useSnackbar } from '@context';
 
-const TestPaymentNotice = ({ membership }: { membership?: boolean }) => {
+const TestPaymentNotice = ({
+	membership,
+	sx,
+}: {
+	membership?: boolean;
+	sx?: SxProps<Theme>;
+}) => {
 	const [isVisible, setIsVisible] = useState(true);
 	const { showSnackbar } = useSnackbar();
 	const theme = useTheme();
@@ -52,6 +60,7 @@ const TestPaymentNotice = ({ membership }: { membership?: boolean }) => {
 					bgcolor: alpha(theme.palette.info.main, 0.05),
 					borderRadius: 2,
 					position: 'relative',
+					...sx,
 				}}
 			>
 				<IconButton

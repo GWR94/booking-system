@@ -12,8 +12,10 @@ describe('CallToAction', () => {
 		);
 
 		expect(
-			screen.getByText(/Ready to Elevate Your Game\?/i),
+			screen.getByText(/Lock in member rates and priority booking/i),
 		).toBeInTheDocument();
-		expect(screen.getByText(/Join Now/i)).toBeInTheDocument();
+		expect(
+			screen.getByRole('button', { name: /View plans & subscribe/i }),
+		).toBeInTheDocument();
 	});
 });

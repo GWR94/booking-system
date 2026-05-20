@@ -9,9 +9,8 @@ vi.mock('@shared', () => ({
 }));
 
 describe('HelpCenter', () => {
-	it('renders Help Center title and subtitle', () => {
+	it('renders FAQ intro and subtitle', () => {
 		render(<HelpCenter />, { wrapper: createWrapper() });
-		expect(screen.getByText('Help Center')).toBeInTheDocument();
 		expect(
 			screen.getByText(/Find answers to common questions about our golf simulator booking system/),
 		).toBeInTheDocument();
@@ -28,6 +27,7 @@ describe('HelpCenter', () => {
 		expect(screen.getByRole('tab', { name: 'All' })).toBeInTheDocument();
 		expect(screen.getByRole('tab', { name: 'Booking' })).toBeInTheDocument();
 		expect(screen.getByRole('tab', { name: 'Payment' })).toBeInTheDocument();
+		expect(screen.getByRole('tab', { name: 'Membership' })).toBeInTheDocument();
 	});
 
 	it('filters FAQs when search query is entered', () => {

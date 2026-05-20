@@ -1,14 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { getVitestNextRouterMocks } from '@test/vitest-next-router';
 import MembershipPreview from './MembershipPreview';
 import { ThemeProvider } from '@context';
-
-const mockPush = vi.fn();
-vi.mock('next/navigation', () => ({
-	useRouter: () => ({
-		push: mockPush,
-	}),
-}));
 
 vi.mock('@ui', () => ({
 	AnimateIn: ({ children }: { children: React.ReactNode }) => (
@@ -22,15 +16,20 @@ vi.mock('@ui', () => ({
 	),
 }));
 
-vi.mock('@mui/icons-material', () => ({
-	Check: () => <div data-testid="CheckIcon" />,
-	Star: () => <div data-testid="StarIcon" />,
-}));
+vi.mock('@mui/icons-material', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@mui/icons-material')>();
+	return {
+		...actual,
+		Check: () => <div data-testid="CheckIcon" />,
+		Star: () => <div data-testid="StarIcon" />,
+	};
+});
 
-vi.mock('@constants/memberships', () => ({
+vi.mock('@/constants/memberships', () => ({
 	__esModule: true,
-	default: [
+	memberships: [
 		{
+			tierKey: 'PAR',
 			title: 'Par',
 			price: '£199.99',
 			period: '/month',
@@ -38,6 +37,7 @@ vi.mock('@constants/memberships', () => ({
 			recommended: false,
 		},
 		{
+			tierKey: 'BIRDIE',
 			title: 'Birdie',
 			price: '£299.99',
 			period: '/month',
@@ -45,6 +45,7 @@ vi.mock('@constants/memberships', () => ({
 			recommended: true,
 		},
 		{
+			tierKey: 'HOLEINONE',
 			title: 'Hole-In-One',
 			price: '£399.99',
 			period: '/month',
@@ -55,6 +56,10 @@ vi.mock('@constants/memberships', () => ({
 }));
 
 describe('MembershipPreview', () => {
+	beforeEach(() => {
+		getVitestNextRouterMocks().push.mockClear();
+	});
+
 	it('should render title and description', () => {
 		render(
 			<ThemeProvider>
@@ -98,6 +103,6 @@ describe('MembershipPreview', () => {
 
 		const viewDetailsBtns = screen.getAllByText(/Choose/i);
 		fireEvent.click(viewDetailsBtns[0]);
-		expect(mockPush).toHaveBeenCalledWith('/membership');
+		expect(getVitestNextRouterMocks().push).toHaveBeenCalledWith('/membership');
 	});
 });

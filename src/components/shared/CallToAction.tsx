@@ -75,47 +75,54 @@ const CallToAction = () => {
 							<Box
 								sx={{
 									display: 'flex',
-									alignItems: { xs: 'stretch', sm: 'center' },
-									flexDirection: { xs: 'column', sm: 'row' },
+									flexDirection: { xs: 'column', md: 'row' },
+									alignItems: { xs: 'stretch', md: 'center' },
 									gap: 2,
 								}}
 							>
-								<Button
-									variant="contained"
-									color="secondary"
-									onClick={() => router.push('/book')}
-									sx={{
-										px: 4,
-										py: 1.5,
-										fontWeight: 600,
-										borderRadius: 2,
-										boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
-										width: { xs: '100%', sm: 'auto' },
-									}}
+								<Stack
+									direction={{ xs: 'column', sm: 'row' }}
+									spacing={2}
+									sx={{ width: { xs: '100%', md: 'auto' } }}
 								>
-									Book a Session Now
-								</Button>
-								<Button
-									variant="outlined"
-									color="accent"
-									onClick={() => router.push('/membership')}
-									sx={{
-										display: { xs: 'block', md: 'none' },
-										px: 4,
-										py: 1.5,
-										fontWeight: 600,
-										borderRadius: 2,
-										boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
-										width: { xs: '100%', sm: 'auto' },
-									}}
-								>
-									Browse Memberships
-								</Button>
+									<Button
+										variant="contained"
+										color="secondary"
+										onClick={() => router.push('/book')}
+										sx={{
+											px: 4,
+											py: 1.5,
+											fontWeight: 600,
+											borderRadius: 2,
+											boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+											width: { xs: '100%', sm: 'auto' },
+										}}
+									>
+										Book a Session Now
+									</Button>
+									<Button
+										variant="outlined"
+										color="accent"
+										onClick={() => router.push('/membership')}
+										sx={{
+											display: { xs: 'flex', md: 'none' },
+											px: 4,
+											py: 1.5,
+											fontWeight: 600,
+											borderRadius: 2,
+											boxShadow: '0 4px 14px 0 rgba(0,0,0,0.25)',
+											width: { xs: '100%', sm: 'auto' },
+										}}
+									>
+										Browse Memberships
+									</Button>
+								</Stack>
 								<Box
 									sx={{
 										display: 'flex',
 										alignItems: 'center',
-										justifyContent: 'center',
+										justifyContent: 'flex-start',
+										width: { xs: '100%', md: 'auto' },
 									}}
 								>
 									<PhoneInTalk

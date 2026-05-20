@@ -11,6 +11,7 @@ interface SectionHeaderProps {
 	color?: 'primary' | 'secondary' | 'white';
 	sx?: SxProps<Theme>;
 	noAnimation?: boolean;
+	maxWidth?: number;
 }
 
 const SectionHeader = ({
@@ -21,6 +22,7 @@ const SectionHeader = ({
 	color = 'primary',
 	sx,
 	noAnimation = false,
+	maxWidth,
 }: SectionHeaderProps) => {
 	const theme = useTheme();
 
@@ -76,7 +78,7 @@ const SectionHeader = ({
 						variant="h6"
 						color={descriptionColor}
 						sx={{
-							maxWidth: align === 'center' ? 700 : 500,
+							maxWidth: maxWidth || (align === 'center' ? 700 : 500),
 							mx: align === 'center' ? 'auto' : 0,
 							fontWeight: 400,
 							lineHeight: 1.6,

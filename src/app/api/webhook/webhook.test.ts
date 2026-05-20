@@ -47,6 +47,16 @@ vi.mock('@db', () => ({
 	db: mockDb,
 }));
 
+vi.mock('next/server', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('next/server')>();
+	return {
+		...actual,
+		after: (callback: () => void | Promise<void>) => {
+			void callback();
+		},
+	};
+});
+
 import { POST } from './route';
 import { createMockRequest } from '@test/api-test-utils';
 

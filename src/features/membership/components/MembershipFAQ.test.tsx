@@ -1,53 +1,31 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import FAQ from './MembershipFAQ';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import MembershipFAQ from './MembershipFAQ';
 import { ThemeProvider } from '@context';
+import { supportFaqsHref } from '@features/help-center/supportSections';
 
-describe('FAQ', () => {
-	it('should render FAQ title', () => {
+vi.mock('next/link', () => ({
+	default: ({
+		children,
+		href,
+	}: {
+		children: React.ReactNode;
+		href: string;
+	}) => <a href={href}>{children}</a>,
+}));
+
+describe('MembershipFAQ', () => {
+	it('links to membership FAQs on the help hub', () => {
 		render(
 			<ThemeProvider>
-				<FAQ />
+				<MembershipFAQ />
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/Frequently Asked Questions/i)).toBeInTheDocument();
-	});
-
-	it('should render all FAQ questions', () => {
-		render(
-			<ThemeProvider>
-				<FAQ />
-			</ThemeProvider>,
+		expect(screen.getByText(/Membership questions\?/i)).toBeInTheDocument();
+		expect(screen.getByRole('link', { name: /View membership FAQs/i })).toHaveAttribute(
+			'href',
+			supportFaqsHref('membership'),
 		);
-
-		expect(
-			screen.getByText(/Can I cancel my membership anytime\?/i),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText(/What happens if I exceed my monthly hours\?/i),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText(/Can I upgrade or downgrade my membership\?/i),
-		).toBeInTheDocument();
-	});
-
-	it('should expand accordion to show answer', () => {
-		render(
-			<ThemeProvider>
-				<FAQ />
-			</ThemeProvider>,
-		);
-
-		const firstQuestion = screen.getByText(
-			/Can I cancel my membership anytime\?/i,
-		);
-		fireEvent.click(firstQuestion);
-
-		expect(
-			screen.getByText(
-				/Your access will remain active until the end of the current billing cycle/i,
-			),
-		).toBeInTheDocument();
 	});
 });

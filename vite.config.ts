@@ -1,66 +1,83 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+/** Tests that need `document`, browser APIs, or @testing-library/react. */
+const jsdomTestGlobs = [
+	'src/components/**/*.test.{ts,tsx}',
+	'src/features/**/*.test.{ts,tsx}',
+	'src/app/**/*.test.{ts,tsx}',
+	'src/hooks/**/*.test.{ts,tsx}',
+	'src/context/**/*.test.{ts,tsx}',
+	'src/api/**/*.test.{ts,tsx}',
+	'src/utils/**/*.test.{ts,tsx}',
+] as const;
 
-// Vite config used only for Vitest; Next.js handles dev/build.
-export default defineConfig(({ mode }) => ({
-	esbuild: {
-		drop: mode === 'production' ? ['console', 'debugger'] : [],
-	},
-	plugins: [react()],
-	resolve: {
-		alias: {
-			'@auth': path.resolve(__dirname, './src/server/auth/auth'),
-			'@db': path.resolve(__dirname, './src/server/db/client'),
-			'@config': path.resolve(__dirname, './src/config'),
-			'@lib': path.resolve(__dirname, './src/server/lib'),
-			'@test': path.resolve(__dirname, './src/__test__'),
-			'@constants': path.resolve(__dirname, './src/constants'),
-			'@components': path.resolve(__dirname, './src/components'),
-			'@hooks': path.resolve(__dirname, './src/hooks'),
-			'@modules': path.resolve(__dirname, './src/server/modules'),
-			'@context': path.resolve(__dirname, './src/context'),
-			'@assets': path.resolve(__dirname, './src/assets'),
-			'@features': path.resolve(__dirname, './src/features'),
-			'@utils': path.resolve(__dirname, './src/utils'),
-			'@api': path.resolve(__dirname, './src/api'),
-			'@ui': path.resolve(__dirname, './src/components/ui'),
-			'@layout': path.resolve(__dirname, './src/components/layout'),
-			'@shared': path.resolve(__dirname, './src/components/shared'),
-			'@styles': path.resolve(__dirname, './src/styles'),
-			'@validation': path.resolve(__dirname, './src/validation'),
-			'@': path.resolve(__dirname, './src'),
-			// Stub Next.js server APIs for Vitest so importing `next/server`
-			// in routes and tests doesn't require the real Next runtime.
-			'next/server': path.resolve(
-				__dirname,
-				'./src/__test__/mocks/next-server.ts',
-			),
-		},
-	},
+/** UI-focused coverage: components, features, client context/hooks, and App Router UI (not API routes). */
+const coverageInclude = [
+	'src/components/**/*.{ts,tsx}',
+	'src/features/**/*.{ts,tsx}',
+	'src/context/**/*.{ts,tsx}',
+	'src/hooks/**/*.{ts,tsx}',
+	'src/app/**/*.{ts,tsx}',
+] as const;
+
+const coverageExclude = [
+	'e2e/**',
+	'**/index.ts',
+	'src/server/db/client.ts',
+	// Route shells: covered indirectly via feature tests / e2e; excluding avoids noisy 0% rows.
+	'src/app/**/page.tsx',
+	'src/app/**/layout.tsx',
+	'src/app/providers.tsx',
+	'src/app/not-found.tsx',
+	'src/app/api/**',
+	'**/*.test.{ts,tsx}',
+	'**/*.spec.{ts,tsx}',
+	'src/setupTests.tsx',
+	'src/vitest-global-setup.ts',
+	'src/__test__/**',
+	'**/mocks/**',
+	'**/*.d.ts',
+	'**/types.ts',
+	'src/types/**',
+	'src/assets/**',
+	'next-env.d.ts',
+	'src/proxy.ts',
+	'**/test-utils.tsx',
+] as const;
+
+export default defineConfig({
+	plugins: [react(), tsconfigPaths()],
 	test: {
 		globals: true,
-		environment: 'jsdom',
+		globalSetup: './src/vitest-global-setup.ts',
 		setupFiles: './src/setupTests.tsx',
-		css: true,
-		reporters: ['verbose'],
-		// Keep Vitest focused on this project's actual test locations.
-		// Prevent accidental execution of any junk generated outside `src/` (e.g. top-level `api/`).
-		include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-		exclude: ['api/**', 'e2e/**', 'node_modules/**', 'dist/**'],
+		css: false,
+		reporters: ['default'],
 		coverage: {
-			reporter: ['text', 'json', 'html'],
-			include: ['src/**/*'],
-			exclude: [
-				'e2e/**',
-				'**/index.ts',
-				'**/index.tsx',
-				'src/server/db/client.ts',
-			],
+			provider: 'v8',
+			include: [...coverageInclude],
+			exclude: [...coverageExclude],
 		},
+		projects: [
+			{
+				extends: true,
+				test: {
+					name: 'jsdom',
+					environment: 'jsdom',
+					include: [...jsdomTestGlobs],
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: 'node',
+					environment: 'node',
+					include: ['src/**/*.test.{ts,tsx}'],
+					exclude: [...jsdomTestGlobs],
+				},
+			},
+		],
 	},
-}));
+});

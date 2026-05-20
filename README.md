@@ -57,7 +57,7 @@ A modern, responsive booking experience for a golf simulator business. This is a
    | `STRIPE_SECRET_KEY`                  | Yes          | Stripe secret key (test or live)                                                                                              |
    | `STRIPE_WEBHOOK_SECRET`              | For webhooks | Stripe webhook signing secret                                                                                                 |
    | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes          | Stripe publishable key                                                                                                        |
-   | `NEXT_PUBLIC_APP_URL`                | Yes          | App base URL (e.g. `http://localhost:3000`); used server-side for emails/redirects and client-side for Stripe return URL etc. |
+   | `NEXT_PUBLIC_APP_URL`                | Yes          | Public app origin (e.g. `http://localhost:3000`); emails, Stripe redirects, JSON-LD, and NextAuth (`NEXTAUTH_URL` is set from this when unset). |
 
    See `.env.example` for all optional vars (SMTP, OAuth, cron, etc.).
 

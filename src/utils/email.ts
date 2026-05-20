@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars';
 import { logger } from './logger';
-import { COMPANY_CONFIG } from '../config/company.config';
+import COMPANY_DATA from '../constants/company';
+import { getEmailLogoUrl, getEmailSiteUrl } from './site-url';
 import path from 'path';
 import dayjs from 'dayjs';
 
@@ -21,8 +22,6 @@ type EmailTemplateName =
 interface SendConfirmProps<T extends EmailTemplateName> {
 	/** Email address of the recipient */
 	recipientEmail: string;
-	/** Prefix for the sender name (e.g. 'booking', 'noreply') */
-	senderPrefix: string;
 	/** Email subject line */
 	subject: string;
 	/** Name of the Handlebars template (e.g. 'confirmation', 'password-reset') */
@@ -31,7 +30,28 @@ interface SendConfirmProps<T extends EmailTemplateName> {
 	templateContext: Record<string, unknown>;
 	/** Optional reply-to email address */
 	replyTo?: string;
+	/** When true, rethrow after logging so API routes can return an error response */
+	rethrow?: boolean;
 }
+
+const smtpEnv = () => ({
+	host: process.env.SMTP_HOST || process.env.EMAIL_HOST,
+	user: process.env.SMTP_USER || process.env.EMAIL_USER,
+	pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
+});
+
+/** Env keys required for outbound mail (host, user, and password). */
+export const missingSmtpEnvKeys = (): string[] => {
+	const { host, user, pass } = smtpEnv();
+	const missing: string[] = [];
+	if (!host) missing.push('SMTP_HOST or EMAIL_HOST');
+	if (!user) missing.push('SMTP_USER or EMAIL_USER');
+	if (!pass) missing.push('SMTP_PASS or EMAIL_PASS');
+	return missing;
+};
+
+export const isSmtpConfigured = (): boolean =>
+	missingSmtpEnvKeys().length === 0;
 
 const getContextValue = (context: Record<string, unknown>, key: string) => {
 	const value = context[key];
@@ -102,13 +122,13 @@ const buildPlainTextFallback = (
 };
 
 const transporter = nodemailer.createTransport({
-	host: process.env.SMTP_HOST || process.env.EMAIL_HOST,
+	host: smtpEnv().host,
 	port: Number(process.env.SMTP_PORT || process.env.EMAIL_PORT || '465'),
 	secure:
 		process.env.SMTP_SECURE === 'true' || process.env.EMAIL_SECURE === 'true',
 	auth: {
-		user: process.env.SMTP_USER || process.env.EMAIL_USER,
-		pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
+		user: smtpEnv().user,
+		pass: smtpEnv().pass,
 	},
 });
 
@@ -125,14 +145,8 @@ const handlebarOptions = {
 
 transporter.use('compile', hbs(handlebarOptions));
 
-const resolveBaseUrl = () => {
-	const configured = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
-	if (!configured) return 'http://localhost:3000';
-	if (/^https?:\/\//i.test(configured)) return configured;
-	const isLocal =
-		configured.startsWith('localhost') || configured.startsWith('127.0.0.1');
-	return `${isLocal ? 'http' : 'https'}://${configured}`;
-};
+const formatFromAddress = () =>
+	`"${COMPANY_DATA.name}" <${COMPANY_DATA.email}>`;
 
 /**
  * Sends a templated email using Handlebars templates.
@@ -151,7 +165,6 @@ const resolveBaseUrl = () => {
  * // Booking confirmation
  * await handleSendEmail({
  *   recipientEmail: 'user@example.com',
- *   senderPrefix: 'booking',
  *   subject: 'Your booking is confirmed!',
  *   templateName: 'confirmation',
  *   templateContext: { booking, payment, baseUrl }
@@ -161,7 +174,6 @@ const resolveBaseUrl = () => {
  * // Password reset email
  * await handleSendEmail({
  *   recipientEmail: 'user@example.com',
- *   senderPrefix: 'noreply',
  *   subject: 'Reset your password',
  *   templateName: 'password-reset',
  *   templateContext: { resetUrl, expiresIn: '1 hour' },
@@ -170,20 +182,20 @@ const resolveBaseUrl = () => {
  */
 export const handleSendEmail = async <T extends EmailTemplateName>({
 	recipientEmail,
-	senderPrefix,
 	subject,
 	templateName,
 	templateContext,
 	replyTo,
+	rethrow = false,
 }: SendConfirmProps<T>) => {
 	try {
-		const fromAddress = `${senderPrefix}@${COMPANY_CONFIG.emailDomain}`;
-		const baseUrl = resolveBaseUrl();
+		const fromAddress = formatFromAddress();
+		const baseUrl = getEmailSiteUrl();
 		const normalizedContext = {
-			baseUrl,
-			logoUrl: process.env.LOGO_URL || `${baseUrl}/logo.webp`,
-			year: new Date().getFullYear(),
 			...templateContext,
+			baseUrl,
+			logoUrl: getEmailLogoUrl(baseUrl),
+			year: new Date().getFullYear(),
 		};
 		const plainText = buildPlainTextFallback(templateName, normalizedContext);
 
@@ -203,6 +215,9 @@ export const handleSendEmail = async <T extends EmailTemplateName>({
 		);
 	} catch (error) {
 		logger.error(`Error sending email: ${error}`);
+		if (rethrow) {
+			throw error;
+		}
 	}
 };
 
@@ -235,10 +250,9 @@ export const sendRefundFailedAlert = async ({
 	paymentId,
 	userEmail,
 }: SendRefundFailedEmailProps) => {
-	const staffEmail = COMPANY_CONFIG.email;
+	const staffEmail = COMPANY_DATA.email;
 	await handleSendEmail({
 		recipientEmail: staffEmail,
-		senderPrefix: 'refunds',
 		subject: `Refund failed – Booking #${bookingId} (manual action required)`,
 		templateName: 'refund-failed-alert',
 		templateContext: {
@@ -265,7 +279,6 @@ export const sendPendingPaymentReminder = async ({
 }: SendPendingPaymentReminderProps) => {
 	await handleSendEmail({
 		recipientEmail,
-		senderPrefix: 'bookings',
 		subject: `Complete your pending booking #${bookingId}`,
 		templateName: 'pending-payment-reminder',
 		templateContext: {

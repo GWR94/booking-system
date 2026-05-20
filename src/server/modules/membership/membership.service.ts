@@ -1,5 +1,5 @@
 import { db } from '@db';
-import { MEMBERSHIP_TIERS, MembershipTier } from '@config/membership.config';
+import { MEMBERSHIP_TIERS, MembershipTier } from '@constants/memberships';
 import Stripe from 'stripe';
 
 export class MembershipService {
@@ -9,13 +9,20 @@ export class MembershipService {
 	static async handleMembershipUpdate(subscription: Stripe.Subscription) {
 		const customerId = subscription.customer as string;
 		const stripeStatus = subscription.status;
-		const currentPeriodStart = (subscription as any).current_period_start
-			? new Date((subscription as any).current_period_start * 1000)
-			: null;
-		const currentPeriodEnd = (subscription as any).current_period_end
-			? new Date((subscription as any).current_period_end * 1000)
-			: null;
-		const priceId = subscription.items?.data[0]?.price.id;
+		const primaryItem = subscription.items?.data?.[0];
+		const currentPeriodStart =
+			primaryItem?.current_period_start != null
+				? new Date(primaryItem.current_period_start * 1000)
+				: null;
+		const currentPeriodEnd =
+			primaryItem?.current_period_end != null
+				? new Date(primaryItem.current_period_end * 1000)
+				: null;
+		const priceId = primaryItem?.price
+			? typeof primaryItem.price === 'string'
+				? primaryItem.price
+				: primaryItem.price.id
+			: undefined;
 
 		const tierEntry = Object.entries(MEMBERSHIP_TIERS).find(
 			([, val]) => val.priceId === priceId,

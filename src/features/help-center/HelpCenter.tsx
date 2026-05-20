@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
 	Box,
 	Container,
@@ -8,7 +8,6 @@ import {
 	Paper,
 	Tabs,
 	Tab,
-	Grid2 as Grid,
 	TextField,
 	Button,
 	Accordion,
@@ -25,34 +24,58 @@ import {
 	CreditCard,
 	SportsGolf,
 	EditCalendar,
+	WorkspacePremium,
 } from '@mui/icons-material';
 import { ContactForm } from '@shared';
-import { FaqItem, faqData } from '../membership/components/data';
+import { FaqItem, faqData } from '@constants/memberships';
+import SearchBar from './SearchBar';
+import { SectionHeader } from '@/components/ui';
 
-const HelpCenter: React.FC = () => {
+const FAQ_CATEGORIES = [
+	'All',
+	'Booking',
+	'Payment',
+	'Facilities',
+	'Account',
+	'Membership',
+] as const;
+
+function categoryToTabIndex(category?: string): number {
+	if (!category) {
+		return 0;
+	}
+	const index = FAQ_CATEGORIES.findIndex(
+		(name) => name.toLowerCase() === category.toLowerCase(),
+	);
+	return index >= 0 ? index : 0;
+}
+
+type HelpCenterProps = {
+	initialCategory?: string;
+};
+
+const HelpCenter: React.FC<HelpCenterProps> = ({ initialCategory }) => {
 	const theme = useTheme();
-	const [tabValue, setTabValue] = useState(0);
+	const initialTab = useMemo(
+		() => categoryToTabIndex(initialCategory),
+		[initialCategory],
+	);
+	const [tabValue, setTabValue] = useState(initialTab);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [filteredFaqs, setFilteredFaqs] =
 		useState<Record<string, FaqItem[]>>(faqData);
 
-	// Category names for tabs
-	const categories = ['All', 'Booking', 'Payment', 'Facilities', 'Account'];
-
-	// Handle tab change
-	const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+	const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
 		setTabValue(newValue);
 		filterFaqs(searchQuery, newValue);
 	};
 
-	// Handle search
 	const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const query = event.target.value;
 		setSearchQuery(query);
 		filterFaqs(query, tabValue);
 	};
 
-	// Filter FAQs based on search query and selected tab
 	const filterFaqs = (query: string, tabIndex: number) => {
 		if (query.trim() === '' && tabIndex === 0) {
 			setFilteredFaqs(faqData);
@@ -63,10 +86,9 @@ const HelpCenter: React.FC = () => {
 		const filteredData: Record<string, FaqItem[]> = {};
 
 		categoryKeys.forEach((category) => {
-			// Skip this category if a specific tab is selected and it's not this one
 			if (
 				tabIndex > 0 &&
-				category.toLowerCase() !== categories[tabIndex].toLowerCase()
+				category.toLowerCase() !== FAQ_CATEGORIES[tabIndex].toLowerCase()
 			) {
 				return;
 			}
@@ -85,7 +107,6 @@ const HelpCenter: React.FC = () => {
 		setFilteredFaqs(filteredData);
 	};
 
-	// Get icon based on category
 	const getCategoryIcon = (category: string) => {
 		switch (category.toLowerCase()) {
 			case 'booking':
@@ -96,83 +117,21 @@ const HelpCenter: React.FC = () => {
 				return <SportsGolf color="primary" />;
 			case 'account':
 				return <LocalOffer color="primary" />;
+			case 'membership':
+				return <WorkspacePremium color="primary" />;
 			default:
 				return <HelpOutline color="primary" />;
 		}
 	};
 
 	return (
-		<Container maxWidth="lg" sx={{ py: 4 }}>
-			<Box sx={{ mb: 5 }}>
-				<Typography variant="title" sx={{ mb: 4 }}>
-					Help Center
-				</Typography>
-				<Typography
-					variant="h6"
-					component="h2"
-					align="center"
-					color="text.secondary"
-					sx={{ maxWidth: 700, mx: 'auto', mb: 4 }}
-				>
-					Find answers to common questions about our golf simulator booking
-					system
-				</Typography>
+		<Box>
+			<SectionHeader
+				title="FAQs"
+				description="Find answers to common questions about our golf simulator booking system"
+			/>
+			<SearchBar value={searchQuery} onChange={handleSearch} />
 
-				{/* Search Bar */}
-				<Paper
-					elevation={0}
-					sx={{
-						maxWidth: 600,
-						mx: 'auto',
-						display: 'flex',
-						borderRadius: 2,
-						border: `1px solid ${theme.palette.divider}`,
-					}}
-				>
-					<TextField
-						fullWidth
-						placeholder="Search for help..."
-						variant="outlined"
-						value={searchQuery}
-						onChange={handleSearch}
-						sx={{
-							'& .MuiOutlinedInput-root': {
-								'& fieldset': {
-									borderColor: 'transparent',
-								},
-								'&:hover fieldset': {
-									borderColor: 'transparent',
-								},
-								'&.Mui-focused fieldset': {
-									borderColor: 'transparent',
-								},
-							},
-						}}
-						slotProps={{
-							input: {
-								startAdornment: (
-									<InputAdornment position="start">
-										<Search color="action" />
-									</InputAdornment>
-								),
-							},
-						}}
-					/>
-					<Button
-						variant="contained"
-						color="primary"
-						sx={{
-							ml: 1,
-							borderTopLeftRadius: 0,
-							borderBottomLeftRadius: 0,
-						}}
-					>
-						Search
-					</Button>
-				</Paper>
-			</Box>
-
-			{/* Category Tabs */}
 			<Paper
 				elevation={0}
 				sx={{
@@ -193,71 +152,75 @@ const HelpCenter: React.FC = () => {
 						borderBottom: 1,
 						borderColor: 'divider',
 						px: 2,
+						'& .MuiTabs-flexContainer': {
+							justifyContent: 'center',
+						},
 					}}
 				>
-					{categories.map((category, index) => (
-						<Tab key={index} label={category} sx={{ fontWeight: 500 }} />
+					{FAQ_CATEGORIES.map((category) => (
+						<Tab
+							key={category}
+							label={category}
+							sx={{ fontWeight: 500, minWidth: 'auto' }}
+						/>
 					))}
 				</Tabs>
 
-				{/* FAQ Accordions */}
 				<Box sx={{ p: 3 }}>
 					{Object.keys(filteredFaqs).length > 0 ? (
-						Object.entries(filteredFaqs).map(
-							([category, items], categoryIndex) => (
-								<Box key={category} sx={{ mb: 4 }}>
-									<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-										{getCategoryIcon(category)}
-										<Typography
-											variant="h6"
-											sx={{
-												ml: 1,
-												fontWeight: 600,
-												textTransform: 'capitalize',
-											}}
-										>
-											{category} FAQs
-										</Typography>
-									</Box>
-
-									{items.map((item, itemIndex) => (
-										<Accordion
-											key={`${category}-${itemIndex}`}
-											elevation={0}
-											disableGutters
-											sx={{
-												mb: 1,
-												border: `1px solid ${theme.palette.divider}`,
-												'&:before': { display: 'none' },
-												borderRadius: 1,
-												overflow: 'hidden',
-											}}
-										>
-											<AccordionSummary
-												expandIcon={<ExpandMore />}
-												aria-controls={`panel-${category}-${itemIndex}-content`}
-												id={`panel-${category}-${itemIndex}-header`}
-												sx={{
-													backgroundColor: 'background.default',
-													'&.Mui-expanded': {
-														backgroundColor: theme.palette.primary.light + '15',
-													},
-												}}
-											>
-												<Typography sx={{ fontWeight: 500 }}>
-													{item.question}
-												</Typography>
-											</AccordionSummary>
-											<AccordionDetails sx={{ pt: 1, pb: 2 }}>
-												<Typography color="text.secondary">
-													{item.answer}
-												</Typography>
-											</AccordionDetails>
-										</Accordion>
-									))}
+						Object.entries(filteredFaqs).map(([category, items]) => (
+							<Box key={category} sx={{ mb: 4 }}>
+								<Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+									{getCategoryIcon(category)}
+									<Typography
+										variant="h6"
+										sx={{
+											ml: 1,
+											fontWeight: 600,
+											textTransform: 'capitalize',
+										}}
+									>
+										{category} FAQs
+									</Typography>
 								</Box>
-							),
-						)
+
+								{items.map((item, itemIndex) => (
+									<Accordion
+										key={`${category}-${itemIndex}`}
+										elevation={0}
+										disableGutters
+										sx={{
+											mb: 1,
+											border: `1px solid ${theme.palette.divider}`,
+											'&:before': { display: 'none' },
+											borderRadius: 1,
+											overflow: 'hidden',
+										}}
+									>
+										<AccordionSummary
+											expandIcon={<ExpandMore />}
+											aria-controls={`panel-${category}-${itemIndex}-content`}
+											id={`panel-${category}-${itemIndex}-header`}
+											sx={{
+												backgroundColor: 'background.default',
+												'&.Mui-expanded': {
+													backgroundColor: theme.palette.primary.light + '15',
+												},
+											}}
+										>
+											<Typography sx={{ fontWeight: 500 }}>
+												{item.question}
+											</Typography>
+										</AccordionSummary>
+										<AccordionDetails sx={{ pt: 1, pb: 2 }}>
+											<Typography color="text.secondary">
+												{item.answer}
+											</Typography>
+										</AccordionDetails>
+									</Accordion>
+								))}
+							</Box>
+						))
 					) : (
 						<Box sx={{ py: 4, textAlign: 'center' }}>
 							<Typography variant="h6" color="text.secondary">
@@ -270,8 +233,20 @@ const HelpCenter: React.FC = () => {
 					)}
 				</Box>
 			</Paper>
-			<ContactForm />
-		</Container>
+			<Container maxWidth="md" sx={{ px: { xs: 0, md: 3 } }}>
+				<Paper
+					elevation={0}
+					sx={{
+						mt: 4,
+						borderRadius: 4,
+						overflow: 'hidden',
+						border: `1px solid ${theme.palette.divider}`,
+					}}
+				>
+					<ContactForm />
+				</Paper>
+			</Container>
+		</Box>
 	);
 };
 

@@ -5,18 +5,23 @@ import {
 	Grid2 as Grid,
 	useTheme,
 	Stack,
-	alpha,
 } from '@mui/material';
 import { AnimateIn } from '@ui';
-import { COMPANY_INFO } from '@constants/company';
+import COMPANY_INFO from '@constants/company';
 
 const AboutHero = () => {
 	const theme = useTheme();
 
 	return (
 		<Box
+			id="about"
 			sx={{
-				background: `linear-gradient(180deg, ${theme.palette.common.white} 0%, ${theme.palette.grey[100]} 100%)`,
+				// White field above; bottom edge fades into grey[100] to meet BarAndEntertainment
+				background: `linear-gradient(180deg,
+					${theme.palette.common.white} 0%,
+					${theme.palette.common.white} 38%,
+					${theme.palette.grey[50]} 72%,
+					${theme.palette.grey[100]} 100%)`,
 				pt: { xs: 12, md: 16 },
 				pb: 8,
 			}}
@@ -40,7 +45,7 @@ const AboutHero = () => {
 								</Typography>
 								<Typography
 									variant="h2"
-									component="h1"
+									component="h2"
 									sx={{
 										fontWeight: 800,
 										color: theme.palette.text.primary,

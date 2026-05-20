@@ -3,15 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import { makeBookingLifecycle } from '@/server/modules/booking-lifecycle/booking/booking-lifecycle';
 import { sendPendingPaymentReminder } from '@utils/email';
-
-const resolveBaseUrl = () => {
-	const configured = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim();
-	if (!configured) return 'http://localhost:3000';
-	if (/^https?:\/\//i.test(configured)) return configured;
-	const isLocal =
-		configured.startsWith('localhost') || configured.startsWith('127.0.0.1');
-	return `${isLocal ? 'http' : 'https'}://${configured}`;
-};
+import { getEmailSiteUrl } from '@utils/site-url';
 
 /**
  * Booking cleanup cron job.
@@ -65,7 +57,7 @@ export const GET = async (req: NextRequest) => {
 			take: 50,
 		});
 
-		const baseUrl = resolveBaseUrl();
+		const baseUrl = getEmailSiteUrl();
 		let reminded = 0;
 		for (const booking of candidates) {
 			const recipientEmail = booking.user?.email ?? booking.guestEmail ?? null;

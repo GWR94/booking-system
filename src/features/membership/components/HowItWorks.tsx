@@ -1,44 +1,82 @@
-import { Box, Typography, useTheme } from '@mui/material';
+import { StarBorder } from '@mui/icons-material';
+import { alpha, Box, Typography } from '@mui/material';
+
+const INTRO_POINTS = [
+	'Monthly playing hours included on every plan.',
+	'Member savings on food and drinks, plus priority booking windows.',
+	'Higher tiers add full weekend access and complimentary club storage.',
+] as const;
 
 const HowItWorks = () => {
-	const theme = useTheme();
 	return (
-		<Box sx={{ mb: 4 }}>
-			<Typography
-				variant="h4"
-				component="h2"
-				gutterBottom
+		<Box component="section" sx={{ my: { xs: 5, md: 6 } }}>
+			<Box
 				sx={{
-					fontWeight: 700,
-					color: theme.palette.primary.main,
+					maxWidth: 'min(40rem, 100%)',
+					mx: 'auto',
+					mb: { xs: 4, md: 5 },
+					px: { xs: 0, sm: 1 },
 				}}
 			>
-				How It Works
-			</Typography>
-			<Typography
-				variant="body1"
-				color="text.secondary"
-				gutterBottom
-				sx={{
-					fontWeight: 400,
-				}}
-			>
-				Select a membership plan that suits your needs, sign up, and enjoy
-				exclusive access to our premium golf simulators. Your membership renews
-				automatically every month, and you can cancel anytime.
-			</Typography>
-			<Typography
-				variant="body1"
-				color="text.secondary"
-				gutterBottom
-				sx={{
-					fontWeight: 400,
-				}}
-			>
-				Once you have an active membership, all you need to do is sign in and
-				you will be able to book your simulator sessions included with your
-				membership instantly.
-			</Typography>
+				<Box
+					component="ul"
+					sx={{
+						listStyle: 'none',
+						m: 0,
+						p: 0,
+					}}
+				>
+					{INTRO_POINTS.map((point) => (
+						<Box
+							component="li"
+							key={point}
+							sx={{
+								display: 'grid',
+								gridTemplateColumns: '28px 1fr',
+								columnGap: 2,
+								alignItems: 'start',
+								py: { xs: 1.35, sm: 1.6 },
+							}}
+						>
+							<Box
+								sx={{
+									display: 'flex',
+									justifyContent: 'center',
+									alignItems: 'flex-start',
+									width: 28,
+									flexShrink: 0,
+									pt: '0.2em',
+									color: 'primary.main',
+								}}
+							>
+								<StarBorder sx={{ fontSize: 22, display: 'block' }} />
+							</Box>
+							<Typography
+								variant="body1"
+								color="text.secondary"
+								sx={{
+									fontSize: { xs: '1rem', sm: '1.0625rem' },
+									lineHeight: 1.75,
+									textWrap: 'pretty',
+								}}
+							>
+								{point}
+							</Typography>
+						</Box>
+					))}
+				</Box>
+				<Box
+					aria-hidden
+					sx={(t) => ({
+						mt: { xs: 3.5, md: 4 },
+						height: 2,
+						maxWidth: 220,
+						mx: 'auto',
+						borderRadius: 1,
+						background: `linear-gradient(90deg, transparent, ${alpha(t.palette.primary.main, 0.5)}, ${alpha(t.palette.secondary.main, 0.35)}, transparent)`,
+					})}
+				/>
+			</Box>
 		</Box>
 	);
 };

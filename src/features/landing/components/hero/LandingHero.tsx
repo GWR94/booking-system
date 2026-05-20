@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import { Diamond } from '@mui/icons-material';
 import { AnimateIn } from '@ui';
-import { COMPANY_INFO } from '@constants/company';
+import COMPANY_INFO from '@constants/company';
 import HeroMedia from './HeroMedia';
 import { useRouter } from 'next/navigation';
 

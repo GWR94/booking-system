@@ -153,6 +153,7 @@ describe('auth.config', () => {
 			const result = await (signIn as any)({
 				user: { email: 'existing@example.com', name: 'Existing' },
 				account: { provider: 'google', providerAccountId: 'google-456' },
+				profile: { email_verified: true },
 			});
 			expect(result).toBe(true);
 			expect(mockUserUpdate).toHaveBeenCalledWith({

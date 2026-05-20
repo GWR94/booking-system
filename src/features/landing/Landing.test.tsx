@@ -25,7 +25,6 @@ vi.mock('@shared/ServicesOverview', () => ({
 vi.mock('@shared/CallToAction', () => ({
 	default: () => <div>Call To Action Component</div>,
 }));
-
 describe('Landing Page', () => {
 	it('renders all landing page sections', async () => {
 		render(<Landing />);

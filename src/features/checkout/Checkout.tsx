@@ -1,21 +1,29 @@
 'use client';
 
-import { Box, Button, Container, Stack, Typography, useTheme } from '@mui/material';
+import {
+	Box,
+	Button,
+	Container,
+	Stack,
+	Typography,
+	useTheme,
+} from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { Elements } from '@stripe/react-stripe-js';
-import {
-	createGuestPaymentIntent,
-	createPaymentIntent,
-	getBasket,
-} from '@api';
+import { createGuestPaymentIntent, createPaymentIntent, getBasket } from '@api';
 import { Appearance, loadStripe } from '@stripe/stripe-js';
-import { CheckoutForm, GuestUser, GuestInfo, CheckoutSkeleton } from './components';
+import {
+	CheckoutForm,
+	GuestUser,
+	GuestInfo,
+	CheckoutSkeleton,
+} from './components';
 import { useBasket, useAuth } from '@hooks';
 import { useSnackbar } from '@context';
 import { trackBeginCheckout } from '@utils/analytics';
 import { SectionHeader, AnimateIn } from '@ui';
 import { useRouter, useSearchParams } from 'next/navigation';
-import type { CheckoutIdentityMode } from './checkout-contract';
+import type { CheckoutIdentityMode } from '../../validation/checkout-contract';
 
 const stripe = loadStripe(
 	process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string,
@@ -28,7 +36,9 @@ const Checkout = () => {
 		'payment_intent_client_secret',
 	);
 
-	const [clientSecret, setClientSecret] = useState(paymentIntentClientSecret || '');
+	const [clientSecret, setClientSecret] = useState(
+		paymentIntentClientSecret || '',
+	);
 	/**
 	 * Start non-loading so guest checkout doesn't get stuck on the skeleton
 	 * while we wait for client-side session/basket hydration
@@ -134,7 +144,13 @@ const Checkout = () => {
 			await runAuthenticatedCheckoutStrategy();
 		};
 		getClientSecret();
-	}, [basket, hasBasketItems, identityMode, isAuthUnresolved, isReturningFromStripe]);
+	}, [
+		basket,
+		hasBasketItems,
+		identityMode,
+		isAuthUnresolved,
+		isReturningFromStripe,
+	]);
 
 	const runGuestCheckoutStrategy = () => {
 		if (identityMode !== 'guest' || guestInfo || paymentIntentClientSecret) {
@@ -144,7 +160,11 @@ const Checkout = () => {
 	};
 
 	const runAuthenticatedCheckoutStrategy = () => {
-		if (clientSecretError && identityMode === 'authenticated' && !paymentIntentClientSecret) {
+		if (
+			clientSecretError &&
+			identityMode === 'authenticated' &&
+			!paymentIntentClientSecret
+		) {
 			return (
 				<Box
 					sx={{

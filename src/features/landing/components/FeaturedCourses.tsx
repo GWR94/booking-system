@@ -7,10 +7,13 @@ import {
 	CardMedia,
 	CardContent,
 	Button,
+	Stack,
 	useTheme,
 } from '@mui/material';
 import { SectionHeader, AnimateIn } from '@ui';
 import Link from 'next/link';
+import { ArrowForward } from '@mui/icons-material';
+import { grey } from '@mui/material/colors';
 
 const featuredCourses = [
 	{
@@ -41,7 +44,7 @@ const FeaturedCourses = () => {
 	return (
 		<Box
 			sx={{
-				py: 10,
+				py: 5,
 				background: `linear-gradient(180deg, ${theme.palette.grey[200]} 0%, ${theme.palette.grey[100]} 100%)`,
 			}}
 		>
@@ -125,22 +128,35 @@ const FeaturedCourses = () => {
 					))}
 				</Grid>
 
-				<Box sx={{ textAlign: 'center', mt: 6 }}>
+				<Stack
+					spacing={2}
+					alignItems="center"
+					sx={{ mt: 6, textAlign: 'center', maxWidth: 520, mx: 'auto' }}
+				>
+					<Typography
+						variant="body1"
+						color="text.secondary"
+						sx={{ fontStyle: 'italic', fontSize: '0.85rem' }}
+					>
+						Ready to tee off? Every bay includes the full course library — just
+						pick a time.
+					</Typography>
 					<Button
-						variant="outlined"
+						variant="contained"
 						color="primary"
 						size="large"
 						component={Link}
 						href="/book"
 						sx={{
-							fontWeight: 500,
+							fontWeight: 600,
 							px: 4,
+							py: 1.25,
 							borderRadius: 2,
 						}}
 					>
-						Continue to Booking
+						Check availability <ArrowForward />
 					</Button>
-				</Box>
+				</Stack>
 			</Container>
 		</Box>
 	);

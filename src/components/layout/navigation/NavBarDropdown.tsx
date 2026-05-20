@@ -17,11 +17,9 @@ import { PROFILE_MENU_ITEMS, ADMIN_MENU_ITEMS } from './menuItems';
 import BasketContent from './BasketContent';
 import { usePathname, useRouter } from 'next/navigation';
 import { NavItem } from './menuItems';
-import { themes } from '@config/theme.config';
-import { useAppTheme } from '@context';
 
 type NavBarDropdownProps = {
-	menuContent: 'nav' | 'basket' | 'account' | 'admin' | 'theme';
+	menuContent: 'nav' | 'basket' | 'account' | 'admin';
 	isMenuOpen: boolean;
 	setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	navItems: NavItem[];
@@ -38,7 +36,6 @@ const NavBarDropdown = ({
 	const router = useRouter();
 	const { openAuthModal } = useUI();
 	const { isAuthenticated, user, logout } = useAuth();
-	const { currentThemeId, setThemeId } = useAppTheme();
 
 	const isActive = (path: string) => pathname === path;
 
@@ -223,67 +220,6 @@ const NavBarDropdown = ({
 									}}
 								>
 									{item.label}
-								</Button>
-							))}
-						</Stack>
-					)}
-					{menuContent === 'theme' && (
-						<Stack spacing={1} sx={{ p: 2 }}>
-							<Box sx={{ mb: 1, px: 2 }}>
-								<Typography variant="subtitle1" color="white" fontWeight={700}>
-									Select Theme
-								</Typography>
-								<Divider sx={{ mt: 1, borderColor: 'rgba(255,255,255,0.1)' }} />
-							</Box>
-							{themes.map((t) => (
-								<Button
-									key={t.id}
-									fullWidth
-									onClick={() => {
-										setThemeId(t.id);
-										setIsMenuOpen(false);
-									}}
-									sx={{
-										color: 'white',
-										justifyContent: 'flex-start',
-										py: 1.5,
-										backgroundColor:
-											t.id === currentThemeId
-												? alpha(theme.palette.secondary.main, 0.15)
-												: 'transparent',
-										borderLeft:
-											t.id === currentThemeId
-												? `4px solid ${theme.palette.secondary.main}`
-												: '4px solid transparent',
-										borderRadius: 1,
-										'&:hover': {
-											backgroundColor: alpha(theme.palette.common.white, 0.1),
-										},
-									}}
-								>
-									<Box sx={{ display: 'flex', mr: 2 }}>
-										{[
-											t.palette.primary?.main,
-											t.palette.secondary?.main,
-											t.palette.accent?.main,
-											t.palette.error?.main,
-											t.palette.warning?.main,
-										].map((color, index) => (
-											<Box
-												key={index}
-												sx={{
-													width: 20,
-													height: 20,
-													borderRadius: '50%',
-													backgroundColor: color,
-													border: `2px solid ${theme.palette.primary.main}`, // Match background for "cutout" effect
-													mr: -1,
-													zIndex: 5 - index,
-												}}
-											/>
-										))}
-									</Box>
-									<Typography variant="body2">{t.name}</Typography>
 								</Button>
 							))}
 						</Stack>

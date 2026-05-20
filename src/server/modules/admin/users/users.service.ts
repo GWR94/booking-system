@@ -6,6 +6,7 @@ import {
 } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { handleSendEmail } from '@utils/email';
+import { getEmailSiteUrl } from '@utils/site-url';
 import dayjs from 'dayjs';
 
 export class AdminUsersService {
@@ -105,10 +106,9 @@ export class AdminUsersService {
 			},
 		});
 
-		const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
+		const resetUrl = `${getEmailSiteUrl()}/reset-password?token=${resetToken}`;
 
 		await handleSendEmail({
-			senderPrefix: 'noreply',
 			recipientEmail: user.email,
 			subject: 'Admin Requested Password Reset',
 			templateName: 'password-reset',

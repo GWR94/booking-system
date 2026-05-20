@@ -11,12 +11,18 @@ describe('HowItWorks', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/How It Works/i)).toBeInTheDocument();
 		expect(
-			screen.getByText(/Select a membership plan that suits your needs/i),
+			screen.getByText(/Monthly playing hours included on every plan/i),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText(/Once you have an active membership/i),
+			screen.getByText(
+				/Member savings on food and drinks, plus priority booking windows/i,
+			),
+		).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				/Higher tiers add full weekend access and complimentary club storage/i,
+			),
 		).toBeInTheDocument();
 	});
 });

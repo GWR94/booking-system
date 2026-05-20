@@ -1,101 +1,61 @@
-import {
-	Box,
-	Typography,
-	Accordion,
-	AccordionSummary,
-	AccordionDetails,
-	useTheme,
-} from '@mui/material';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import Link from 'next/link';
+import { Box, Button, Typography, useTheme } from '@mui/material';
+import { supportFaqsHref } from '@features/help-center/supportSections';
 
 const MembershipFAQ = () => {
 	const theme = useTheme();
 
 	return (
-		<Box sx={{ mb: 8 }}>
+		<Box
+			component="section"
+			aria-labelledby="membership-faq-heading"
+			sx={{
+				mb: 8,
+				maxWidth: 'min(42rem, 100%)',
+				mx: 'auto',
+				px: { xs: 0, sm: 1 },
+				textAlign: 'center',
+			}}
+		>
 			<Typography
+				variant="overline"
+				sx={{
+					color: 'primary.main',
+					fontWeight: 700,
+					letterSpacing: 2,
+					mb: 1,
+					display: 'block',
+				}}
+			>
+				FAQ
+			</Typography>
+			<Typography
+				id="membership-faq-heading"
 				variant="h4"
 				component="h2"
-				gutterBottom
 				sx={{
 					fontWeight: 700,
-					color: theme.palette.primary.main,
-					textAlign: 'center',
+					mb: 2,
+					letterSpacing: '-0.02em',
 				}}
 			>
-				Frequently Asked Questions
+				Membership questions?
 			</Typography>
-			<Accordion
-				elevation={0}
-				disableGutters
+			<Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+				Plans, billing, and perks are covered in our help center.
+			</Typography>
+			<Button
+				component={Link}
+				href={supportFaqsHref('membership')}
+				variant="outlined"
+				color="primary"
 				sx={{
-					mb: 1,
-					border: `1px solid ${theme.palette.divider}`,
-					'&:before': { display: 'none' },
-					borderRadius: 1,
-					overflow: 'hidden',
+					borderColor: theme.palette.divider,
+					fontWeight: 600,
 				}}
 			>
-				<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-					<Typography sx={{ fontWeight: 500 }}>
-						Can I cancel my membership anytime?
-					</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						Yes, you can cancel your membership at any time. Your access will
-						remain active until the end of the current billing cycle.
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-
-			<Accordion
-				elevation={0}
-				disableGutters
-				sx={{
-					mb: 1,
-					border: `1px solid ${theme.palette.divider}`,
-					'&:before': { display: 'none' },
-					borderRadius: 1,
-					overflow: 'hidden',
-				}}
-			>
-				<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-					<Typography sx={{ fontWeight: 500 }}>
-						What happens if I exceed my monthly hours?
-					</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						If you exceed your monthly hours, you can book additional simulator
-						time at a discounted rate based on your membership tier.
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
-
-			<Accordion
-				elevation={0}
-				disableGutters
-				sx={{
-					mb: 1,
-					border: `1px solid ${theme.palette.divider}`,
-					'&:before': { display: 'none' },
-					borderRadius: 1,
-					overflow: 'hidden',
-				}}
-			>
-				<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-					<Typography sx={{ fontWeight: 500 }}>
-						Can I upgrade or downgrade my membership?
-					</Typography>
-				</AccordionSummary>
-				<AccordionDetails>
-					<Typography>
-						Yes, you can upgrade or downgrade your membership at any time.
-						Changes will take effect at the start of the next billing cycle.
-					</Typography>
-				</AccordionDetails>
-			</Accordion>
+				View membership FAQs
+			</Button>
 		</Box>
 	);
 };

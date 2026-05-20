@@ -13,22 +13,27 @@ import {
 } from '@mui/material';
 import {
 	Facebook,
-	Twitter,
 	Instagram,
 	X,
-	Email,
 	Phone,
 	LocationOn,
+	AlternateEmail,
 } from '@mui/icons-material';
-
 import { Logo } from '@ui';
-import { COMPANY_INFO } from '@constants/company';
-import { useRouter } from 'next/navigation';
+import COMPANY_INFO, {
+	companyAddressMaps,
+	companyEmailMailto,
+	companyPhoneTel,
+} from '@constants/company';
+import CompanyAddressText from '@/components/shared/CompanyAddressText';
+import { supportSectionHref } from '@features/help-center/supportSections';
+import NextLink from 'next/link';
+import SocialMediaIcons from '../shared/SocialMediaIcons';
+import { alpha } from '@mui/system';
 
 const Footer: React.FC = () => {
 	const theme = useTheme();
-  const router = useRouter();
-  
+
 	return (
 		<Box
 			sx={{
@@ -42,7 +47,7 @@ const Footer: React.FC = () => {
 			<Container>
 				<Grid container spacing={2}>
 					<Grid
-						size={{ xs: 12, md: 4 }}
+						size={{ xs: 12, sm: 4 }}
 						sx={{
 							px: 2,
 							display: 'flex',
@@ -62,111 +67,19 @@ const Footer: React.FC = () => {
 						>
 							<Logo />
 						</Box>
-						<Box
-							sx={{
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-							}}
-						>
-							<IconButton
-								color="inherit"
-								aria-label="Facebook"
-								sx={{
-									color: theme.palette.accent.main,
-									'&:hover': {
-										backgroundColor: theme.palette.primary.dark,
-									},
-								}}
-							>
-								<Facebook />
-							</IconButton>
-							<IconButton
-								color="inherit"
-								aria-label="X | Twitter"
-								sx={{
-									color: theme.palette.accent.main,
+						<SocialMediaIcons />
+					</Grid>
 
-									'&:hover': {
-										backgroundColor: theme.palette.primary.dark,
-									},
-								}}
-							>
-								<Twitter />
-							</IconButton>
-							<IconButton
-								color="inherit"
-								aria-label="Instagram"
-								sx={{
-									color: theme.palette.accent.main,
-									'&:hover': {
-										backgroundColor: theme.palette.primary.dark,
-									},
-								}}
-							>
-								<Instagram />
-							</IconButton>
-							<IconButton
-								aria-label="YouTube"
-								sx={{
-									color: theme.palette.accent.main,
-									'&:hover': {
-										backgroundColor: theme.palette.primary.dark,
-									},
-								}}
-							>
-								<X />
-							</IconButton>
-						</Box>
-					</Grid>
-					<Grid size={{ xs: 6, md: 2 }}>
-						<Typography
-							variant="h6"
-							gutterBottom
-							sx={{
-								fontWeight: 600,
-								color: theme.palette.secondary.light,
-								opacity: 0.9,
-							}}
-						>
-							Links
-						</Typography>
-						<Box sx={{ display: 'flex', flexDirection: 'column' }}>
-							<Link
-								onClick={() => router.push('/')}
-								color="inherit"
-								underline="hover"
-								sx={{ mb: 1, opacity: 0.85, '&:hover': { opacity: 1 } }}
-							>
-								Home
-							</Link>
-							<Link
-								onClick={() => router.push('/about')}
-								color="inherit"
-								underline="hover"
-								sx={{ mb: 1 }}
-							>
-								About Us
-							</Link>
-							<Link
-								onClick={() => router.push('/book')}
-								color="inherit"
-								underline="hover"
-								sx={{ mb: 1 }}
-							>
-								Bookings
-							</Link>
-							<Link
-								onClick={() => router.push('/membership')}
-								color="inherit"
-								underline="hover"
-								sx={{ mb: 1 }}
-							>
-								Membership
-							</Link>
-						</Box>
-					</Grid>
-					<Grid size={{ xs: 6, md: 2 }}>
+					<Grid
+						size={{
+							xs: 12,
+							sm: 3,
+						}}
+						sx={{
+							fontSize: '0.875rem',
+							color: alpha(theme.palette.primary.contrastText, 0.7),
+						}}
+					>
 						<Typography
 							variant="h6"
 							gutterBottom
@@ -176,29 +89,32 @@ const Footer: React.FC = () => {
 						</Typography>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
 							<Link
-								onClick={() => router.push('/terms')}
+								component={NextLink}
+								href={supportSectionHref('faqs')}
 								color="inherit"
 								underline="hover"
-								sx={{ opacity: 0.85, '&:hover': { opacity: 1 } }}
+							>
+								FAQs
+							</Link>
+							<Link
+								component={NextLink}
+								href={supportSectionHref('terms')}
+								color="inherit"
+								underline="hover"
 							>
 								Terms & Conditions
 							</Link>
 							<Link
-								onClick={() => router.push('/privacy')}
+								component={NextLink}
+								href={supportSectionHref('privacy')}
 								color="inherit"
 								underline="hover"
 							>
 								Privacy Policy
 							</Link>
 							<Link
-								onClick={() => router.push('/help')}
-								color="inherit"
-								underline="hover"
-							>
-								Help Center
-							</Link>
-							<Link
-								onClick={() => router.push('/cookies')}
+								component={NextLink}
+								href={supportSectionHref('cookies')}
 								color="inherit"
 								underline="hover"
 							>
@@ -206,7 +122,13 @@ const Footer: React.FC = () => {
 							</Link>
 						</Box>
 					</Grid>
-					<Grid size={{ xs: 12, md: 3 }}>
+					<Grid
+						size={{ xs: 12, sm: 5 }}
+						sx={{
+							fontSize: '0.875rem',
+							color: alpha(theme.palette.primary.contrastText, 0.7),
+						}}
+					>
 						<Typography
 							variant="h6"
 							gutterBottom
@@ -214,44 +136,73 @@ const Footer: React.FC = () => {
 						>
 							Contact Us
 						</Typography>
-						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+						<Link
+							component="a"
+							href={companyAddressMaps}
+							target="_blank"
+							rel="noopener noreferrer"
+							color="inherit"
+							underline="hover"
+							aria-label={`Open ${COMPANY_INFO.address} in Google Maps`}
+							sx={{
+								display: 'flex',
+								flexDirection: 'row',
+								gap: 1,
+								mb: 1,
+								alignItems: 'flex-start',
+							}}
+						>
 							<LocationOn
-								sx={{ mr: 1, color: theme.palette.error.light, opacity: 0.85 }}
+								sx={{
+									color: theme.palette.accent.main,
+									flexShrink: 0,
+								}}
 							/>
-							<Typography variant="body2" sx={{ opacity: 0.85 }}>
-								{COMPANY_INFO.address}
-							</Typography>
-						</Box>
-						<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+							<CompanyAddressText />
+						</Link>
+						<Link
+							component="a"
+							href={companyPhoneTel}
+							color="inherit"
+							underline="hover"
+							aria-label={`Call ${COMPANY_INFO.phone}`}
+							sx={{
+								display: 'flex',
+								flexDirection: 'row',
+								gap: 1,
+								mb: 1,
+								alignItems: 'center',
+							}}
+						>
 							<Phone
-								sx={{ mr: 1, color: theme.palette.error.main, opacity: 0.85 }}
+								sx={{
+									color: theme.palette.accent.main,
+									flexShrink: 0,
+								}}
 							/>
-							<Typography variant="body2" sx={{ opacity: 0.85 }}>
-								{COMPANY_INFO.phone}
-							</Typography>
-						</Box>
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Email
-								sx={{ mr: 1, color: theme.palette.error.dark, opacity: 0.85 }}
+							{COMPANY_INFO.phone}
+						</Link>
+						<Link
+							component="a"
+							href={companyEmailMailto}
+							color="inherit"
+							underline="hover"
+							aria-label={`Email ${COMPANY_INFO.email}`}
+							sx={{
+								display: 'flex',
+								flexDirection: 'row',
+								gap: 1,
+								alignItems: 'center',
+							}}
+						>
+							<AlternateEmail
+								sx={{
+									color: theme.palette.accent.main,
+									flexShrink: 0,
+								}}
 							/>
-							<Typography variant="body2">
-								<Box
-									component="a"
-									href={`mailto:${COMPANY_INFO.email}`}
-									sx={{
-										color: '#fff',
-										textDecoration: 'none',
-										opacity: 0.85,
-										'&:hover': {
-											textDecoration: 'underline',
-											opacity: 1,
-										},
-									}}
-								>
-									{COMPANY_INFO.email}
-								</Box>
-							</Typography>
-						</Box>
+							{COMPANY_INFO.email}
+						</Link>
 					</Grid>
 				</Grid>
 
@@ -260,17 +211,23 @@ const Footer: React.FC = () => {
 				<Box
 					sx={{
 						display: 'flex',
-						justifyContent: 'space-between',
-						flexWrap: 'wrap',
+						justifyContent: 'flex-end',
 					}}
 				>
-					<Typography
-						variant="body2"
-						sx={{ color: theme.palette.grey[500], mb: { xs: 2, sm: 0 } }}
+					<Box
+						component={NextLink}
+						href="https://www.jamesgower.dev"
+						sx={{
+							textDecoration: 'none',
+							'&:hover': { textDecoration: 'underline' },
+							textAlign: 'right',
+							fontSize: '0.875rem',
+							color: alpha(theme.palette.primary.contrastText, 0.5),
+							mb: { xs: 2, sm: 0 },
+						}}
 					>
-						© {new Date().getFullYear()} {COMPANY_INFO.name}. All rights
-						reserved.
-					</Typography>
+						© James Gower {new Date().getFullYear()}
+					</Box>
 				</Box>
 			</Container>
 		</Box>

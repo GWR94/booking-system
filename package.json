@@ -37,6 +37,7 @@
 		"react-google-recaptcha": "^3.1.0",
 		"stripe": "^20.3.1",
 		"swiper": "^12.0.3",
+		"vite-tsconfig-paths": "^6.1.1",
 		"zod": "^4.3.6"
 	},
 	"scripts": {
@@ -50,6 +51,7 @@
 		"test:coverage": "vitest run --coverage --watch=false",
 		"test:e2e": "playwright test",
 		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:report": "playwright show-report playwright/playwright-report",
 		"seed": "npx tsx scripts/seed.ts",
 		"seed:test-users": "npx tsx scripts/seed-test-users.ts",
 		"seed:demo": "npx tsx scripts/seed-demo-data.ts",

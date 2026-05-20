@@ -14,7 +14,7 @@ vi.mock('@db', () => ({
 	},
 }));
 
-vi.mock('@config/membership.config', () => ({
+vi.mock('@constants/memberships', () => ({
 	MEMBERSHIP_TIERS: {
 		PAR: {
 			priceId: 'price_par_123',
@@ -44,14 +44,20 @@ describe('MembershipService', () => {
 
 	describe('handleMembershipUpdate', () => {
 		it('should update user by stripeCustomerId for active subscription with matching tier', async () => {
+			const t0 = Math.floor(Date.now() / 1000) - 86400 * 15;
+			const t1 = Math.floor(Date.now() / 1000) + 86400 * 15;
 			const subscription = {
 				customer: 'cus_abc',
 				status: 'active',
-				current_period_start: Math.floor(Date.now() / 1000) - 86400 * 15,
-				current_period_end: Math.floor(Date.now() / 1000) + 86400 * 15,
 				cancel_at_period_end: false,
 				items: {
-					data: [{ price: { id: 'price_par_123' } }],
+					data: [
+						{
+							current_period_start: t0,
+							current_period_end: t1,
+							price: { id: 'price_par_123' },
+						},
+					],
 				},
 			} as any;
 
@@ -73,10 +79,16 @@ describe('MembershipService', () => {
 			const subscription = {
 				customer: 'cus_xyz',
 				status: 'canceled',
-				current_period_start: null,
-				current_period_end: null,
 				cancel_at_period_end: false,
-				items: { data: [{ price: { id: 'price_par_123' } }] },
+				items: {
+					data: [
+						{
+							current_period_start: Math.floor(Date.now() / 1000),
+							current_period_end: Math.floor(Date.now() / 1000) + 86400,
+							price: { id: 'price_par_123' },
+						},
+					],
+				},
 			} as any;
 
 			await MembershipService.handleMembershipUpdate(subscription);
@@ -93,13 +105,21 @@ describe('MembershipService', () => {
 		});
 
 		it('should set membershipStatus to CANCELLED when active but price not in tiers', async () => {
+			const t0 = Math.floor(Date.now() / 1000);
+			const t1 = Math.floor(Date.now() / 1000) + 86400 * 30;
 			const subscription = {
 				customer: 'cus_unknown',
 				status: 'active',
-				current_period_start: Math.floor(Date.now() / 1000),
-				current_period_end: Math.floor(Date.now() / 1000) + 86400 * 30,
 				cancel_at_period_end: false,
-				items: { data: [{ price: { id: 'price_unknown' } }] },
+				items: {
+					data: [
+						{
+							current_period_start: t0,
+							current_period_end: t1,
+							price: { id: 'price_unknown' },
+						},
+					],
+				},
 			} as any;
 
 			await MembershipService.handleMembershipUpdate(subscription);
@@ -118,10 +138,16 @@ describe('MembershipService', () => {
 			const subscription = {
 				customer: 'cus_abc',
 				status: 'active',
-				current_period_start: Math.floor(Date.now() / 1000),
-				current_period_end: Math.floor(Date.now() / 1000) + 86400,
 				cancel_at_period_end: false,
-				items: { data: [{ price: { id: 'price_par_123' } }] },
+				items: {
+					data: [
+						{
+							current_period_start: Math.floor(Date.now() / 1000),
+							current_period_end: Math.floor(Date.now() / 1000) + 86400,
+							price: { id: 'price_par_123' },
+						},
+					],
+				},
 			} as any;
 
 			await expect(

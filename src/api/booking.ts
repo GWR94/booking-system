@@ -1,7 +1,7 @@
 import { axios } from '@api/client';
 import type { GuestUser } from '@features/checkout/components';
 import type { Booking, GroupedSlot } from '@features/booking/components';
-import type { CheckoutIdentityMode } from '@features/checkout/checkout-contract';
+import type { CheckoutIdentityMode } from '@/validation/checkout-contract';
 
 const BOOKING_STORAGE_KEY = 'booking-data';
 
@@ -16,7 +16,9 @@ export const deleteBooking = async (bookingId: number) => {
 };
 
 export const resumePendingBookingPayment = async (bookingId: number) => {
-	const response = await axios.post(`/api/bookings/${bookingId}/resume-payment`);
+	const response = await axios.post(
+		`/api/bookings/${bookingId}/resume-payment`,
+	);
 	return response.data as { clientSecret: string; paymentIntentId: string };
 };
 

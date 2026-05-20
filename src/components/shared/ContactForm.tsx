@@ -1,42 +1,22 @@
 'use client';
 
-'use client';
-
 import React, { useState } from 'react';
 import {
 	Box,
-	Container,
 	Typography,
 	TextField,
 	Button,
 	Grid2 as Grid,
-	Paper,
 	useTheme,
 	MenuItem,
 	InputAdornment,
 } from '@mui/material';
-import {
-	Email,
-	Phone,
-	LocationOn,
-	Send,
-	Person,
-	Subject,
-} from '@mui/icons-material';
+import { Email, Phone, Send, Person, Subject } from '@mui/icons-material';
 import { sendContactMessage } from '@api';
 import { useSnackbar } from '@context';
 
-interface ContactFormProps {
-	maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-	elevation?: number;
-}
-
-const ContactForm: React.FC<ContactFormProps> = ({
-	maxWidth = 'md',
-	elevation = 0,
-}) => {
+const ContactForm: React.FC = () => {
 	const theme = useTheme();
-
 	const { showSnackbar } = useSnackbar();
 	const [formData, setFormData] = useState({
 		name: '',
@@ -75,7 +55,6 @@ const ContactForm: React.FC<ContactFormProps> = ({
 			[name]: value,
 		});
 
-		// Clear error when user types
 		if (errors[name as keyof typeof errors]) {
 			setErrors({
 				...errors,
@@ -136,304 +115,179 @@ const ContactForm: React.FC<ContactFormProps> = ({
 	};
 
 	return (
-		<Container
-			maxWidth={maxWidth}
-			sx={{
-				px: { xs: 0, md: 3 },
-			}}
-		>
-			<Paper
-				elevation={elevation}
-				sx={{
-					borderRadius: { xs: 0, md: 2 },
-					overflow: 'hidden',
-					border: { xs: 'none', md: `1px solid ${theme.palette.divider}` },
-				}}
+		<Box sx={{ p: { xs: 3, md: 4 } }}>
+			<Typography
+				variant="subtitle1"
+				component="h2"
+				fontWeight={600}
+				sx={{ mb: 1 }}
 			>
-				<Grid container>
-					<Grid size={{ xs: 12, md: 4 }}>
-						<Box
-							sx={{
-								p: 4,
-								height: '100%',
-								bgcolor: theme.palette.primary.main,
-								color: 'white',
-								display: 'flex',
-								flexDirection: 'column',
-							}}
-						>
-							<Typography
-								variant="h5"
-								component="h2"
-								fontWeight={600}
-								sx={{ mb: 4 }}
-							>
-								Contact Information
-							</Typography>
+				Send us a message
+			</Typography>
+			<Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+				Fill out the form below and we&apos;ll get back to you as soon as
+				possible.
+			</Typography>
 
-							<Typography
-								variant="body2"
-								sx={{ color: 'rgba(255,255,255,0.8)' }}
-								textAlign="justify"
-							>
-								Have questions about our services? Need to book a slot or
-								inquire about membership? Feel free to get in touch with us
-								using the form or our contact details below.
-							</Typography>
-
-							<Box sx={{ mt: 3 }}>
-								<Box sx={{ display: 'flex', mb: 3 }}>
-									<LocationOn sx={{ mr: 2, fontSize: 22 }} color="accent" />
-									<Box>
-										<Typography variant="body2" fontWeight={500}>
-											Our Location
-										</Typography>
-										<Typography
-											variant="body2"
-											sx={{ color: 'rgba(255,255,255,0.8)' }}
-										>
-											Royal Star Arcade, High St, Maidstone ME14 1JL
-										</Typography>
-									</Box>
-								</Box>
-
-								<Box sx={{ display: 'flex', mb: 3 }}>
-									<Phone sx={{ mr: 2, fontSize: 22 }} color="accent" />
-									<Box>
-										<Typography variant="body2" fontWeight={500}>
-											Phone Number
-										</Typography>
-										<Typography
-											variant="body2"
-											sx={{ color: 'rgba(255,255,255,0.8)' }}
-										>
-											+44 79874 45123
-										</Typography>
-									</Box>
-								</Box>
-
-								<Box sx={{ display: 'flex' }}>
-									<Email sx={{ mr: 2, fontSize: 22 }} color="accent" />
-									<Box>
-										<Typography variant="body2" fontWeight={500}>
-											Email Address
-										</Typography>
-										<Typography
-											variant="body2"
-											sx={{ color: 'rgba(255,255,255,0.8)' }}
-										>
-											golf@jamesgower.dev
-										</Typography>
-									</Box>
-								</Box>
-							</Box>
-
-							<Box
-								sx={{
-									mt: 4,
-									pt: 4,
-									borderTop: '1px solid rgba(255,255,255,0.2)',
+			{submitted ? (
+				<Box sx={{ textAlign: 'center', py: 4 }}>
+					<Send
+						sx={{
+							fontSize: 60,
+							color: theme.palette.success.main,
+							mb: 2,
+						}}
+					/>
+					<Typography variant="h6" gutterBottom component="h3">
+						Thank You!
+					</Typography>
+					<Typography variant="body1" color="text.secondary" component="p">
+						Your message has been sent successfully.
+					</Typography>
+					<Typography variant="body2" color="text.secondary" component="p">
+						We typically respond within 1-2 business days.
+					</Typography>
+					<Button
+						variant="outlined"
+						color="primary"
+						onClick={() => setSubmitted(false)}
+						sx={{ mt: 2 }}
+					>
+						Send Another Message
+					</Button>
+				</Box>
+			) : (
+				<form onSubmit={handleSubmit}>
+					<Grid container spacing={3}>
+						<Grid size={{ xs: 12, sm: 6 }}>
+							<TextField
+								fullWidth
+								label="Full Name"
+								name="name"
+								value={formData.name}
+								onChange={handleChange}
+								error={errors.name}
+								helperText={errors.name ? 'Name is required' : ''}
+								required
+								variant="outlined"
+								slotProps={{
+									input: {
+										startAdornment: (
+											<InputAdornment position="start">
+												<Person color="action" fontSize="small" />
+											</InputAdornment>
+										),
+									},
+								}}
+							/>
+						</Grid>
+						<Grid size={{ xs: 12, sm: 6 }}>
+							<TextField
+								fullWidth
+								label="Email Address"
+								name="email"
+								type="email"
+								value={formData.email}
+								onChange={handleChange}
+								error={errors.email}
+								helperText={errors.email ? 'Valid email is required' : ''}
+								required
+								variant="outlined"
+								slotProps={{
+									input: {
+										startAdornment: (
+											<InputAdornment position="start">
+												<Email color="action" fontSize="small" />
+											</InputAdornment>
+										),
+									},
+								}}
+							/>
+						</Grid>
+						<Grid size={{ xs: 12, sm: 6 }}>
+							<TextField
+								fullWidth
+								label="Phone Number (Optional)"
+								name="phone"
+								value={formData.phone}
+								onChange={handleChange}
+								variant="outlined"
+								slotProps={{
+									input: {
+										startAdornment: (
+											<InputAdornment position="start">
+												<Phone color="action" fontSize="small" />
+											</InputAdornment>
+										),
+									},
+								}}
+							/>
+						</Grid>
+						<Grid size={{ xs: 12, sm: 6 }}>
+							<TextField
+								select
+								fullWidth
+								label="Subject"
+								name="subject"
+								value={formData.subject}
+								onChange={handleChange}
+								error={errors.subject}
+								helperText={errors.subject ? 'Please select a subject' : ''}
+								required
+								variant="outlined"
+								slotProps={{
+									input: {
+										startAdornment: (
+											<InputAdornment position="start">
+												<Subject color="action" fontSize="small" />
+											</InputAdornment>
+										),
+									},
 								}}
 							>
-								<Typography variant="body2" fontWeight={500} sx={{ mb: 1 }}>
-									Operating Hours
-								</Typography>
-								<Typography
-									variant="body2"
-									sx={{ color: 'rgba(255,255,255,0.8)' }}
-								>
-									Monday - Saturday <br />
-									10:00 AM - 10:00 PM
-								</Typography>
-							</Box>
-						</Box>
-					</Grid>
-
-					{/* Form Section */}
-					<Grid size={{ xs: 12, md: 8 }}>
-						<Box sx={{ p: 4 }}>
-							<Typography
-								variant="h5"
-								component="h2"
-								fontWeight={600}
-								sx={{ mb: 1 }}
+								{subjectOptions.map((option) => (
+									<MenuItem key={option} value={option}>
+										{option}
+									</MenuItem>
+								))}
+							</TextField>
+						</Grid>
+						<Grid size={{ xs: 12 }}>
+							<TextField
+								fullWidth
+								label="Message"
+								name="message"
+								value={formData.message}
+								onChange={handleChange}
+								error={errors.message}
+								helperText={errors.message ? 'Please enter your message' : ''}
+								required
+								multiline
+								rows={4}
+								variant="outlined"
+							/>
+						</Grid>
+						<Grid size={{ xs: 12 }}>
+							<Button
+								type="submit"
+								variant="contained"
+								color="secondary"
+								size="large"
+								disabled={loading}
+								sx={{
+									mt: 1,
+									px: 4,
+									py: 1.5,
+									fontWeight: 500,
+								}}
 							>
-								Send Us a Message
-							</Typography>
-							<Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-								Fill out the form below and we'll get back to you as soon as
-								possible.
-							</Typography>
-
-							{submitted ? (
-								<Box sx={{ textAlign: 'center', py: 4 }}>
-									<Send
-										sx={{
-											fontSize: 60,
-											color: theme.palette.success.main,
-											mb: 2,
-										}}
-									/>
-									<Typography variant="h6" gutterBottom>
-										Thank You!
-									</Typography>
-									<Typography variant="body1" color="text.secondary" paragraph>
-										Your message has been sent successfully.
-									</Typography>
-									<Typography variant="body2" color="text.secondary" paragraph>
-										We typically respond within 1-2 business days.
-									</Typography>
-									<Button
-										variant="outlined"
-										color="primary"
-										onClick={() => setSubmitted(false)}
-										sx={{ mt: 2 }}
-									>
-										Send Another Message
-									</Button>
-								</Box>
-							) : (
-								<form onSubmit={handleSubmit}>
-									<Grid container spacing={3}>
-										<Grid size={{ xs: 12, sm: 6 }}>
-											<TextField
-												fullWidth
-												label="Full Name"
-												name="name"
-												value={formData.name}
-												onChange={handleChange}
-												error={errors.name}
-												helperText={errors.name ? 'Name is required' : ''}
-												required
-												variant="outlined"
-												slotProps={{
-													input: {
-														startAdornment: (
-															<InputAdornment position="start">
-																<Person color="action" fontSize="small" />
-															</InputAdornment>
-														),
-													},
-												}}
-											/>
-										</Grid>
-										<Grid size={{ xs: 12, sm: 6 }}>
-											<TextField
-												fullWidth
-												label="Email Address"
-												name="email"
-												type="email"
-												value={formData.email}
-												onChange={handleChange}
-												error={errors.email}
-												helperText={
-													errors.email ? 'Valid email is required' : ''
-												}
-												required
-												variant="outlined"
-												slotProps={{
-													input: {
-														startAdornment: (
-															<InputAdornment position="start">
-																<Email color="action" fontSize="small" />
-															</InputAdornment>
-														),
-													},
-												}}
-											/>
-										</Grid>
-										<Grid size={{ xs: 12, sm: 6 }}>
-											<TextField
-												fullWidth
-												label="Phone Number (Optional)"
-												name="phone"
-												value={formData.phone}
-												onChange={handleChange}
-												variant="outlined"
-												slotProps={{
-													input: {
-														startAdornment: (
-															<InputAdornment position="start">
-																<Phone color="action" fontSize="small" />
-															</InputAdornment>
-														),
-													},
-												}}
-											/>
-										</Grid>
-										<Grid size={{ xs: 12, sm: 6 }}>
-											<TextField
-												select
-												fullWidth
-												label="Subject"
-												name="subject"
-												value={formData.subject}
-												onChange={handleChange}
-												error={errors.subject}
-												helperText={
-													errors.subject ? 'Please select a subject' : ''
-												}
-												required
-												variant="outlined"
-												slotProps={{
-													input: {
-														startAdornment: (
-															<InputAdornment position="start">
-																<Subject color="action" fontSize="small" />
-															</InputAdornment>
-														),
-													},
-												}}
-											>
-												{subjectOptions.map((option) => (
-													<MenuItem key={option} value={option}>
-														{option}
-													</MenuItem>
-												))}
-											</TextField>
-										</Grid>
-										<Grid size={{ xs: 12 }}>
-											<TextField
-												fullWidth
-												label="Message"
-												name="message"
-												value={formData.message}
-												onChange={handleChange}
-												error={errors.message}
-												helperText={
-													errors.message ? 'Please enter your message' : ''
-												}
-												required
-												multiline
-												rows={6}
-												variant="outlined"
-											/>
-										</Grid>
-										<Grid size={{ xs: 12 }}>
-											<Button
-												type="submit"
-												variant="contained"
-												color="secondary"
-												size="large"
-												disabled={loading}
-												sx={{
-													mt: 2,
-													px: 4,
-													py: 1.5,
-													fontWeight: 500,
-												}}
-											>
-												{loading ? 'Sending...' : 'Send Message'}
-											</Button>
-										</Grid>
-									</Grid>
-								</form>
-							)}
-						</Box>
+								{loading ? 'Sending...' : 'Send Message'}
+							</Button>
+						</Grid>
 					</Grid>
-				</Grid>
-			</Paper>
-		</Container>
+				</form>
+			)}
+		</Box>
 	);
 };
 

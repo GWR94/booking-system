@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { gotoApp } from '../fixtures/page';
 
 test.describe('Guest Booking Flow', () => {
 	test('should show book page and session picker', async ({ page }) => {
-		await page.goto('/book');
+		await gotoApp(page, '/book');
 		await expect(
 			page.getByRole('heading', { name: /book your session/i }),
 		).toBeVisible();
@@ -11,7 +12,7 @@ test.describe('Guest Booking Flow', () => {
 	});
 
 	test('should add slot to basket and go to checkout', async ({ page }) => {
-		await page.goto('/book');
+		await gotoApp(page, '/book');
 
 		await expect(page.getByTestId('session-picker')).toBeVisible({ timeout: 15000 });
 		// Wait for slots to load (loading spinner to disappear)

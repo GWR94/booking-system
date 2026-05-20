@@ -7,7 +7,9 @@ import createWrapper from '@utils/test-utils';
 describe('Terms', () => {
 	it('renders Terms and Conditions heading', () => {
 		render(<Terms />, { wrapper: createWrapper() });
-		expect(screen.getByRole('heading', { name: /Terms and Conditions/i })).toBeInTheDocument();
+		expect(
+			screen.getByRole('heading', { name: /Terms & Conditions/i }),
+		).toBeInTheDocument();
 	});
 
 	it('renders Last Updated date', () => {

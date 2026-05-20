@@ -15,7 +15,7 @@ vi.mock('next/navigation', () => ({
 describe('DesktopNavigation', () => {
 	const mockNavItems = [
 		{ name: 'Home', path: '/', icon: <Home /> },
-		{ name: 'About', path: '/about', icon: <Home /> },
+		{ name: 'Book', path: '/book', icon: <Home /> },
 	];
 
 	it('should render navigation items', () => {
@@ -26,7 +26,7 @@ describe('DesktopNavigation', () => {
 		);
 
 		expect(screen.getByText('Home')).toBeInTheDocument();
-		expect(screen.getByText('About')).toBeInTheDocument();
+		expect(screen.getByText('Book')).toBeInTheDocument();
 	});
 
 	it('should navigate to path when item is clicked', () => {
@@ -36,7 +36,7 @@ describe('DesktopNavigation', () => {
 			</ThemeProvider>,
 		);
 
-		fireEvent.click(screen.getByText('About'));
-		expect(mockPush).toHaveBeenCalledWith('/about');
+		fireEvent.click(screen.getByText('Book'));
+		expect(mockPush).toHaveBeenCalledWith('/book');
 	});
 });

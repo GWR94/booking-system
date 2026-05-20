@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginAsUser } from '../fixtures/auth';
+import { gotoApp } from '../fixtures/page';
 
 test.describe('Authenticated Booking Flow', () => {
 	test.beforeEach(async ({ page }, testInfo) => {
@@ -29,7 +30,7 @@ test.describe('Authenticated Booking Flow', () => {
 			await page.waitForTimeout(500);
 		}
 
-		await page.goto('/checkout');
+		await gotoApp(page, '/checkout');
 		await expect(page).toHaveURL(/\/checkout/);
 		// Authenticated: checkout/payment section visible
 		await expect(
@@ -38,9 +39,9 @@ test.describe('Authenticated Booking Flow', () => {
 	});
 
 	test('should show profile when visiting profile', async ({ page }) => {
-		await page.goto('/profile/overview');
-		await expect(
-			page.getByRole('heading', { name: /profile|overview/i }).or(page.getByText(/profile|bookings|settings/i)),
-		).toBeVisible({ timeout: 10000 });
+		await gotoApp(page, '/profile/overview');
+		await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible({
+			timeout: 10000,
+		});
 	});
 });

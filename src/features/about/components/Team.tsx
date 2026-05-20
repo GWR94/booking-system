@@ -113,8 +113,8 @@ const Team = () => {
 													position: 'absolute',
 													inset: -4,
 													borderRadius: '50%',
-													background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-													opacity: 0.8,
+													background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.8)}, ${alpha(theme.palette.secondary.dark, 0.8)})`,
+													opacity: 0.6,
 													filter: 'blur(8px)',
 												}}
 											/>
@@ -141,7 +141,7 @@ const Team = () => {
 										</Typography>
 										<Typography
 											variant="subtitle1"
-											color="secondary"
+											color="primary"
 											gutterBottom
 											sx={{
 												fontWeight: 700,

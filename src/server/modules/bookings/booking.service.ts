@@ -111,7 +111,6 @@ export class BookingService {
 
 		if (recipientEmail) {
 			await handleSendEmail({
-				senderPrefix: 'bookings',
 				recipientEmail,
 				templateName: 'confirmation',
 				subject: 'Booking Confirmation',
@@ -129,9 +128,6 @@ export class BookingService {
 						intentId: paymentId,
 						amount: amount.toFixed(2),
 					},
-					year: new Date().getFullYear(),
-					baseUrl: process.env.NEXT_PUBLIC_APP_URL,
-					logoUrl: process.env.LOGO_URL,
 				},
 			});
 		}

@@ -4,6 +4,7 @@ import { useMotionValueEvent, useScroll, motion } from 'framer-motion';
 import { Close, Menu } from '@mui/icons-material';
 import {
 	AppBar,
+	Button,
 	Container,
 	Toolbar,
 	Box,
@@ -13,16 +14,15 @@ import {
 	IconButton,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Basket from './Basket';
 import DesktopNavigation from './DesktopNavigation';
 import AccountButton from './AccountButton';
 import NavBarDropdown from './NavBarDropdown';
 import AdminMenuButton from './AdminMenuButton';
 import { Logo } from '@ui';
-import { NAV_ITEMS } from './menuItems';
+import { JOIN_NAV_ITEM, NAV_ITEMS, PRIMARY_NAV_ITEMS } from './menuItems';
 import { useAuth } from '@hooks';
-import ThemeSwitcher from './ThemeSwitcher';
 
 interface NavBarProps {
 	threshold?: number;
@@ -30,10 +30,11 @@ interface NavBarProps {
 
 const NavBar = ({ threshold = 150 }: NavBarProps) => {
 	const theme = useTheme();
+	const router = useRouter();
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [menuContent, setMenuContent] = useState<
-		'nav' | 'basket' | 'account' | 'admin' | 'theme'
+		'nav' | 'basket' | 'account' | 'admin'
 	>('nav');
 
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -67,12 +68,6 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 		setIsMenuOpen(!isMenuOpen);
 	};
 
-	const setMobileNavBarToTheme = () => {
-		setMenuContent('theme');
-		setIsMenuOpen(!isMenuOpen);
-	};
-
-	// Close menu when route changes
 	useEffect(() => {
 		setIsMenuOpen(false);
 	}, [pathname]);
@@ -118,53 +113,113 @@ const NavBar = ({ threshold = 150 }: NavBarProps) => {
 								position: 'relative',
 								display: 'flex',
 								alignItems: 'center',
-								justifyContent: 'space-between',
+								justifyContent: { xs: 'space-between', md: 'flex-start' },
+								gap: { md: 1 },
 								width: '100%',
 							}}
 						>
-							<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-								<IconButton
-									size="large"
-									onClick={() => {
-										setMenuContent('nav');
-										setIsMenuOpen(!isMenuOpen);
-									}}
-									aria-label="Toggle menu"
-									color="inherit"
-									edge="start"
-									sx={{
-										borderRadius: 1.5,
-										mr: 1,
-										transition: 'all 0.2s ease',
-										'&:hover': {
-											backgroundColor: alpha(theme.palette.common.white, 0.1),
-										},
-									}}
-								>
-									{isMenuOpen ? <Close /> : <Menu />}
-								</IconButton>
-							</Box>
-							<DesktopNavigation navItems={NAV_ITEMS} />
-							<Logo
-								sx={{
-									height: '50px',
-									position: 'absolute',
-									left: '50%',
-									transform: 'translateX(-50%)',
-								}}
-								logoOnly={isLgDown}
-							/>
 							<Box
 								sx={{
 									display: 'flex',
 									alignItems: 'center',
-									gap: { xs: 0, sm: 1, md: 2 },
+									flex: { xs: '0 0 auto', md: '1 1 0' },
+									minWidth: 0,
 								}}
 							>
-								<ThemeSwitcher
-									isMobile={isMobile}
-									onMobileClick={setMobileNavBarToTheme}
+								<Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+									<IconButton
+										size="large"
+										onClick={() => {
+											setMenuContent('nav');
+											setIsMenuOpen(!isMenuOpen);
+										}}
+										aria-label="Toggle menu"
+										color="inherit"
+										edge="start"
+										sx={{
+											borderRadius: 1.5,
+											mr: 1,
+											transition: 'all 0.2s ease',
+											'&:hover': {
+												backgroundColor: alpha(theme.palette.common.white, 0.1),
+											},
+										}}
+									>
+										{isMenuOpen ? <Close /> : <Menu />}
+									</IconButton>
+								</Box>
+								<DesktopNavigation navItems={PRIMARY_NAV_ITEMS} />
+							</Box>
+							<Box
+								sx={{
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									flex: { xs: '0 0 auto', md: '0 0 auto' },
+									position: { xs: 'absolute', md: 'static' },
+									left: { xs: '50%', md: 'auto' },
+									transform: { xs: 'translateX(-50%)', md: 'none' },
+									zIndex: 1,
+								}}
+							>
+								<Logo
+									sx={{
+										height: '50px',
+									}}
+									logoOnly={isLgDown}
 								/>
+							</Box>
+							<Box
+								sx={{
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'flex-end',
+									gap: { xs: 0, sm: 1, md: 2 },
+									flex: { xs: '0 0 auto', md: '1 1 0' },
+									minWidth: 0,
+								}}
+							>
+								{user?.membershipStatus !== 'ACTIVE' && (
+									<Button
+										onClick={() => router.push(JOIN_NAV_ITEM.path)}
+										aria-current={
+											pathname === JOIN_NAV_ITEM.path ? 'page' : undefined
+										}
+										sx={{
+											display: { xs: 'none', md: 'inline-flex' },
+											alignItems: 'center',
+											color: 'white',
+											minWidth: 'auto',
+											px: 1.5,
+											py: 0.75,
+											fontWeight: pathname === JOIN_NAV_ITEM.path ? 700 : 500,
+											position: 'relative',
+											borderRadius: 1,
+											'&:hover': {
+												backgroundColor: alpha(theme.palette.link.light, 0.1),
+											},
+											'&::after':
+												pathname === JOIN_NAV_ITEM.path
+													? {
+															content: '""',
+															position: 'absolute',
+															bottom: 0,
+															left: '50%',
+															width: '40%',
+															transform: 'translateX(-50%)',
+															height: 3,
+															backgroundColor: theme.palette.accent.main,
+															borderRadius: 4,
+														}
+													: {},
+										}}
+									>
+										{JOIN_NAV_ITEM.icon}
+										<Box component="span" sx={{ ml: 0.75 }}>
+											{JOIN_NAV_ITEM.name}
+										</Box>
+									</Button>
+								)}
 								<Basket
 									isMobile={isMobile}
 									onMobileBasketClick={setMobileNavBarToBasket}

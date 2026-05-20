@@ -1,6 +1,5 @@
 html {
 	height: 100%;
-	overflow-y: scroll;
 }
 
 body {
@@ -11,7 +10,8 @@ body {
 		sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	overflow-y: auto; /* Always show vertical scrollbar */
+	/* Single scroll container: do not also set overflow-y on html or you get two scrollbars */
+	overflow-y: auto;
 }
 
 #root {

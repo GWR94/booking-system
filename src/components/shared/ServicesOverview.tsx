@@ -32,7 +32,7 @@ const offers = [
 		description:
 			'Unlock your potential with expert tuition. Our PGA professionals use elite video analysis to transform your game, one swing at a time.',
 		image: '/services/coaching.webp',
-		link: '/contact',
+		link: '/about#plan-your-visit',
 		linkText: 'Enquire Now',
 	},
 	{
@@ -41,14 +41,14 @@ const offers = [
 			'Relax in our contemporary lounge with a selection of premium drinks and snacks. The perfect atmosphere for post-round analysis.',
 		image: '/services/clubhouse.webp',
 		linkText: 'Request a Table',
-		link: '/contact',
+		link: '/about#plan-your-visit',
 	},
 	{
 		title: 'Private Events',
 		description:
 			'From corporate team days to private celebrations, make it memorable. Exclusive venue hire available with tailored catering packages.',
 		image: '/services/events.webp',
-		link: '/contact',
+		link: '/about#plan-your-visit',
 		linkText: 'Plan an Event',
 	},
 ];
@@ -58,7 +58,7 @@ const ServicesOverview = () => {
 	return (
 		<Box
 			sx={{
-				py: 10,
+				py: 5,
 				background: `linear-gradient(180deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[200]} 100%)`,
 			}}
 		>

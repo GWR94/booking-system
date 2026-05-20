@@ -3,10 +3,11 @@ import {
 	EventNote,
 	Settings,
 	Home,
-	Info,
 	EventAvailable,
 	Dashboard,
 	People,
+	WorkspacePremium,
+	Info,
 } from '@mui/icons-material';
 
 export type NavItem = {
@@ -15,11 +16,21 @@ export type NavItem = {
 	icon: React.ReactNode;
 };
 
-export const NAV_ITEMS: NavItem[] = [
+export const PRIMARY_NAV_ITEMS: NavItem[] = [
 	{ name: 'Home', path: '/', icon: <Home fontSize="small" /> },
 	{ name: 'About', path: '/about', icon: <Info fontSize="small" /> },
 	{ name: 'Book', path: '/book', icon: <EventAvailable fontSize="small" /> },
 ];
+
+/** Shown on the right with basket / account on `md+` to save horizontal space by the logo. */
+export const JOIN_NAV_ITEM: NavItem = {
+	name: 'Join',
+	path: '/membership',
+	icon: <WorkspacePremium color="accent" fontSize="small" />,
+};
+
+/** Full list for mobile drawer and anywhere else that needs every destination. */
+export const NAV_ITEMS: NavItem[] = [...PRIMARY_NAV_ITEMS, JOIN_NAV_ITEM];
 
 export const PROFILE_MENU_ITEMS = [
 	{

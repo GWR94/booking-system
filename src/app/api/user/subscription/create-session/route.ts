@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@db';
 import { getSessionUser } from '@/server/auth/auth';
-import { MEMBERSHIP_TIERS, MembershipTier } from '@config/membership.config';
+import { MEMBERSHIP_TIERS, MembershipTier } from '@constants/memberships';
 import { parseWithFirstError } from '@lib/zod';
 import { apiSubscriptionTierSchema } from '@validation/api-schemas';
 import { errorResponse } from '@/app/api/_utils/responses';

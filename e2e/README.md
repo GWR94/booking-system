@@ -10,7 +10,9 @@ Playwright is already installed. To install browsers:
 npx playwright install
 ```
 
-When you run the tests, the **Next.js dev server is started automatically** (see `playwright.config.ts` `webServer`). You do not need to run `npm run dev` yourself unless you want to reuse an existing server.
+When you run the tests, Playwright starts **Next.js on port 3001** (so it does not clash with a manual `npm run dev` on 3000). Override with `PLAYWRIGHT_PORT` or `FRONT_END` if needed.
+
+If you see `Timed out waiting … from config.webServer`, stop anything on port 3001, ensure `.env` has `DATABASE_URL` and `AUTH_SECRET`, then retry.
 
 For tests that log in or create bookings (e.g. authenticated booking, login with valid credentials), a **running database** and **test users** (see Test Data below) are required. If login does not succeed (e.g. database not running), those tests are **skipped** automatically so the rest of the suite can pass.
 
@@ -121,11 +123,11 @@ npx playwright test --debug e2e/auth/login.spec.ts
 
 - Screenshots are captured on failure
 - Videos are recorded on first retry
-- Reports are saved to `playwright-report/`
+- Reports are saved to `playwright/playwright-report/`
 
-View the report:
+View the report (use forward slashes on Git Bash — backslashes break the path):
 ```bash
-npx playwright show-report
+npm run test:e2e:report
 ```
 
 ## CI/CD

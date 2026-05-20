@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { handleSendEmail } from './email';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { existsSync, readFileSync } from 'fs';
+import COMPANY_DATA from '@/constants/company';
 
 const { mockTransporter } = vi.hoisted(() => ({
 	mockTransporter: {
@@ -22,14 +23,20 @@ vi.mock('nodemailer-express-handlebars', () => ({
 }));
 
 describe('email utilities', () => {
+	const originalEmailSiteUrl = process.env.EMAIL_SITE_URL;
+
 	beforeEach(() => {
 		vi.clearAllMocks();
+		process.env.EMAIL_SITE_URL = 'https://email.example.com';
+	});
+
+	afterEach(() => {
+		process.env.EMAIL_SITE_URL = originalEmailSiteUrl;
 	});
 
 	it('should send email successfully with correct props', async () => {
 		await handleSendEmail({
 			recipientEmail: 'test@test.com',
-			senderPrefix: 'test',
 			subject: 'Test Subject',
 			templateName: 'contact-form',
 			templateContext: { name: 'Test' },
@@ -37,10 +44,15 @@ describe('email utilities', () => {
 
 		expect(mockTransporter.sendMail).toHaveBeenCalledWith(
 			expect.objectContaining({
+				from: `"${COMPANY_DATA.name}" <${COMPANY_DATA.email}>`,
 				to: 'test@test.com',
 				subject: 'Test Subject',
 				template: 'contact-form',
 				text: expect.any(String),
+				context: expect.objectContaining({
+					baseUrl: 'https://email.example.com',
+					logoUrl: 'https://email.example.com/logo.webp',
+				}),
 			}),
 		);
 	});
@@ -93,7 +105,6 @@ describe('email utilities', () => {
 		for (const testCase of cases) {
 			await handleSendEmail({
 				recipientEmail: 'test@test.com',
-				senderPrefix: 'test',
 				subject: 'Test Subject',
 				templateName: testCase.templateName,
 				templateContext: testCase.templateContext,

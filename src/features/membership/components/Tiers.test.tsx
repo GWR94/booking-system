@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import Tiers from './Tiers';
+import Tiers from './PurchaseTiers';
 import { ThemeProvider } from '@context';
 import { useAuth } from '@hooks';
 import { useSnackbar, useUI } from '@context';
@@ -51,9 +51,13 @@ describe('Tiers', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText('Par')).toBeInTheDocument();
-		expect(screen.getByText('Birdie')).toBeInTheDocument();
-		expect(screen.getByText('Hole-In-One')).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /Purchase Par/i })).toBeInTheDocument();
+		expect(
+			screen.getByRole('button', { name: /Purchase Birdie/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole('button', { name: /Purchase Hole-In-One/i }),
+		).toBeInTheDocument();
 	});
 
 	it('should render prices for each tier', () => {
@@ -63,9 +67,10 @@ describe('Tiers', () => {
 			</ThemeProvider>,
 		);
 
-		expect(screen.getByText(/£199.99\/month/i)).toBeInTheDocument();
-		expect(screen.getByText(/£299.99\/month/i)).toBeInTheDocument();
-		expect(screen.getByText(/£399.99\/month/i)).toBeInTheDocument();
+		expect(screen.getByText('£199.99')).toBeInTheDocument();
+		expect(screen.getByText('£299.99')).toBeInTheDocument();
+		expect(screen.getByText('£399.99')).toBeInTheDocument();
+		expect(screen.getAllByText('/month')).toHaveLength(3);
 	});
 
 	it('should show warning and open auth modal if not authenticated', async () => {
@@ -79,7 +84,7 @@ describe('Tiers', () => {
 			</ThemeProvider>,
 		);
 
-		const chooseBtn = screen.getAllByText(/Choose/i)[0];
+		const chooseBtn = screen.getByRole('button', { name: /Purchase Par/i });
 		fireEvent.click(chooseBtn);
 
 		await waitFor(() => {
@@ -104,7 +109,7 @@ describe('Tiers', () => {
 			</ThemeProvider>,
 		);
 
-		const chooseBtn = screen.getAllByText(/Choose Par/i)[0];
+		const chooseBtn = screen.getByRole('button', { name: /Purchase Par/i });
 		fireEvent.click(chooseBtn);
 
 		await waitFor(() => {

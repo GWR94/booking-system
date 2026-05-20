@@ -1,29 +1,32 @@
-import { render, screen } from '@testing-library/react';
-import { vi, describe, it, expect } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import About from './About';
-
-vi.mock('@shared', () => ({
-	CallToAction: () => <div>Call To Action Component</div>,
-}));
-
-vi.mock('./components', () => ({
-	AboutHero: () => <div>About Hero Component</div>,
-	ServicesOverview: () => <div>Services Overview Component</div>,
-	Team: () => <div>Team Component</div>,
-	BarAndEntertainment: () => <div>Bar And Entertainment Component</div>,
-}));
-
 import createWrapper from '@utils/test-utils';
 
+vi.mock('./components/AboutHero', () => ({
+	default: () => <div>About Hero Component</div>,
+}));
+vi.mock('./components/BarAndEntertainment', () => ({
+	default: () => <div>Bar And Entertainment Component</div>,
+}));
+vi.mock('./components/Team', () => ({
+	default: () => <div>Team Component</div>,
+}));
+vi.mock('@shared/CallToAction', () => ({
+	default: () => <div>Call To Action Component</div>,
+}));
+
 describe('About Page', () => {
-	it('renders all child components', () => {
+	it('renders hero immediately and lazy sections after load', async () => {
 		render(<About />, { wrapper: createWrapper() });
 
 		expect(screen.getByText('About Hero Component')).toBeInTheDocument();
-		expect(screen.getByText('Services Overview Component')).toBeInTheDocument();
-		expect(
-			screen.getByText('Bar And Entertainment Component'),
-		).toBeInTheDocument();
+
+		await waitFor(() => {
+			expect(
+				screen.getByText('Bar And Entertainment Component'),
+			).toBeInTheDocument();
+		});
 		expect(screen.getByText('Team Component')).toBeInTheDocument();
 		expect(screen.getByText('Call To Action Component')).toBeInTheDocument();
 	});
